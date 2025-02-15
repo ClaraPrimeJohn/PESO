@@ -6,6 +6,7 @@ import { RiMenu3Line, RiCloseLine, RiArrowDropDownLine } from "react-icons/ri";
 import { FaUserEdit } from "react-icons/fa";
 import { auth } from "../firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -14,7 +15,8 @@ const Navbar = () => {
     const [isLoginDropdownOpen, setIsLoginDropdownOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
     const [user, setUser] = useState(null);
-    const [lastScrollTop, setLastScrollTop] = useState(0); // To track scroll direction
+    const [lastScrollTop, setLastScrollTop] = useState(0);
+    const [profileData, setProfileData] = useState(null); 
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -33,8 +35,11 @@ const Navbar = () => {
 
         window.addEventListener("scroll", handleScroll);
 
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
             setUser(currentUser);
+            if (currentUser) {
+                await fetchProfileData(currentUser.uid);
+            }
         });
 
         return () => {
@@ -57,6 +62,22 @@ const Navbar = () => {
                 position: "top-center",
                 autoClose: 1000,
             });
+        }
+    };
+
+    const fetchProfileData = async (uid) => {
+        try {
+            const db = getFirestore();
+            const profileRef = doc(db, "profiles", uid);
+            const profileSnap = await getDoc(profileRef);
+
+            if (profileSnap.exists()) {
+                setProfileData(profileSnap.data());
+            } else {
+                console.log("No profile found");
+            }
+        } catch (error) {
+            console.error("Error fetching profile:", error);
         }
     };
 
@@ -105,27 +126,17 @@ const Navbar = () => {
                 {/* Login/Profile Dropdown */}
                 <div className="relative hidden lg:block">
                     {user ? (
-                        <button
-                            className="flex items-center text-black hover:text-darkblue min-w-max"
-                            onClick={() => setIsLoginDropdownOpen(!isLoginDropdownOpen)}
-                        >
-                            {user ? (
-                                <img
-                                    src={user.photoURL}
-                                    alt="Profile"
-                                    className="w-10 h-10 rounded-full object-cover"
-                                />
-                            ) : (
-                                <span>Loading...</span>
-                            )}
-                            <span className="text-sm pl-2 overflow-hidden text-ellipsis whitespace-nowrap flex-1">
-                                {user.displayName || "Profile"}
-                            </span>
-                            <RiArrowDropDownLine
-                                className={`text-4xl transform transition-transform duration-300 ${isLoginDropdownOpen ? "rotate-180" : ""
-                                    }`}
-                            />
-                        </button>
+                        <button className="flex items-center text-black hover:text-darkblue min-w-max" onClick={() => setIsLoginDropdownOpen(!isLoginDropdownOpen)}>
+                        <img
+                            src={profileData?.profileImage || user.photoURL || "/default-avatar.png"}
+                            alt="Profile"
+                            className="w-10 h-10 rounded-full object-cover"
+                        />
+                        <span className="text-sm pl-2 overflow-hidden text-ellipsis whitespace-nowrap flex-1">
+                            {profileData?.name || user.displayName || "Profile"}
+                        </span>
+                        <RiArrowDropDownLine className={`text-4xl transform transition-transform duration-300 ${isLoginDropdownOpen ? "rotate-180" : ""}`} />
+                    </button>
                     ) : (
                         <Link
                             to="/login"
@@ -185,13 +196,15 @@ const Navbar = () => {
                     {/* Profile Section */}
                     <div className="flex flex-col items-center py-4 border-b px-6">
                         {user ? (
-                            <div className="flex flex-col items-center w-full">
-                                <img
-                                    src={user.photoURL}
-                                    alt="Profile"
-                                    className="w-16 h-16 rounded-full object-cover mb-2"
-                                />
-                                <span className="font-semibold text-center">{user.displayName}</span>
+                                <div className="flex flex-col items-center w-full">
+                                    <img
+                                src={profileData?.profileImage || user.photoURL || "/default-avatar.png"}
+                                alt="Profile"
+                                className="w-10 h-10 rounded-full object-cover"
+                            />
+                            <span className="text-sm pl-2 overflow-hidden text-ellipsis whitespace-nowrap flex-1">
+                                {profileData?.name || user.displayName || "Profile"}
+                            </span>
                                 <Link
                                     to="/profile"
                                     className="text-sm text-black w-full hover:text-darkblue text-center mx-2 mt-2 py-2 border rounded-md bg-gray-100"

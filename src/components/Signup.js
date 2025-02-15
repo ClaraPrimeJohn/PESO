@@ -15,17 +15,25 @@ function Signup() {
 
     const handleSignup = async (e) => {
         e.preventDefault();
+        if (password.length < 6) {
+            toast.error("Password must be at least 6 characters long.", { position: "top-center", autoClose: 3000 });
+            return;
+        }
         setLoading(true);
+
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
             await sendEmailVerification(user);
+
             await setDoc(doc(db, "profiles", user.uid), {
                 email: user.email,
                 phone: "",
+                profileImageUrl: "",
                 createdAt: new Date(),
             });
-            toast.success("Account created successfully! Verify your email before signing in.", { position: "top-center", autoClose: 3000 });
+
+            toast.success("Account created! Verify your email before signing in.", { position: "top-center", autoClose: 3000 });
             navigate("/login");
         } catch (error) {
             toast.error(`Error signing up: ${error.message}`, { position: "top-center", autoClose: 3000 });
@@ -39,9 +47,10 @@ function Signup() {
             <div className="bg-white shadow-lg rounded-lg overflow-hidden w-full max-w-md p-8">
                 <h2 className="text-2xl font-bold text-center mb-6">Sign Up</h2>
                 <form className="space-y-4" onSubmit={handleSignup}>
-                    <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full px-4 py-2 border rounded-md" />
-                    <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required className="w-full px-4 py-2 border rounded-md" />
-                    <button type="submit" className="bg-blue text-white px-4 py-2 rounded-md hover:bg-darkblue transition flex items-center justify-center gap-2" disabled={loading}>
+                    <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={loading} className="w-full px-4 py-2 border rounded-md" />
+                    <input type="password" placeholder="Password (min. 6 characters)" value={password} onChange={(e) => setPassword(e.target.value)} required disabled={loading} className="w-full px-4 py-2 border rounded-md" />
+                    
+                    <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-darkblue transition flex items-center justify-center gap-2 disabled:opacity-50" disabled={loading}>
                         {loading && <ClipLoader size={20} color="white" />} {loading ? "Signing Up..." : "Sign Up"}
                     </button>
                 </form>
