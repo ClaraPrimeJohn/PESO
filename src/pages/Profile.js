@@ -3,17 +3,35 @@ import { auth, db } from "../firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { 
+    FaCamera, 
+    FaSpinner, 
+    FaUser, 
+    FaMapMarkerAlt, 
+    FaPhone, 
+    FaEnvelope,
+    FaPencilAlt,
+    FaSave,
+    FaTimes
+} from 'react-icons/fa';
 
 const CLOUDINARY_UPLOAD_PRESET = "ybbfcbyk";
 const CLOUDINARY_CLOUD_NAME = "drg1csmnn";
 
 const Profile = () => {
     const [user, setUser] = useState(null);
-    const [profile, setProfile] = useState({ name: "", address: "", contactNumber: "", profileImage: "" });
+    const [profile, setProfile] = useState({ 
+        name: "", 
+        address: "", 
+        contactNumber: "", 
+        profileImage: "" 
+    });
     const [previewImage, setPreviewImage] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [uploadingImage, setUploadingImage] = useState(false);
     const [originalProfile, setOriginalProfile] = useState(null);
+    const [isDirty, setIsDirty] = useState(false);
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
@@ -28,35 +46,57 @@ const Profile = () => {
         return () => unsubscribe();
     }, []);
 
+    // Check for changes in form
+    useEffect(() => {
+        if (originalProfile) {
+            const hasChanges = Object.keys(originalProfile).some(
+                key => originalProfile[key] !== profile[key]
+            );
+            setIsDirty(hasChanges);
+        }
+    }, [profile, originalProfile]);
+
     const fetchProfileData = async (uid) => {
         try {
             const profileRef = doc(db, "profiles", uid);
             const profileSnap = await getDoc(profileRef);
             if (profileSnap.exists()) {
-                setProfile(profileSnap.data());
-                setOriginalProfile(profileSnap.data());
+                const data = profileSnap.data();
+                setProfile(data);
+                setOriginalProfile(data);
             }
         } catch (error) {
             console.error("Error fetching profile data:", error);
+            toast.error("Failed to fetch profile data");
         }
     };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setProfile((prevProfile) => ({ ...prevProfile, [name]: value }));
+        setProfile(prevProfile => ({ ...prevProfile, [name]: value }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!isDirty) {
+            toast.info("No changes to save");
+            setIsEditing(false);
+            return;
+        }
+
         try {
             if (!user) return;
-            console.log("Updating profile in Firestore:", profile);
+            setLoading(true);
             await setDoc(doc(db, "profiles", user.uid), profile, { merge: true });
-            toast.success("Profile updated successfully!");
+            setOriginalProfile(profile);
+            setIsDirty(false);
             setIsEditing(false);
+            toast.success("Profile updated successfully!");
         } catch (error) {
             console.error("Error updating profile:", error);
-            toast.error("Failed to update profile.");
+            toast.error("Failed to update profile");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -64,6 +104,7 @@ const Profile = () => {
         const file = e.target.files[0];
         if (!file) return;
 
+        setUploadingImage(true);
         const reader = new FileReader();
         reader.onloadend = () => {
             setPreviewImage(reader.result);
@@ -76,67 +117,217 @@ const Profile = () => {
         formData.append("folder", "profiles");
 
         try {
-            const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
-                method: "POST",
-                body: formData,
-            });
+            const res = await fetch(
+                `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+                {
+                    method: "POST",
+                    body: formData,
+                }
+            );
             const data = await res.json();
-            if (!data.secure_url) throw new Error("Image upload failed.");
-            setProfile((prevProfile) => ({ ...prevProfile, profileImage: data.secure_url }));
+            if (!data.secure_url) throw new Error("Image upload failed");
+            
+            setProfile(prevProfile => ({ 
+                ...prevProfile, 
+                profileImage: data.secure_url 
+            }));
+            setIsDirty(true);
             toast.success("Profile image uploaded successfully!");
-            await setDoc(doc(db, "profiles", user.uid), { profileImage: data.secure_url }, { merge: true });
         } catch (error) {
             console.error("Error uploading image:", error);
-            toast.error("Failed to upload image.");
+            toast.error("Failed to upload image");
+        } finally {
+            setUploadingImage(false);
         }
     };
 
     const handleCancel = () => {
         setProfile(originalProfile);
-        setIsEditing(false);
         setPreviewImage(null);
+        setIsEditing(false);
+        setIsDirty(false);
     };
 
-    if (loading) return <p>Loading...</p>;
+    const handleEditClick = () => {
+        setIsEditing(true);
+    };
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <FaSpinner className="w-8 h-8 animate-spin text-blue" />
+            </div>
+        );
+    }
 
     return (
-        <div className="max-w-md mx-auto p-6 bg-white shadow-md rounded-lg mt-10 relative border">
-            <div className="mb-4 text-center">
-                    {(previewImage || profile.profileImage) && (
-                        <img src={previewImage || profile.profileImage} alt="Profile" className="w-24 h-24 mt-2 rounded-full border mx-auto" />
-                    )}
-                    <label className="block text-sm font-semibold mb-8">Profile Image</label>
-                    <input type="file" accept="image/*" onChange={handleFileUpload} className="w-full p-2 border rounded"/>
-                </div>
-            <h2 className="text-xl font-bold mt-8 text-center">Profile</h2>
-            {isEditing && <p className="text-sm text-green font-bold">Editing Mode...</p>}
-            <form onSubmit={handleSubmit} className={isEditing ? "border border-green p-4 rounded" : ""}>
-                <div className="mb-4"> 
-                    
-                    <label className="block text-sm font-semibold mb-1">Name</label>
-                    <input type="text" name="name" value={profile.name} onChange={handleChange} className={`w-full p-2 border rounded ${isEditing ? "border-green" : ""}`} disabled={!isEditing} required />
-                </div>
-                <div className="mb-4">
-                    <label className="block text-sm font-semibold mb-1">Address</label>
-                    <input type="text" name="address" value={profile.address} onChange={handleChange} className={`w-full p-2 border rounded ${isEditing ? "border-green" : ""}`} disabled={!isEditing} required />
-                </div>
-                <div className="mb-4">
-                    <label className="block text-sm font-semibold mb-1">Contact Number</label>
-                    <input type="text" name="contactNumber" value={profile.contactNumber} onChange={handleChange} className={`w-full p-2 border rounded ${isEditing ? "border-green" : ""}`} disabled={!isEditing} required />
-                </div>
-                <div className="mb-4">
-                    <label className="block text-sm font-semibold mb-1">Email</label>
-                    <input type="email" value={user?.email || ""} className="w-full p-2 border rounded bg-gray-100 cursor-not-allowed" disabled />
-                </div>
-                {isEditing ? (
-                    <div className="flex space-x-4">
-                        <button type="submit" className="flex-1 bg-darkblue text-white py-2 rounded hover:bg-green">Save</button>
-                        <button type="button" className="flex-1 bg-gray-500 text-white py-2 rounded hover:bg-gray-600" onClick={handleCancel}>Cancel</button>
+        <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-3xl mx-auto">
+                <div className="bg-white rounded-2xl shadow-xl overflow-hidden transform transition-all duration-300 hover:shadow-2xl">
+                    {/* Header Section */}
+                    <div className="relative h-40 bg-gradient-to-r from-blue to-blue">
+                        <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2">
+                            <div className="relative">
+                                <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-lg bg-white">
+                                    {(previewImage || profile.profileImage) ? (
+                                        <img 
+                                            src={previewImage || profile.profileImage} 
+                                            alt="Profile" 
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                                            <FaUser className="w-12 h-12 text-gray-400" />
+                                        </div>
+                                    )}
+                                </div>
+                                {uploadingImage && (
+                                    <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
+                                        <FaSpinner className="w-8 h-8 animate-spin text-white" />
+                                    </div>
+                                )}
+                                {isEditing && (
+                                    <label 
+                                        htmlFor="image-upload" 
+                                        className="absolute bottom-0 right-0 bg-blue p-2 rounded-full cursor-pointer hover:bg-blue transition-colors duration-200"
+                                    >
+                                        <FaCamera className="w-4 h-4 text-white" />
+                                        <input 
+                                            id="image-upload"
+                                            type="file" 
+                                            accept="image/*" 
+                                            onChange={handleFileUpload}
+                                            className="hidden"
+                                        />
+                                    </label>
+                                )}
+                            </div>
+                        </div>
                     </div>
-                ) : (
-                    <button type="button" className="w-full bg-blue text-white py-2 rounded hover:bg-blue-600" onClick={() => setIsEditing(true)}>Edit Profile</button>
-                )}
-            </form>
+
+                    {/* Profile Content */}
+                    <div className="pt-20 px-4 sm:px-6 lg:px-8 pb-8">
+                        <div className="text-center mb-8">
+                            <h2 className="text-2xl font-bold text-gray-900">
+                                {profile.name || "Your Profile"}
+                            </h2>
+                            <p className="text-sm text-gray-500 mt-1">{user?.email}</p>
+                        </div>
+
+                        <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="flex items-center text-sm font-medium text-gray-700">
+                                        <FaUser className="w-4 h-4 mr-2 text-blue" />
+                                        Full Name
+                                    </label>
+                                    <input
+                                        name="name"
+                                        value={profile.name}
+                                        onChange={handleChange}
+                                        disabled={!isEditing}
+                                        required
+                                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 
+                                            ${isEditing 
+                                                ? 'border-blue focus:ring-blue bg-white' 
+                                                : 'border-gray-200 bg-gray-50'
+                                            } transition-all duration-200`}
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="flex items-center text-sm font-medium text-gray-700">
+                                        <FaPhone className="w-4 h-4 mr-2 text-blue" />
+                                        Contact Number
+                                    </label>
+                                    <input
+                                        name="contactNumber"
+                                        value={profile.contactNumber}
+                                        onChange={handleChange}
+                                        disabled={!isEditing}
+                                        required
+                                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 
+                                            ${isEditing 
+                                                ? 'border-blue focus:ring-blue bg-white' 
+                                                : 'border-gray-200 bg-gray-50'
+                                            } transition-all duration-200`}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="flex items-center text-sm font-medium text-gray-700">
+                                    <FaMapMarkerAlt className="w-4 h-4 mr-2 text-blue" />
+                                    Address
+                                </label>
+                                <input
+                                    name="address"
+                                    value={profile.address}
+                                    onChange={handleChange}
+                                    disabled={!isEditing}
+                                    required
+                                    className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 
+                                        ${isEditing 
+                                            ? 'border-blue focus:ring-blue bg-white' 
+                                            : 'border-gray-200 bg-gray-50'
+                                        } transition-all duration-200`}
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="flex items-center text-sm font-medium text-gray-700">
+                                    <FaEnvelope className="w-4 h-4 mr-2 text-blue" />
+                                    Email
+                                </label>
+                                <input
+                                    type="email"
+                                    value={user?.email || ""}
+                                    disabled
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50"
+                                />
+                            </div>
+
+                            <div className="pt-6 flex justify-center gap-4">
+                                {isEditing ? (
+                                    <>
+                                        <button 
+                                            type="submit" 
+                                            disabled={!isDirty}
+                                            className={`flex items-center px-6 py-2 rounded-lg text-white
+                                                ${isDirty 
+                                                    ? 'bg-blue hover:bg-blue' 
+                                                    : 'bg-gray-400 cursor-not-allowed'
+                                                } transition-colors duration-200`}
+                                        >
+                                            <FaSave className="w-4 h-4 mr-2" />
+                                            Save Changes
+                                        </button>
+                                        <button 
+                                            type="button" 
+                                            onClick={handleCancel}
+                                            className="flex items-center px-6 py-2 border border-gray-300 rounded-lg text-gray-700 
+                                                hover:bg-gray-50 transition-colors duration-200"
+                                        >
+                                            <FaTimes className="w-4 h-4 mr-2" />
+                                            Cancel
+                                        </button>
+                                    </>
+                                ) : (
+                                    <button 
+                                        type="button" 
+                                        onClick={handleEditClick}
+                                        className="flex items-center px-6 py-2 bg-blue text-white rounded-lg 
+                                            hover:bg-blue transition-colors duration-200"
+                                    >
+                                        <FaPencilAlt className="w-4 h-4 mr-2" />
+                                        Edit Profile
+                                    </button>
+                                )}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };

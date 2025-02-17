@@ -109,7 +109,7 @@ function Login() {
                                     {loading && <ClipLoader size={20} color="white" />} 
                                     {loading ? "Signing In..." : "Sign In"}
                                 </button>
-                                <a href="/basta" className="text-sm text-blue hover:underline">
+                                <a href="/forgot" className="text-sm text-blue hover:underline">
                                     Forgot Password?
                                 </a>
                             </div>

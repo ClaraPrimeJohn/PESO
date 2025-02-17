@@ -11,6 +11,7 @@ import JobDetails from "./pages/JobDetails";
 import Login from "./components/Login";
 import Profile from "./pages/Profile"; 
 import Signup from "./components/Signup"
+import ForgotPassword from "./components/ForgotPassword";
 import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
@@ -49,6 +50,7 @@ function AppContent({ isScrolled }) {
                     <Route path="/contact-us" element={<Contactus />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
+                    <Route path="/forgot" element={<ForgotPassword />} /> 
                     <Route path="/profile" element={<Profile />} /> 
                 </Routes>
             </main>
