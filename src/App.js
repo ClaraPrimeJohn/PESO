@@ -10,7 +10,7 @@ import Joblist from "./pages/Joblist";
 import JobDetails from "./pages/JobDetails";
 import Login from "./components/Login";
 import Profile from "./pages/Profile"; 
-import Signup from "./components/Signup"
+import Signup from "./components/Signup";
 import ForgotPassword from "./components/ForgotPassword";
 import ScrollToTop from "./components/ScrollToTop";
 
@@ -36,10 +36,11 @@ function App() {
 
 function AppContent({ isScrolled }) {
     const location = useLocation();
+    const hideNavbarRoutes = ["/login", "/signup", "/forgot"]; 
 
     return (
         <div className="flex flex-col min-h-screen">
-            {location.pathname !== "/login" && <Navbar isScrolled={isScrolled} />}
+            {!hideNavbarRoutes.includes(location.pathname) && <Navbar isScrolled={isScrolled} />}
             <main className={`flex-grow transition-all duration-1000 ${isScrolled ? "pt-16" : "pt-0"}`}>
                 <Routes>
                     <Route path="/" element={<Home />} />
@@ -54,7 +55,7 @@ function AppContent({ isScrolled }) {
                     <Route path="/profile" element={<Profile />} /> 
                 </Routes>
             </main>
-            {location.pathname !== "/login" && <Footer />}
+            {!hideNavbarRoutes.includes(location.pathname) && <Footer />}
         </div>
     );
 }

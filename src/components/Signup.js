@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ClipLoader } from "react-spinners";
+import { HiMail, HiLockClosed, HiUserAdd } from "react-icons/hi";
 
 function Signup() {
     const [email, setEmail] = useState("");
@@ -43,19 +44,58 @@ function Signup() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-200 px-4 sm:px-6 lg:px-8">
-            <div className="bg-white shadow-lg rounded-lg overflow-hidden w-full max-w-md p-8">
-                <h2 className="text-2xl font-bold text-center mb-6">Sign Up</h2>
-                <form className="space-y-4" onSubmit={handleSignup}>
-                    <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={loading} className="w-full px-4 py-2 border rounded-md" />
-                    <input type="password" placeholder="Password (min. 6 characters)" value={password} onChange={(e) => setPassword(e.target.value)} required disabled={loading} className="w-full px-4 py-2 border rounded-md" />
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 px-4 sm:px-6 lg:px-8">
+            <div className="bg-white shadow-xl rounded-lg overflow-hidden w-full max-w-md p-8 transform transition-all hover:scale-[1.02]">
+                <div className="flex justify-center mb-6">
+                    <HiUserAdd className="w-12 h-12 text-blue" />
+                </div>
+                <h2 className="text-3xl font-bold text-center mb-8 text-gray-800">Sign Up</h2>
+                <form className="space-y-6" onSubmit={handleSignup}>
+                    <div className="relative">
+                        <HiMail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                        <input 
+                            type="email" 
+                            placeholder="Email" 
+                            value={email} 
+                            onChange={(e) => setEmail(e.target.value)} 
+                            required 
+                            disabled={loading}
+                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue focus:border-transparent transition" 
+                        />
+                    </div>
+                    <div className="relative">
+                        <HiLockClosed className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                        <input 
+                            type="password" 
+                            placeholder="Password (min. 6 characters)" 
+                            value={password} 
+                            onChange={(e) => setPassword(e.target.value)} 
+                            required 
+                            disabled={loading}
+                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue focus:border-transparent transition" 
+                        />
+                    </div>
                     
-                    <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-darkblue transition flex items-center justify-center gap-2 disabled:opacity-50" disabled={loading}>
-                        {loading && <ClipLoader size={20} color="white" />} {loading ? "Signing Up..." : "Sign Up"}
+                    <button 
+                        type="submit" 
+                        className="w-full bg-blue hover:bg-blue text-white py-3 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed h-12 flex items-center justify-center"
+                        disabled={loading}
+                    >
+                        {loading ? (
+                            <ClipLoader size={24} color="white" />
+                        ) : (
+                            <>
+                                <HiUserAdd className="w-5 h-5 mr-2" />
+                                Sign Up
+                            </>
+                        )}
                     </button>
                 </form>
-                <p className="mt-6 text-center text-sm">
-                    Already have an account? <a href="/login" className="text-darkblue hover:underline">Sign in here.</a>
+                <p className="mt-8 text-center text-gray-600">
+                    Already have an account?{" "}
+                    <a href="/login" className="text-blue hover:text-blue font-medium hover:underline transition">
+                        Sign in here
+                    </a>
                 </p>
             </div>
         </div>

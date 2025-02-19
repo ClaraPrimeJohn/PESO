@@ -75,81 +75,86 @@ const Joblist = () => {
   return (
     <div>
       <HowItWorks />
-
-      <div className="text-center p-4 mx-32 rounded-lg bg-cover bg-center bg-no-repeat bg-gray-100 border">
-        <div className="mx-auto p-4">
-          <h1 className="text-darkblue font-extrabold text-xl">
-            Available Jobs for You
-          </h1>
-          <p className="text-gray-600 text-base pt-2">
-            Browse our available positions and find the perfect job to match your skills and interests.
-          </p>
-        </div>
-      </div>
+      <div className="text-center p-4 sm:p-6 md:p-8 lg:p-12 mx-4 sm:mx-8 md:mx-16 lg:mx-32 rounded-lg bg-cover bg-center bg-no-repeat bg-gray-100 border">
+  <div className="mx-auto p-4">
+    <h1 className="text-darkblue font-extrabold text-xl">
+      Available Jobs for You
+    </h1>
+    <p className="text-gray-600 text-base pt-2">
+      Browse our available positions and find the perfect job to match your skills and interests.
+    </p>
+  </div>
+</div>
 
       <div className="flex flex-col lg:flex-row py-10 lg:px-32 px-6">
         {/* Filter Component */}
         <div className="lg:w-1/4 w-full p-4 bg-gray-100 rounded-lg mb-6 lg:mb-0 h-full border">
-          <h2 className="font-bold text-lg mb-4">Search Filter</h2>
+    <h2 className="font-bold text-lg mb-4">Search Filter</h2>
+    <div className="mb-6">
+      <input
+        type="text"
+        placeholder="Search by job title or company"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+
+    {/* Job Type Filter */}
+    <div className="mb-6">
+  <h2 className="font-semibold text-base mb-2">Job Type</h2>
+  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-1 gap-2">
+    {["Full-time", "Part-time", "Contract", "Internship"].map((type, index) => (
+      <label key={index} className="flex items-center space-x-2">
+        <input
+          type="checkbox"
+          checked={selectedJobType.includes(type)}
+          onChange={() => handleJobTypeChange(type)}
+        />
+        <span>{type}</span>
+      </label>
+    ))}
+  </div>
+</div>
+
           <div className="mb-6">
-            <input
-              type="text"
-              placeholder="Search by job title or company"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div className="mb-6">
-            <h2 className="font-semibold text-base mb-2">Job Type</h2>
-            <div className="flex flex-col space-y-2">
-              {["Full-time", "Part-time", "Contract", "Internship"].map((type, index) => (
-                <label key={index} className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    checked={selectedJobType.includes(type)}
-                    onChange={() => handleJobTypeChange(type)}
-                  />
-                  <span>{type}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-          <div className="mb-6">
-            <h2 className="font-semibold text-base mb-2">Tags</h2>
-            <div className="flex flex-wrap gap-2">
-              {["YUMMY", "Creative", "Technical"].map((tag, index) => (
-                <span
-                  key={index}
-                  className={`px-3 py-1 text-sm rounded-full ${filterTags.includes(tag) ? "bg-orange text-white" : "bg-gray-200 text-gray-800"
-                    }`}
-                  onClick={() =>
-                    setFilterTags((prev) =>
-                      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
-                    )
-                  }
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-          <div className="mb-6">
-            <h2 className="font-semibold text-base mb-2">Month</h2>
-            <select
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-            >
-              <option value="">All Months</option>
-              {[...Array(12)].map((_, i) => (
-                <option key={i} value={new Date(0, i).toLocaleString("default", { month: "long" })}>
-                  {new Date(0, i).toLocaleString("default", { month: "long" })}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+      <h2 className="font-semibold text-base mb-2">Tags</h2>
+      <div className="flex flex-wrap gap-2">
+        {["YUMMY", "Creative", "Technical"].map((tag, index) => (
+          <span
+            key={index}
+            className={`px-3 py-1 text-sm rounded-full cursor-pointer ${
+              filterTags.includes(tag) ? "bg-orange text-white" : "bg-gray-200 text-gray-800"
+            }`}
+            onClick={() =>
+              setFilterTags((prev) =>
+                prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+              )
+            }
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
+    </div>
+
+    {/* Month Filter */}
+    <div className="mb-6">
+      <h2 className="font-semibold text-base mb-2">Month</h2>
+      <select
+        className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        value={selectedMonth}
+        onChange={(e) => setSelectedMonth(e.target.value)}
+      >
+        <option value="">All Months</option>
+        {[...Array(12)].map((_, i) => (
+          <option key={i} value={new Date(0, i).toLocaleString("default", { month: "long" })}>
+            {new Date(0, i).toLocaleString("default", { month: "long" })}
+          </option>
+        ))}
+      </select>
+    </div>
+  </div>
 
         {/* Job Listings */}
         <div className="lg:w-3/4 w-full pl-6">
