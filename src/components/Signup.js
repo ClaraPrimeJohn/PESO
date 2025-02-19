@@ -45,7 +45,7 @@ function Signup() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 px-4 sm:px-6 lg:px-8">
-            <div className="bg-white shadow-xl rounded-lg overflow-hidden w-full max-w-md p-8 transform transition-all hover:scale-[1.02]">
+            <div className="bg-white shadow-xl rounded-lg overflow-hidden w-full max-w-md p-8 transform transition-all">
                 <div className="flex justify-center mb-6">
                     <HiUserAdd className="w-12 h-12 text-blue" />
                 </div>
@@ -78,14 +78,14 @@ function Signup() {
                     
                     <button 
                         type="submit" 
-                        className="w-full bg-blue hover:bg-blue text-white py-3 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed h-12 flex items-center justify-center"
+                        className="w-full bg-darkblue hover:bg-blue text-white py-3 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed h-12 flex items-center justify-center"
                         disabled={loading}
                     >
                         {loading ? (
                             <ClipLoader size={24} color="white" />
                         ) : (
                             <>
-                                <HiUserAdd className="w-5 h-5 mr-2" />
+                                {/* <HiUserAdd className="w-5 h-5 mr-2" /> */}
                                 Sign Up
                             </>
                         )}
