@@ -15,7 +15,7 @@ const HowItWorks = () => {
                     </div>
                     <h4 className="text-xl font-semibold text-gray-800 mt-4">Register Your Account</h4>
                     <p className="text-sm text-gray-500 mt-2">
-                        You need to create an account to find your best-preferred job.
+                    Create an account to find the right job for you.
                     </p>
                 </div>
 
@@ -26,7 +26,7 @@ const HowItWorks = () => {
                     </div>
                     <h4 className="text-xl font-semibold text-gray-800 mt-4">We Here to Help You</h4>
                     <p className="text-sm text-gray-500 mt-2">
-                        You need to create an account to find your best-preferred job.
+                    Sign up and let us connect you with jobs.
                     </p>
                 </div>
 
@@ -37,7 +37,7 @@ const HowItWorks = () => {
                     </div>
                     <h4 className="text-xl font-semibold text-gray-800 mt-4">Complete Your Profile</h4>
                     <p className="text-sm text-gray-500 mt-2">
-                        You need to create an account to find your best-preferred job.
+                    Fill in your details to find the best jobs
                     </p>
                 </div>
 
@@ -48,7 +48,7 @@ const HowItWorks = () => {
                     </div>
                     <h4 className="text-xl font-semibold text-gray-800 mt-4">Apply Job or Hire</h4>
                     <p className="text-sm text-gray-500 mt-2">
-                        You need to create an account to find your best-preferred job.
+                    Find a job or hire someone today!
                     </p>
                 </div>
             </div>
