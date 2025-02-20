@@ -11,7 +11,7 @@ const Joblist = () => {
   const [selectedJobType, setSelectedJobType] = useState([]);
   const [filterTags, setFilterTags] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState("");
-  const [user, setUser] = useState(null);
+  const [, setUser] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {

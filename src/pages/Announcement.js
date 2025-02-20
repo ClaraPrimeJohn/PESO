@@ -125,7 +125,7 @@ const Announcement = () => {
          
           <div className="mt-6">
             <a
-              href="/ewan"
+              href="/contact-us"
               className="text-blue-600 hover:text-blue-800 text-sm font-medium"
             >
               Learn more about PESO services
