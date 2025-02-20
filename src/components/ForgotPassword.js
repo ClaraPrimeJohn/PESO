@@ -4,7 +4,7 @@ import { ClipLoader } from 'react-spinners';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { HiMail } from 'react-icons/hi';
-import { FaArrowLeft, FaLock } from 'react-icons/fa';
+import { FaArrowLeft, FaLock, FaShieldAlt } from 'react-icons/fa';
 import { MdEmail } from 'react-icons/md';
 
 const ForgotPassword = () => {
@@ -36,7 +36,7 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-200 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray px-4 sm:px-6 lg:px-8">
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden w-full max-w-4xl flex flex-col md:flex-row">
         <div className="w-full md:w-1/2 p-8 lg:p-12">
           <div className="flex items-center mb-8">
@@ -53,7 +53,7 @@ const ForgotPassword = () => {
             <>
               <div className="text-center mb-8">
                 <div className="inline-block p-3 rounded-full bg-blue/10 mb-4">
-                  <FaLock className="text-3xl text-blue" />
+                  <FaLock className="text-3xl text-darkblue" />
                 </div>
                 <h2 className="text-2xl font-bold mb-2">Forgot Password?</h2>
                 <p className="text-gray-600">
@@ -82,13 +82,12 @@ const ForgotPassword = () => {
 
                 <button
                   type="submit"
-                  className="w-full bg-blue text-white px-4 py-3 rounded-lg hover:bg-darkblue transition-colors flex items-center justify-center gap-2 font-medium"
+                  className="w-full bg-darkblue text-white px-4 py-3 rounded-lg hover:bg-blue transition-colors flex items-center justify-center gap-2 font-medium"
                   disabled={loading}
                 >
                   {loading ? (
                     <>
                       <ClipLoader size={20} color="white" />
-                      <span>Sending...</span>
                     </>
                   ) : (
                     <>
@@ -123,17 +122,23 @@ const ForgotPassword = () => {
           )}
         </div>
 
-        <div className="hidden md:block w-1/2 bg-orange p-12">
-          <div className="h-full flex flex-col items-center justify-center text-black">
-            <img
-              src={require("../assets/login-main.jpg")}
-              alt="Reset Password"
-              className="w-full max-w-sm rounded-lg shadow-lg mb-8"
-            />
-            <h3 className="text-3xl font-bold mb-4">Kalma Batang Kankaloo</h3>
-            <p className="text-center text-md text-darkblue">
-            Prayoridad namin ang seguridad ng account mo. Sundan mo lang ang instructions sa email para ma-reset ang iyong password.
+        <div className="hidden md:block w-1/2 bg-slate-700 p-12">
+          <div className="h-full flex flex-col items-center justify-center relative">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2" />
+            
+            <div className="w-20 h-20 mb-8 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
+              <FaShieldAlt className="text-4xl text-white" />
+            </div>
+            <h3 className="text-2xl font-bold mb-6 text-white">Kalma Batang Kankaloo</h3>
+            <p className="text-center text-md text-white/90 max-w-sm">
+              Prayoridad namin ang seguridad ng account mo. Sundan mo lang ang instructions sa email para ma-reset ang iyong password.
             </p>
+            <div className="absolute left-1/2 bottom-8 -translate-x-1/2 flex space-x-3">
+              <div className="w-16 h-1 rounded-full bg-white/30" />
+              <div className="w-8 h-1 rounded-full bg-white/20" />
+              <div className="w-8 h-1 rounded-full bg-white/20" />
+            </div>
           </div>
         </div>
       </div>
