@@ -7,6 +7,7 @@ import { IoClose } from "react-icons/io5";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import placeholder from "../assets/companycolored.png";
 
 const JobDetails = () => {
   const { jobId } = useParams();
@@ -192,12 +193,13 @@ const JobDetails = () => {
         </div>
 
         <div className="bg-gray-100 border rounded-lg p-6 flex flex-col space-y-6 min-h-auto self-start">
-  <div className="flex flex-col items-center space-y-4 mb-4">
-    <img
-      src={job.logo}
-      alt={`${job.company} logo`}
-      className="w-24 h-24 rounded-full object-cover shadow-md"
-    />
+      <div className="flex flex-col items-center space-y-4 mb-4">
+        <img
+          src={job.logo || placeholder}
+          alt={`${job.company} logo`}
+          className="w-24 h-24 rounded-full object-cover shadow-md"
+        />
+
     <h2 className="text-xl font-bold text-darkblue">{job.company}</h2>
   </div>
 
