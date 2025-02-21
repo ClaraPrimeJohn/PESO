@@ -22,6 +22,7 @@ const Profile = () => {
     const [user, setUser] = useState(null);
     const [profile, setProfile] = useState({ 
         name: "", 
+        email: "",
         address: "", 
         contactNumber: "", 
         profileImage: "" 
@@ -38,6 +39,29 @@ const Profile = () => {
             if (currentUser) {
                 setUser(currentUser);
                 await fetchProfileData(currentUser.uid);
+                
+                const profileRef = doc(db, "profiles", currentUser.uid);
+                const profileSnap = await getDoc(profileRef);
+                
+                if (!profileSnap.exists() || !profileSnap.data().name) {
+                    const newProfile = {
+                        name: currentUser.displayName || "",
+                        email: currentUser.email || "",
+                        profileImage: currentUser.photoURL || "",
+                        address: "",
+                        contactNumber: ""
+                    };
+                    
+                    try {
+                        await setDoc(profileRef, newProfile, { merge: true });
+                        setProfile(newProfile);
+                        setOriginalProfile(newProfile);
+                        toast.success("Profile set up with Google data!");
+                    } catch (error) {
+                        console.error("Error initializing profile:", error);
+                        toast.error("Failed to initialize profile");
+                    }
+                }
             } else {
                 setUser(null);
             }
@@ -45,6 +69,16 @@ const Profile = () => {
         });
         return () => unsubscribe();
     }, []);
+
+    useEffect(() => {
+        // Update email whenever user changes
+        if (user && user.email) {
+            setProfile(prevProfile => ({
+                ...prevProfile,
+                email: user.email
+            }));
+        }
+    }, [user]);
 
     // Check for changes in form
     useEffect(() => {
@@ -62,8 +96,12 @@ const Profile = () => {
             const profileSnap = await getDoc(profileRef);
             if (profileSnap.exists()) {
                 const data = profileSnap.data();
-                setProfile(data);
-                setOriginalProfile(data);
+                const updatedData = {
+                    ...data,
+                    email: auth.currentUser?.email || data.email
+                };
+                setProfile(updatedData);
+                setOriginalProfile(updatedData);
             }
         } catch (error) {
             console.error("Error fetching profile data:", error);
@@ -87,8 +125,14 @@ const Profile = () => {
         try {
             if (!user) return;
             setLoading(true);
-            await setDoc(doc(db, "profiles", user.uid), profile, { merge: true });
-            setOriginalProfile(profile);
+            // Ensure email is included in the save
+            const updatedProfile = {
+                ...profile,
+                email: user.email || profile.email
+            };
+            await setDoc(doc(db, "profiles", user.uid), updatedProfile, { merge: true });
+            setProfile(updatedProfile);
+            setOriginalProfile(updatedProfile);
             setIsDirty(false);
             setIsEditing(false);
             toast.success("Profile updated successfully!");
@@ -211,7 +255,7 @@ const Profile = () => {
                             <h2 className="text-2xl font-bold text-gray-900">
                                 {profile.name || "Your Profile"}
                             </h2>
-                            <p className="text-sm text-gray-500 mt-1">{user?.email}</p>
+                            <p className="text-sm text-gray-500 mt-1">{profile.email}</p>
                         </div>
 
                         <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
@@ -281,7 +325,7 @@ const Profile = () => {
                                 </label>
                                 <input
                                     type="email"
-                                    value={user?.email || ""}
+                                    value={profile.email || ""}
                                     disabled
                                     className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50"
                                 />
