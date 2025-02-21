@@ -10,6 +10,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ClipLoader } from "react-spinners";
+import { db } from "../firebase"; 
+import { doc, setDoc, getDoc } from "firebase/firestore";
 
 function Login() {
     const [email, setEmail] = useState("");
@@ -17,16 +19,31 @@ function Login() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    // Sign in with email and password
+
     const handleEmailSignIn = async (e) => {
         e.preventDefault();
         setLoading(true);
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+    
+            await user.reload(); 
+    
+            if (!user.emailVerified) {
+                toast.error("Please verify your email before logging in.", {
+                    position: "top-center",
+                    autoClose: 3000,
+                });
+                await auth.signOut(); 
+                setLoading(false);
+                return;
+            }
+    
             toast.success("Signed in successfully!", {
                 position: "top-center",
                 autoClose: 1000,
             });
+    
             navigate("/");
         } catch (error) {
             console.error("Error signing in with email and password", error);
@@ -35,22 +52,37 @@ function Login() {
                 autoClose: 1000,
             });
         } finally {
-            setLoading(false); 
+            setLoading(false);
         }
     };
+    
 
-
-    // Sign in with Google
     const handleGoogleSignIn = async () => {
         setLoading(true);
         try {
             const provider = new GoogleAuthProvider();
             const result = await signInWithPopup(auth, provider);
-            console.log("User signed in with Google:", result.user);
+            const user = result.user;
+    
+            const { uid, displayName, email, photoURL } = user;
+    
+            const userRef = doc(db, "profiles", uid);
+            const userSnap = await getDoc(userRef);
+    
+            if (!userSnap.exists()) {
+                await setDoc(userRef, {
+                    name: displayName || "Unnamed User",
+                    email: email,
+                    profileImage: photoURL || "",
+                    createdAt: new Date(),
+                });
+            }
+    
             toast.success("Signed in successfully with Google!", {
                 position: "top-center",
                 autoClose: 3000,
             });
+    
             navigate("/");
         } catch (error) {
             console.error("Error signing in with Google", error);
@@ -62,7 +94,7 @@ function Login() {
             setLoading(false);
         }
     };
-
+    
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-200 px-4 sm:px-6 lg:px-8">
             <div className="bg-white shadow-lg rounded-lg overflow-hidden w-full max-w-5xl">
