@@ -8,6 +8,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import placeholder from "../assets/companycolored.png";
+import PageLoader from "../components/PageLoader";
 
 const JobDetails = () => {
   const { jobId } = useParams();
@@ -168,6 +169,7 @@ const JobDetails = () => {
   if (!job) return <p className="text-center text-gray-500">Loading job details...</p>;
 
   return (
+    <PageLoader>
     <div className="relative">
       <div className="mx-auto py-16 px-8 lg:px-48 grid grid-cols-1 md:grid-cols-3 gap-12">
         <div className="md:col-span-2">
@@ -311,6 +313,7 @@ const JobDetails = () => {
         </div>
       )}
     </div>
+    </PageLoader>
   );
 };
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
+import PageLoader from "../components/PageLoader";
 
 const Announcement = () => {
   const [announcements, setAnnouncements] = useState([]);
@@ -92,6 +93,7 @@ const Announcement = () => {
   };
 
   return (
+    <PageLoader>
     <div className="bg-white py-16 lg:px-32 md:px-32 px-8 flex">
       <div className="w-1/4 pr-8 hidden lg:block">
         <div className="bg-gray-100 p-6 shadow-sm border rounded-lg space-y-6">
@@ -225,6 +227,7 @@ const Announcement = () => {
         </div>
       </div>
     </div>
+    </PageLoader>
   );
 };
 

@@ -5,6 +5,7 @@ import { collection, getDocs } from "firebase/firestore";
 import HowItWorks from "../components/HowItWorks";
 import { useNavigate } from "react-router-dom";
 import placeholder from "../assets/companycolored.png";
+import PageLoader from "../components/PageLoader";
 
 const Joblist = () => {
   const [jobs, setJobs] = useState([]);
@@ -75,6 +76,7 @@ const Joblist = () => {
 
   return (
     <div>
+      <PageLoader>
       <HowItWorks />
 
       <div className="text-center p-4 mx-32 rounded-lg bg-cover bg-center bg-no-repeat bg-gray-100 border">
@@ -227,6 +229,7 @@ const Joblist = () => {
           ))}
         </div>
       </div>
+      </PageLoader>
     </div>
   );
 };

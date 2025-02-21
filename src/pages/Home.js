@@ -6,20 +6,22 @@ import HeroJoblistings from '../components/HeroJoblisting'
 import HeroJobApplications from '../components/HeroJobApplication'
 import HeroNotif from '../components/HeroNotif'
 import HeroAnnouncement from '../components/HeroAnnouncement'
-
+import PageLoader from '../components/PageLoader'
 import HeroLast from '../components/HeroLast'
 
 const Home = () => { 
     return (
-        <div>
-            <Hero />
-            <Heromid />
-            <HeroJoblistings />
-            <HeroJobApplications />
-            <HeroAnnouncement />
-            <HeroNotif />
-            <HeroLast />
-        </div>
+        <PageLoader>  
+            <div>
+                <Hero />
+                <Heromid />
+                <HeroJoblistings />
+                <HeroJobApplications />
+                <HeroAnnouncement />
+                <HeroNotif />
+                <HeroLast />
+            </div>
+        </PageLoader>
     )
 }
 

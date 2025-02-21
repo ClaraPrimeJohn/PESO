@@ -4,6 +4,7 @@ import { IoCall } from "react-icons/io5";
 import { IoIosMail } from "react-icons/io";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import Banner from '../assets/banner.jpg';
+import PageLoader from '../components/PageLoader';
 // import FaqIllustration from '../assets/contactus.png';
 
 const Contactus = () => {
@@ -14,6 +15,7 @@ const Contactus = () => {
     };
 
     return (
+        <PageLoader>
         <div className="py-16 px-6 lg:px-20">
             {/* Banner */}
             <div className="relative -mx-6 lg:-mx-20 -mt-20 mb-10">
@@ -104,6 +106,7 @@ const Contactus = () => {
                 </div>
             </div>
         </div>
+        </PageLoader>
     );
 };
 
