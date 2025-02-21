@@ -140,7 +140,7 @@ function Login() {
                     </div>
 
                     {/* Right Side: Image */}
-                    <div className="w-full sm:w-1/2">
+                    <div className="hidden sm:block w-full sm:w-1/2">
                         <img
                             src={require("../assets/login-main.jpg")}
                             alt="Login Visual"
