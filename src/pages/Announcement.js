@@ -22,7 +22,7 @@ const Announcement = () => {
         const sortedAnnouncements = fetchedAnnouncements.sort((a, b) => {
           return b.date.seconds - a.date.seconds;
         });
-        
+
         const uniqueLocations = [...new Set(fetchedAnnouncements.map(ann => ann.location))];
         setLocations(uniqueLocations);
 
@@ -160,11 +160,28 @@ const Announcement = () => {
           >
             Clear Filters
           </button>
-         
-          <div className="mt-6">
+
+          <div className="mt-6 mb-4">
             <div className="text-sm text-gray-600">
               Showing {filteredAnnouncements.length} of {announcements.length} announcements
             </div>
+          </div>
+  
+          <div className="space-y-6">
+            <h4 className="text-lg font-semibold text-darkblue">What’s New at PESO?</h4>
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li>📅 Check out upcoming events such as job fairs, workshops, and community outreach programs.</li>
+              <li>💼 Explore new job opportunities posted daily by local employers.</li>
+              <li>🎓 Stay updated on free training and skills development programs available to the public.</li>
+            </ul>
+          </div>
+          <div className="mt-6">
+            <a
+              href="/about-us"
+              className="text-blue hover:text-blue-800 text-sm font-medium"
+            >
+              Learn more about PESO services
+            </a>
           </div>
         </div>
       </div>
