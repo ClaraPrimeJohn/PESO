@@ -5,7 +5,10 @@ import { db } from "../firebase";
 const Announcement = () => {
   const [announcements, setAnnouncements] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState("All");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  // const [selectedCategory, setSelectedCategory] = useState("All");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState("All");
+  const [locations, setLocations] = useState([]);
 
   useEffect(() => {
     const fetchAnnouncements = async () => {
@@ -19,6 +22,9 @@ const Announcement = () => {
         const sortedAnnouncements = fetchedAnnouncements.sort((a, b) => {
           return b.date.seconds - a.date.seconds;
         });
+        
+        const uniqueLocations = [...new Set(fetchedAnnouncements.map(ann => ann.location))];
+        setLocations(uniqueLocations);
 
         setAnnouncements(sortedAnnouncements);
       } catch (error) {
@@ -29,19 +35,29 @@ const Announcement = () => {
     fetchAnnouncements();
   }, []);
 
-  const filteredAnnouncements = selectedMonth === "All"
-    ? announcements
-    : announcements.filter((announcement) => {
-      const announcementDate = new Date(announcement.date.seconds * 1000);
-      const announcementMonth = announcementDate.toLocaleString("default", { month: "long" });
-      return announcementMonth === selectedMonth;
+  const filterAnnouncements = (announcements) => {
+    return announcements.filter(announcement => {
+
+      const monthMatch = selectedMonth === "All" || 
+        new Date(announcement.date.seconds * 1000).toLocaleString("default", { month: "long" }) === selectedMonth;
+
+      // const categoryMatch = selectedCategory === "All" || announcement.category === selectedCategory; 
+
+      const locationMatch = selectedLocation === "All" || announcement.location === selectedLocation;
+      const searchMatch = !searchTerm || 
+        announcement.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        announcement.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        announcement.id?.toLowerCase().includes(searchTerm.toLowerCase());
+
+      return monthMatch && locationMatch && searchMatch;
     });
+  };
 
-  const filteredByCategory = filteredAnnouncements.filter((announcement) => {
-    return selectedCategory === "All" || announcement.category === selectedCategory;
-  });
+  // Apply all filters
+  const filteredAnnouncements = filterAnnouncements(announcements);
 
-  const groupedAnnouncements = filteredByCategory.reduce((groups, announcement) => {
+  // Group announcements by month after filtering
+  const groupedAnnouncements = filteredAnnouncements.reduce((groups, announcement) => {
     const announcementDate = new Date(announcement.date.seconds * 1000);
     const month = announcementDate.toLocaleString("default", { month: "long", year: "numeric" });
 
@@ -52,14 +68,6 @@ const Announcement = () => {
     return groups;
   }, {});
 
-  const handleMonthChange = (e) => {
-    setSelectedMonth(e.target.value);
-  };
-
-  const handleCategoryChange = (e) => {
-    setSelectedCategory(e.target.value);
-  };
-
   const months = Array.from(
     new Set(
       announcements.map((announcement) =>
@@ -68,28 +76,46 @@ const Announcement = () => {
     )
   ).sort();
 
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handleLocationChange = (e) => {
+    setSelectedLocation(e.target.value);
+  };
+
+  const clearFilters = () => {
+    setSearchTerm("");
+    setSelectedMonth("All");
+    // setSelectedCategory("All");
+    setSelectedLocation("All");
+  };
+
   return (
     <div className="bg-white py-16 lg:px-32 md:px-32 px-8 flex">
       <div className="w-1/4 pr-8 hidden lg:block">
         <div className="bg-gray-100 p-6 shadow-sm border rounded-lg space-y-6">
           <h3 className="text-2xl font-bold text-darkblue mb-4">PESO Announcements</h3>
           <p className="text-gray-700 text-sm mb-4">
-            Stay informed with the latest announcements from the Public Employment Service Office (PESO). This section contains important updates about job opportunities, public service programs, and events. Filter and search for announcements to easily find the information that matters to you.
+            Stay informed with the latest announcements from the Public Employment Service Office (PESO).
           </p>
        
           <div className="mb-6">
             <label className="block text-gray-700 mb-2">Search Announcements</label>
             <input
               type="text"
-              placeholder="Search by title or keywords..."
+              value={searchTerm}
+              onChange={handleSearch}
+              placeholder="Search by title, description, or ID..."
               className="border rounded-lg p-2 w-full text-gray-700"
             />
           </div>
        
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <label className="block text-gray-700 mb-2">Category</label>
             <select
-              onChange={handleCategoryChange}
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
               className="border rounded-lg p-2 w-full text-gray-700"
             >
               <option value="All">All Categories</option>
@@ -98,13 +124,13 @@ const Announcement = () => {
               <option value="Training">Training Programs</option>
               <option value="PublicServices">Public Services</option>
             </select>
-          </div>
+          </div> */}
      
-          <div className="mb-4">
+          <div className="mb-6">
             <label className="block text-gray-700 mb-2">Filter by Month</label>
             <select
-              onChange={handleMonthChange}
               value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
               className="border rounded-lg p-2 w-full text-gray-700"
             >
               <option value="All">All Months</option>
@@ -113,23 +139,32 @@ const Announcement = () => {
               ))}
             </select>
           </div>
-       
-          <div className="space-y-4">
-            <h4 className="text-lg font-semibold text-darkblue">What’s New at PESO?</h4>
-            <ul className="space-y-2 text-sm text-gray-600">
-              <li>📅 Check out upcoming events such as job fairs, workshops, and community outreach programs.</li>
-              <li>💼 Explore new job opportunities posted daily by local employers.</li>
-              <li>🎓 Stay updated on free training and skills development programs available to the public.</li>
-            </ul>
+
+          <div className="mb-6">
+            <label className="block text-gray-700 mb-2">Filter by Location</label>
+            <select
+              value={selectedLocation}
+              onChange={handleLocationChange}
+              className="border rounded-lg p-2 w-full text-gray-700"
+            >
+              <option value="All">All Locations</option>
+              {locations.map((location) => (
+                <option key={location} value={location}>{location}</option>
+              ))}
+            </select>
           </div>
+
+          <button
+            onClick={clearFilters}
+            className="w-full bg-blue text-white py-2 rounded-lg hover:bg-darkblue transition-colors"
+          >
+            Clear Filters
+          </button>
          
           <div className="mt-6">
-            <a
-              href="/contact-us"
-              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-            >
-              Learn more about PESO services
-            </a>
+            <div className="text-sm text-gray-600">
+              Showing {filteredAnnouncements.length} of {announcements.length} announcements
+            </div>
           </div>
         </div>
       </div>
