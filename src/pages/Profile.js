@@ -71,7 +71,6 @@ const Profile = () => {
     }, []);
 
     useEffect(() => {
-        // Update email whenever user changes
         if (user && user.email) {
             setProfile(prevProfile => ({
                 ...prevProfile,
@@ -80,7 +79,6 @@ const Profile = () => {
         }
     }, [user]);
 
-    // Check for changes in form
     useEffect(() => {
         if (originalProfile) {
             const hasChanges = Object.keys(originalProfile).some(
@@ -125,7 +123,6 @@ const Profile = () => {
         try {
             if (!user) return;
             setLoading(true);
-            // Ensure email is included in the save
             const updatedProfile = {
                 ...profile,
                 email: user.email || profile.email
@@ -136,6 +133,9 @@ const Profile = () => {
             setIsDirty(false);
             setIsEditing(false);
             toast.success("Profile updated successfully!");
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
         } catch (error) {
             console.error("Error updating profile:", error);
             toast.error("Failed to update profile");
