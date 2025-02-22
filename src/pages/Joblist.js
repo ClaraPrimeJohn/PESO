@@ -11,14 +11,13 @@ const Joblist = () => {
   const [jobs, setJobs] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedJobType, setSelectedJobType] = useState([]);
-  const [filterTags, setFilterTags] = useState([]);
+  const [selectedExperience, setSelectedExperience] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState("");
   const [, setUser] = useState(null);
   const navigate = useNavigate();
   
-  
   const [currentPage, setCurrentPage] = useState(1);
-  const [jobsPerPage] = useState(5); 
+  const [jobsPerPage] = useState(5);
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -54,7 +53,7 @@ const Joblist = () => {
           job.job_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
           job.company.toLowerCase().includes(searchTerm.toLowerCase())) &&
         (selectedJobType.length === 0 || selectedJobType.includes(job.job_type)) &&
-        (filterTags.length === 0 || filterTags.every((tag) => job.skills?.includes(tag))) &&
+        (selectedExperience.length === 0 || selectedExperience.includes(job.experience)) &&
         (selectedMonth === "" || jobMonth === selectedMonth)
       );
     });
@@ -67,7 +66,6 @@ const Joblist = () => {
     return dateB - dateA;
   });
 
-  // Pagination logic
   const indexOfLastJob = currentPage * jobsPerPage;
   const indexOfFirstJob = indexOfLastJob - jobsPerPage;
   const currentJobs = filteredJobs.slice(indexOfFirstJob, indexOfLastJob);
@@ -79,14 +77,20 @@ const Joblist = () => {
     setSelectedJobType((prev) =>
       prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
     );
-    setCurrentPage(1); // Reset to first page when filter changes
+    setCurrentPage(1);
+  };
+
+  const handleExperienceChange = (level) => {
+    setSelectedExperience((prev) =>
+      prev.includes(level) ? prev.filter((l) => l !== level) : [...prev, level]
+    );
+    setCurrentPage(1);
   };
 
   const handleApplyNow = (jobId) => {
     navigate(`/job/${jobId}`);
   };
 
-  // New Pagination component
   const PaginationControls = () => {
     const pageNumbers = [];
     for (let i = 1; i <= totalPages; i++) {
@@ -191,7 +195,7 @@ const Joblist = () => {
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
-                  setCurrentPage(1); 
+                  setCurrentPage(1);
                 }}
                 className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
@@ -199,7 +203,7 @@ const Joblist = () => {
             <div className="mb-6">
               <h2 className="font-semibold text-base mb-2">Job Type</h2>
               <div className="flex flex-col space-y-2">
-                {["Full-time", "Part-time", "Contract", "Internship"].map((type, index) => (
+                {["Full-time", "Part-time", "Contract"].map((type, index) => (
                   <label key={index} className="flex items-center space-x-2">
                     <input
                       type="checkbox"
@@ -212,22 +216,17 @@ const Joblist = () => {
               </div>
             </div>
             <div className="mb-6">
-              <h2 className="font-semibold text-base mb-2">Tags</h2>
+              <h2 className="font-semibold text-base mb-2">Experience Level</h2>
               <div className="flex flex-wrap gap-2">
-                {["YUMMY", "Creative", "Technical"].map((tag, index) => (
+                {["Beginner", "Intermediate", "Expert"].map((level, index) => (
                   <span
                     key={index}
                     className={`px-3 py-1 text-sm rounded-full cursor-pointer ${
-                      filterTags.includes(tag) ? "bg-orange text-white" : "bg-gray-200 text-gray-800"
+                      selectedExperience.includes(level) ? "bg-orange text-white" : "bg-gray-200 text-gray-800"
                     }`}
-                    onClick={() => {
-                      setFilterTags((prev) =>
-                        prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
-                      );
-                      setCurrentPage(1); 
-                    }}
+                    onClick={() => handleExperienceChange(level)}
                   >
-                    {tag}
+                    {level}
                   </span>
                 ))}
               </div>
@@ -239,7 +238,7 @@ const Joblist = () => {
                 value={selectedMonth}
                 onChange={(e) => {
                   setSelectedMonth(e.target.value);
-                  setCurrentPage(1); 
+                  setCurrentPage(1);
                 }}
               >
                 <option value="">All Months</option>
@@ -300,18 +299,18 @@ const Joblist = () => {
                 </div>
 
                 <div className="flex flex-col items-end mt-4 lg:mt-0 w-full lg:w-1/3">
-                <button
-                  className={`px-4 py-2 rounded-lg transition-all ${
-                    job.isOpen
-                      ? "bg-blue text-white hover:bg-darkblue"
-                      : "bg-gray-400 text-white cursor-not-allowed"
-                  }`}
-                  onClick={() => job.isOpen && handleApplyNow(job.id)}
-                  disabled={!job.isOpen}
-                  title={!job.isOpen ? "Not accepting applicants" : ""}
-                >
-                  Apply Now
-                </button>
+                  <button
+                    className={`px-4 py-2 rounded-lg transition-all ${
+                      job.isOpen
+                        ? "bg-blue text-white hover:bg-darkblue"
+                        : "bg-gray-400 text-white cursor-not-allowed"
+                    }`}
+                    onClick={() => job.isOpen && handleApplyNow(job.id)}
+                    disabled={!job.isOpen}
+                    title={!job.isOpen ? "Not accepting applicants" : ""}
+                  >
+                    Apply Now
+                  </button>
 
                   <div className="mt-2 text-gray-500 text-sm">
                     Date Posted:{" "}
