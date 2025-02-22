@@ -10,14 +10,14 @@ const HeroJoblistings = () => {
       whileInView={{ opacity: 1, scale: 1, y: 0 }}
       viewport={{ once: false, amount: 0.15 }}
       transition={{ duration: 0.5, ease: "easeInOut" }}
-      className="w-full mt-10 py-2 px-4 md:px-6 lg:px-8"
+      className="w-full mt-10 py-2"
     >
       <motion.h1
         initial={{ opacity: 0, y: -20 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: "easeInOut" }}
         viewport={{ once: false }}
-        className="text-center text-5xl text-darkblue font-extrabold"
+        className="text-center text-4xl text-darkblue font-extrabold"
       >
         PESO Services
       </motion.h1>
@@ -39,7 +39,7 @@ const HeroJoblistings = () => {
         viewport={{ once: false, amount: 0.15 }}
         transition={{ duration: 0.2, ease: "easeOut" }}
         whileHover={{ scale: 1.01 }}
-        className="mt-1 max-w-[105rem] mx-auto flex flex-col md:flex-row items-center bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200 px-4 md:px-6 lg:px-8 py-6 md:py-8 lg:py-10 transition-all duration-300"
+        className="mt-1 mx-4 sm:mx-8 md:mx-16 lg:mx-32 xl:mx-48 mb-1 flex flex-col md:flex-row items-center bg-white shadow-sm rounded-xl overflow-hidden border border-gray-200 px-4 md:px-6 lg:px-8 py-6 md:py-8 lg:py-10 transition-all duration-300"
       >
         {/* Left Section - Image */}
         <motion.div
@@ -75,7 +75,7 @@ const HeroJoblistings = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: false }}
             transition={{ duration: 0.4, ease: "easeInOut" }}
-            className="text-orange text-3xl font-extrabold tracking-wide"
+            className="text-orange text-xl md:text-2xl font-extrabold tracking-wide"
           >
             Job Listings
           </motion.h4>
@@ -85,7 +85,7 @@ const HeroJoblistings = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: false }}
             transition={{ duration: 0.45, ease: "easeInOut" }}
-            className="mt-3 text-gray-700 text-base md:text-base leading-relaxed"
+            className="mt-3 text-gray-700 text-base md:text-md leading-relaxed"
           >
             Explore a wide array of job openings tailored to your unique skills and career interests. Whether you're seeking your first job or looking to advance your career, stay informed with the most recent opportunities available in your area. Begin your journey to professional growth and success today!
           </motion.p>

@@ -11,7 +11,7 @@ const HeroAnnouncement = () => {
       viewport={{ once: false, amount: 0.15 }}
       transition={{ duration: 0.2, ease: "easeOut" }}
       whileHover={{ scale: 1.005 }}
-      className="max-w-[105rem] mx-auto mb-1 flex flex-col md:flex-row items-center bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200 px-12 md:px-16 lg:px-20 py-8 md:py-10 lg:py-12 transition-all duration-300"
+      className="mx-4 sm:mx-8 md:mx-16 lg:mx-32 xl:mx-48 mb-3 flex flex-col md:flex-row items-center bg-white shadow-sm rounded-xl overflow-hidden border border-gray-200 px-12 md:px-16 lg:px-20 py-8 md:py-10 lg:py-12 transition-all duration-300"
     >
       {/* Left Section - Image */}
       <motion.div
@@ -47,7 +47,7 @@ const HeroAnnouncement = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false }}
           transition={{ duration: 0.4, ease: "easeInOut" }}
-          className="text-orange text-3xl font-extrabold tracking-wide"
+          className="text-orange text-xl md:text-2xl font-extrabold tracking-wide"
         >
           PESO Activity Announcements
         </motion.h4>
@@ -57,7 +57,7 @@ const HeroAnnouncement = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false }}
           transition={{ duration: 0.45, ease: "easeInOut" }}
-          className="mt-3 text-gray-700 text-base md:text-base leading-relaxed"
+          className="mt-3 text-gray-700 text-base md:text-md leading-relaxed"
         >
           Stay ahead by participating in PESO-organized activities designed to enhance your career opportunities. From job fairs and networking events to skill development workshops, discover ways to grow personally and professionally. Don’t miss out on the chance to connect with potential employers and like-minded individuals!
         </motion.p>

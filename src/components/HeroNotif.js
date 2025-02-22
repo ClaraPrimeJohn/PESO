@@ -11,7 +11,7 @@ const HeroNotif = () => {
       viewport={{ once: false, amount: 0.15 }}
       transition={{ duration: 0.2, ease: "easeOut" }}
       whileHover={{ scale: 1.01 }}
-      className="max-w-[105rem] mt-1 mb-12 mx-auto flex flex-col md:flex-row-reverse items-center bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200 p-6 md:p-10 lg:p-12 transition-all duration-300"
+      className="mx-4 sm:mx-8 md:mx-16 lg:mx-32 xl:mx-48 mb-8 flex flex-col md:flex-row-reverse items-center bg-white shadow-sm rounded-xl overflow-hidden border border-gray-200 p-6 md:p-10 lg:p-12 transition-all duration-300"
     >
       {/* Right Section - Image */}
       <motion.div
@@ -47,7 +47,7 @@ const HeroNotif = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false }}
           transition={{ duration: 0.4, ease: "easeInOut" }}
-          className="text-orange text-3xl font-extrabold tracking-wide"
+          className="text-orange text-xl md:text-2xl font-extrabold tracking-wide"
         >
           Program Updates and Notifications
         </motion.h4>
@@ -57,7 +57,7 @@ const HeroNotif = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false }}
           transition={{ duration: 0.45, ease: "easeInOut" }}
-          className="mt-3 text-gray-700 text-xl md:text-lg leading-relaxed"
+          className="mt-3 text-gray-700 text-base md:text-md leading-relaxed"
         >
           Stay updated with the latest PESO programs, employment-related policy changes, and announcements. Gain insights into new initiatives designed to support job seekers and employees alike. By staying informed, you can make better decisions and stay competitive in the ever-changing job market.
         </motion.p>
@@ -70,7 +70,7 @@ const HeroNotif = () => {
         >
           <Link
             to="/announcement"
-            className="inline-block text-darkblue font-bold border-2 border-darkblue px-4 py-2 rounded-md transition duration-300 transform hover:text-white hover:bg-blue hover:border-orange-600"
+            className="inline-block text-darkblue text-sm md:text-base font-bold border-2 border-darkblue px-4 py-2 rounded-md transition duration-300 transform hover:text-white hover:bg-blue hover:border-orange-600"
           >
             View more →
           </Link>

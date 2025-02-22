@@ -11,7 +11,7 @@ const HeroJobApplications = () => {
       viewport={{ once: false, amount: 0.15 }}
       transition={{ duration: 0.2, ease: "easeOut" }}
       whileHover={{ scale: 1.005 }}
-      className="max-w-[105rem] mb-1 mx-auto flex flex-col md:flex-row-reverse items-center bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200 p-6 md:p-10 lg:p-12 transition-all duration-300"
+      className="mx-4 sm:mx-8 md:mx-16 lg:mx-32 xl:mx-48 mb-3 flex flex-col md:flex-row-reverse items-center bg-white shadow-sm rounded-xl overflow-hidden border border-gray-200 p-6 md:p-10 lg:p-12 transition-all duration-300"
     >
       {/* Right Section - Image */}
       <motion.div
@@ -47,7 +47,7 @@ const HeroJobApplications = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false }}
           transition={{ duration: 0.4, ease: "easeInOut" }}
-          className="text-orange text-3xl font-extrabold tracking-wide"
+          className="text-orange text-xl md:text-2xl font-extrabold tracking-wide"
         >
           Job Application Process
         </motion.h4>
@@ -57,7 +57,7 @@ const HeroJobApplications = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false }}
           transition={{ duration: 0.45, ease: "easeInOut" }}
-          className="mt-3 text-gray-700 text-base md:text-base leading-relaxed"
+          className="mt-3 text-gray-700 text-base md:text-md leading-relaxed"
         >
           Navigating the job market can be challenging, but we're here to help. Learn how to create standout resumes and write compelling cover letters that catch recruiters' attention. Gain confidence with practical tips on how to prepare for and excel in interviews. Your comprehensive guide to a successful application process is just a click away!
         </motion.p>
