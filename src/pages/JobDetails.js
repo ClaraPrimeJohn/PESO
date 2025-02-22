@@ -171,28 +171,40 @@ const JobDetails = () => {
   return (
     <PageLoader>
     <div className="relative">
-      <div className="mx-auto py-16 px-8 lg:px-48 grid grid-cols-1 md:grid-cols-3 gap-12">
-        <div className="md:col-span-2">
-          <div className="flex items-center space-x-3 mb-4">
-            <button
-              onClick={() => navigate(-1)}
-              className="bg-white p-2 hover:text-blue transition duration-300 flex items-center"
-              title="Back"
-            >
-              <IoIosArrowBack className="text-3xl text-gray-700 hover:text-blue" />
-            </button>
-            <h1 className="text-3xl font-extrabold text-darkblue">{job.job_title}</h1>
+        <div className="mx-auto py-16 px-8 lg:px-48 grid grid-cols-1 md:grid-cols-3 gap-12">
+                <div className="md:col-span-2">
+                <div className="mb-4">
+        <button
+          onClick={() => navigate(-1)}
+          className="-ml-2 bg-white hover:text-blue transition duration-300 flex items-center group"
+          title="Back to Job List"
+        >
+          <div className="flex items-center space-x-1 group-hover:text-blue">
+            <IoIosArrowBack className="text-3xl text-gray-700 group-hover:text-blue" />
+            <span className="text-lg">Back to Job List</span>
           </div>
-          <div className="space-y-4 text-gray-700 pl-12">
-            <p><strong>Location:</strong> {job.location}</p>
-            <p><strong>Skills Required:</strong> {job.skills || "Not specified"}</p>
-            <div className="border-t border-gray-300 pt-4">
-              <p className="whitespace-pre-line">
-                <strong>Job Description:</strong> {job.job_description.trim() || "No description available."}
+        </button>
+      </div>
+      <div className="flex items-center mb-4 space-x-3">
+        <h1 className="text-2xl md:text-3xl font-extrabold text-darkblue break-words">
+          {job.job_title}
+        </h1>
+      </div>
+    
+          <div className="space-y-4 text-gray-700 pl-0 md:pl-12">
+              <p>
+                <strong>Location:</strong> {job.location}
               </p>
+              <p>
+                <strong>Skills Required:</strong> {job.skills || "Not specified"}
+              </p>
+              <div className="border-t border-gray-300 pt-4">
+                <p className="whitespace-pre-line">
+                  <strong>Job Description:</strong> {job.job_description.trim() || "No description available."}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
 
         <div className="bg-gray-100 border rounded-lg p-6 flex flex-col space-y-6 min-h-auto self-start">
       <div className="flex flex-col items-center space-y-4 mb-4">
