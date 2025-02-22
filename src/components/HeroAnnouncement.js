@@ -57,7 +57,7 @@ const HeroAnnouncement = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false }}
           transition={{ duration: 0.45, ease: "easeInOut" }}
-          className="mt-3 text-gray-700 text-base md:text-xl leading-relaxed"
+          className="mt-3 text-gray-700 text-base md:text-base leading-relaxed"
         >
           Stay ahead by participating in PESO-organized activities designed to enhance your career opportunities. From job fairs and networking events to skill development workshops, discover ways to grow personally and professionally. Don’t miss out on the chance to connect with potential employers and like-minded individuals!
         </motion.p>

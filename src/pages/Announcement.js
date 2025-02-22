@@ -95,7 +95,7 @@ const Announcement = () => {
   return (
     <PageLoader>
     <div className="bg-white py-16 lg:px-32 md:px-32 px-8 flex">
-      <div className="w-1/4 pr-8 hidden lg:block">
+      <div className="w-1/4 pr-8">
         <div className="bg-gray-100 p-6 shadow-sm border rounded-lg space-y-6">
           <h3 className="text-2xl font-bold text-darkblue mb-4 break-words">PESO Announcements</h3>
           <p className="text-gray-700 text-sm mb-4">

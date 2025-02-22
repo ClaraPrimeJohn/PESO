@@ -169,7 +169,7 @@ const Joblist = () => {
       <PageLoader>
         <HowItWorks />
 
-        <div className="text-center p-4 mx-32 rounded-lg bg-cover bg-center bg-no-repeat bg-gray-100 border">
+        <div className="text-center p-4 mx-4 sm:mx-8 md:mx-16 lg:mx-32 rounded-lg bg-cover bg-center bg-no-repeat bg-gray-100 border">
           <div className="mx-auto p-4">
             <h1 className="text-darkblue font-extrabold text-xl">
               Available Jobs for You
@@ -253,7 +253,7 @@ const Joblist = () => {
           </div>
 
           {/* Job Listings */}
-          <div className="lg:w-3/4 w-full pl-6">
+          <div className="w-full lg:w-3/4 lg:pl-6 pl-0">
             <div className="flex justify-between items-center text-gray-700 mb-4">
               <div>
                 Showing <span className="font-bold">{currentJobs.length}</span> of{" "}

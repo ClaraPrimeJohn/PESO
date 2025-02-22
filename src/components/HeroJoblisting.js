@@ -85,7 +85,7 @@ const HeroJoblistings = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: false }}
             transition={{ duration: 0.45, ease: "easeInOut" }}
-            className="mt-3 text-gray-700 text-base md:text-xl leading-relaxed"
+            className="mt-3 text-gray-700 text-base md:text-base leading-relaxed"
           >
             Explore a wide array of job openings tailored to your unique skills and career interests. Whether you're seeking your first job or looking to advance your career, stay informed with the most recent opportunities available in your area. Begin your journey to professional growth and success today!
           </motion.p>

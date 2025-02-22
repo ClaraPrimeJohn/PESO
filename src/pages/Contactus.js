@@ -75,7 +75,7 @@ const Contactus = () => {
             {/* FAQ & Illustration Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                 {/* FAQ Section */}
-                <div className="bg-white shadow-lg rounded-xl p-6">
+                <div className="bg-white rounded-xl p-6">
                     <h2 className="text-orange text-2xl font-bold mb-4">Frequently Asked Questions</h2>
                     <ul className="space-y-4">
                         {[

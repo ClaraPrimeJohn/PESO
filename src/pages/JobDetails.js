@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { doc, getDoc, collection, addDoc } from "firebase/firestore";
-import { db, auth } from "../firebase"; // Ensure auth is imported
+import { db, auth } from "../firebase";
 import { IoIosArrowBack } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
 import axios from "axios";

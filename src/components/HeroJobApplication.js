@@ -57,7 +57,7 @@ const HeroJobApplications = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false }}
           transition={{ duration: 0.45, ease: "easeInOut" }}
-          className="mt-3 text-gray-700 text-base md:text-xl leading-relaxed"
+          className="mt-3 text-gray-700 text-base md:text-base leading-relaxed"
         >
           Navigating the job market can be challenging, but we're here to help. Learn how to create standout resumes and write compelling cover letters that catch recruiters' attention. Gain confidence with practical tips on how to prepare for and excel in interviews. Your comprehensive guide to a successful application process is just a click away!
         </motion.p>
