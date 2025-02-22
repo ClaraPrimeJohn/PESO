@@ -5,11 +5,12 @@ import PageLoader from "../components/PageLoader";
 
 const Announcement = () => {
   const [announcements, setAnnouncements] = useState([]);
-  const [selectedMonth, setSelectedMonth] = useState("All");
-  // const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState("All");
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState("");
   const [locations, setLocations] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [announcementsPerPage] = useState(5);
 
   useEffect(() => {
     const fetchAnnouncements = async () => {
@@ -26,7 +27,6 @@ const Announcement = () => {
 
         const uniqueLocations = [...new Set(fetchedAnnouncements.map(ann => ann.location))];
         setLocations(uniqueLocations);
-
         setAnnouncements(sortedAnnouncements);
       } catch (error) {
         console.error("Error fetching announcements:", error);
@@ -36,197 +36,259 @@ const Announcement = () => {
     fetchAnnouncements();
   }, []);
 
-  const filterAnnouncements = (announcements) => {
-    return announcements.filter(announcement => {
+  const applyFilters = () => {
+    return announcements.filter((announcement) => {
+      const announcementDate = new Date(announcement.date.seconds * 1000);
+      const announcementMonth = announcementDate.toLocaleString("default", { month: "long" });
 
-      const monthMatch = selectedMonth === "All" || 
-        new Date(announcement.date.seconds * 1000).toLocaleString("default", { month: "long" }) === selectedMonth;
-
-      // const categoryMatch = selectedCategory === "All" || announcement.category === selectedCategory; 
-
-      const locationMatch = selectedLocation === "All" || announcement.location === selectedLocation;
-      const searchMatch = !searchTerm || 
+      const matchesSearch = searchTerm === "" ||
         announcement.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         announcement.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        announcement.id?.toLowerCase().includes(searchTerm.toLowerCase());
+        announcement.location?.toLowerCase().includes(searchTerm.toLowerCase());
 
-      return monthMatch && locationMatch && searchMatch;
+      const matchesMonth = selectedMonth === "" || announcementMonth === selectedMonth;
+      
+      const matchesLocation = selectedLocation === "" || announcement.location === selectedLocation;
+
+      return matchesSearch && matchesMonth && matchesLocation;
     });
   };
 
-  // Apply all filters
-  const filteredAnnouncements = filterAnnouncements(announcements);
+  const filteredAnnouncements = applyFilters();
+  
+  // Pagination logic
+  const indexOfLastAnnouncement = currentPage * announcementsPerPage;
+  const indexOfFirstAnnouncement = indexOfLastAnnouncement - announcementsPerPage;
+  const currentAnnouncements = filteredAnnouncements.slice(indexOfFirstAnnouncement, indexOfLastAnnouncement);
+  const totalPages = Math.ceil(filteredAnnouncements.length / announcementsPerPage);
 
-  // Group announcements by month after filtering
-  const groupedAnnouncements = filteredAnnouncements.reduce((groups, announcement) => {
-    const announcementDate = new Date(announcement.date.seconds * 1000);
-    const month = announcementDate.toLocaleString("default", { month: "long", year: "numeric" });
-
-    if (!groups[month]) {
-      groups[month] = [];
-    }
-    groups[month].push(announcement);
-    return groups;
-  }, {});
-
-  const months = Array.from(
-    new Set(
-      announcements.map((announcement) =>
-        new Date(announcement.date.seconds * 1000).toLocaleString("default", { month: "long" })
-      )
-    )
-  ).sort();
-
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
-  };
-
-  const handleLocationChange = (e) => {
-    setSelectedLocation(e.target.value);
-  };
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const clearFilters = () => {
     setSearchTerm("");
-    setSelectedMonth("All");
-    // setSelectedCategory("All");
-    setSelectedLocation("All");
+    setSelectedMonth("");
+    setSelectedLocation("");
+    setCurrentPage(1);
+  };
+
+  const PaginationControls = () => {
+    const pageNumbers = [];
+    for (let i = 1; i <= totalPages; i++) {
+      pageNumbers.push(i);
+    }
+
+    return (
+      <div className="flex justify-center items-center space-x-1 mt-8">
+        <button
+          onClick={() => paginate(currentPage - 1)}
+          disabled={currentPage === 1}
+          className={`p-2 rounded-lg transition-all duration-200 ${
+            currentPage === 1
+              ? 'text-gray-300 cursor-not-allowed'
+              : 'text-gray-600 hover:text-blue hover:bg-blue/10'
+          }`}
+          aria-label="Previous page"
+        >
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+        </button>
+
+        <div className="flex items-center space-x-1">
+          {pageNumbers.map((number) => (
+            <button
+              key={number}
+              onClick={() => paginate(number)}
+              className={`min-w-[2rem] h-8 flex items-center justify-center rounded-lg transition-all duration-200 ${
+                number === currentPage
+                  ? 'bg-blue text-white font-medium'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              {number}
+            </button>
+          ))}
+        </div>
+
+        <button
+          onClick={() => paginate(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className={`p-2 rounded-lg transition-all duration-200 ${
+            currentPage === totalPages
+              ? 'text-gray-300 cursor-not-allowed'
+              : 'text-gray-600 hover:text-blue hover:bg-blue/10'
+          }`}
+          aria-label="Next page"
+        >
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </button>
+      </div>
+    );
   };
 
   return (
     <PageLoader>
-    <div className="bg-white py-16 lg:px-32 md:px-32 px-8 flex">
-      <div className="w-1/4 pr-8">
-        <div className="bg-gray-100 p-6 shadow-sm border rounded-lg space-y-6">
-          <h3 className="text-2xl font-bold text-darkblue mb-4 break-words">PESO Announcements</h3>
-          <p className="text-gray-700 text-sm mb-4">
-            Stay informed with the latest announcements from the Public Employment Service Office (PESO).
-          </p>
-       
-          <div className="mb-6">
-            <label className="block text-gray-700 mb-2">Search Announcements</label>
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={handleSearch}
-              placeholder="Search by title, description, or ID..."
-              className="border rounded-lg p-2 w-full text-gray-700"
-            />
-          </div>
-       
-          {/* <div className="mb-6">
-            <label className="block text-gray-700 mb-2">Category</label>
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="border rounded-lg p-2 w-full text-gray-700"
-            >
-              <option value="All">All Categories</option>
-              <option value="Jobs">Job Listings</option>
-              <option value="Events">Events</option>
-              <option value="Training">Training Programs</option>
-              <option value="PublicServices">Public Services</option>
-            </select>
-          </div> */}
-     
-          <div className="mb-6">
-            <label className="block text-gray-700 mb-2">Filter by Month</label>
-            <select
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              className="border rounded-lg p-2 w-full text-gray-700"
-            >
-              <option value="All">All Months</option>
-              {months.map((month) => (
-                <option key={month} value={month}>{month}</option>
-              ))}
-            </select>
-          </div>
+      <div className="bg-white py-8 px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Sidebar */}
+          <div className="lg:w-1/4">
+            <div className="bg-gray-100 p-6 rounded-lg shadow-sm border">
+              <h3 className="text-2xl font-bold text-darkblue mb-4">PESO Announcements</h3>
+              <p className="text-gray-700 text-sm mb-6">
+                Stay informed with the latest announcements from the Public Employment Service Office (PESO).
+              </p>
 
-          <div className="mb-6">
-            <label className="block text-gray-700 mb-2">Filter by Location</label>
-            <select
-              value={selectedLocation}
-              onChange={handleLocationChange}
-              className="border rounded-lg p-2 w-full text-gray-700"
-            >
-              <option value="All">All Locations</option>
-              {locations.map((location) => (
-                <option key={location} value={location}>{location}</option>
-              ))}
-            </select>
-          </div>
-
-          <button
-            onClick={clearFilters}
-            className="w-full bg-blue text-white py-2 rounded-lg hover:bg-darkblue transition-colors"
-          >
-            Clear Filters
-          </button>
-
-          <div className="mt-6 mb-4">
-            <div className="text-sm text-gray-600">
-              Showing {filteredAnnouncements.length} of {announcements.length} announcements
-            </div>
-          </div>
-  
-          <div className="space-y-6">
-            <h4 className="text-lg font-semibold text-darkblue">What’s New at PESO?</h4>
-            <ul className="space-y-2 text-sm text-gray-600">
-              <li>📅 Check out upcoming events such as job fairs, workshops, and community outreach programs.</li>
-              <li>💼 Explore new job opportunities posted daily by local employers.</li>
-              <li>🎓 Stay updated on free training and skills development programs available to the public.</li>
-            </ul>
-          </div>
-          <div className="mt-6">
-            <a
-              href="/about-us"
-              className="text-blue hover:text-blue-800 text-sm font-medium"
-            >
-              Learn more about PESO services
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <div className="w-full lg:w-3/4">
-        <div className="max-w-8xl mx-auto">
-          {Object.entries(groupedAnnouncements).map(([month, announcements]) => (
-            <div key={month} className="mb-12">
-              <h2 className="text-xl font-bold text-darkblue mb-4">{month}</h2>
-              {announcements.map((announcement) => (
-                <div
-                  key={announcement.id}
-                  className="bg-white shadow-sm border rounded-lg overflow-hidden transition-transform transform hover:-translate-y-1 hover:scale-10 hover:shadow-md duration-300 ease-out mb-6">
-                  <div className="px-8 py-4">
-                    <p className="text-sm text-gray-500 text-right">
-                      {new Date(announcement.date.seconds * 1000).toLocaleDateString(
-                        "en-US",
-                        {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        }
-                      )}
-                    </p>
-                   
-                    <h1 className="text-xl font-bold text-darkblue pt-2 mb-4">
-                      {announcement.title}
-                    </h1>
-                    <p className="text-gray-700 mb-4 text-base leading-relaxed" style={{ whiteSpace: "pre-wrap" }}>
-                      {announcement.description}
-                    </p>
-                    <p className="text-gray-700 mb-4 text-sm">
-                      <strong className="text-darkblue">Location:</strong>{" "}
-                      {announcement.location}
-                    </p>
-                  </div>
+              <div className="space-y-6">
+                <div>
+                  <h2 className="font-semibold text-base mb-2">Search Announcements</h2>
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    placeholder="Search by title, description, or location"
+                    className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
                 </div>
-              ))}
+
+                <div>
+                  <h2 className="font-semibold text-base mb-2">Filter by Month</h2>
+                  <select
+                    value={selectedMonth}
+                    onChange={(e) => {
+                      setSelectedMonth(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">All Months</option>
+                    {[...Array(12)].map((_, i) => (
+                      <option key={i} value={new Date(0, i).toLocaleString("default", { month: "long" })}>
+                        {new Date(0, i).toLocaleString("default", { month: "long" })}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <h2 className="font-semibold text-base mb-2">Filter by Location</h2>
+                  <select
+                    value={selectedLocation}
+                    onChange={(e) => {
+                      setSelectedLocation(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">All Locations</option>
+                    {locations.map((location) => (
+                      <option key={location} value={location}>{location}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <button
+                  onClick={clearFilters}
+                  className="w-full bg-blue text-white py-2 rounded-lg hover:bg-darkblue transition-colors"
+                >
+                  Clear Filters
+                </button>
+
+                <div className="text-sm text-gray-600">
+                  Showing {filteredAnnouncements.length} of {announcements.length} announcements
+                </div>
+
+                <div className="hidden lg:block space-y-4 mt-6">
+                  <h4 className="text-lg font-semibold text-darkblue">What's New at PESO?</h4>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li>📅 Check out upcoming events such as job fairs and workshops</li>
+                    <li>💼 Explore new job opportunities posted daily</li>
+                    <li>🎓 Stay updated on free training programs</li>
+                  </ul>
+                </div>
+              </div>
             </div>
-          ))}
+          </div>
+
+          {/* Main Content */}
+          <div className="lg:w-3/4">
+            <div className="flex justify-between items-center mb-6">
+              <div className="text-gray-700">
+                Showing <span className="font-bold">{currentAnnouncements.length}</span> of{" "}
+                <span className="font-bold">{filteredAnnouncements.length}</span> announcements
+              </div>
+            </div>
+
+            {currentAnnouncements.map((announcement) => (
+              <div
+                key={announcement.id}
+                className="bg-white shadow-sm border rounded-lg overflow-hidden transition-transform transform hover:-translate-y-1 hover:shadow-md duration-300 ease-out mb-6"
+              >
+                <div className="px-6 py-4">
+                  <p className="text-sm text-gray-500 text-right">
+                    {new Date(announcement.date.seconds * 1000).toLocaleDateString(
+                      "en-US",
+                      {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      }
+                    )}
+                  </p>
+                  <h1 className="text-xl font-bold text-darkblue pt-2 mb-4">
+                    {announcement.title}
+                  </h1>
+                  <p className="text-gray-700 mb-4 text-base leading-relaxed" style={{ whiteSpace: "pre-wrap" }}>
+                    {announcement.description}
+                  </p>
+                  <p className="text-gray-700 mb-4 text-sm">
+                    <strong className="text-darkblue">Location:</strong>{" "}
+                    {announcement.location}
+                  </p>
+                </div>
+              </div>
+            ))}
+
+            {filteredAnnouncements.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-gray-600">No announcements found matching your filters.</p>
+                <button
+                  onClick={clearFilters}
+                  className="mt-4 text-blue hover:text-darkblue underline"
+                >
+                  Clear all filters
+                </button>
+              </div>
+            )}
+
+            <PaginationControls />
+          </div>
         </div>
       </div>
-    </div>
     </PageLoader>
   );
 };
