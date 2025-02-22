@@ -8,7 +8,7 @@ const AboutCity = () => {
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: "easeOut", type: "spring", stiffness: 100 }}
-      className="bmt-1 max-w-[105rem] mb-8 mx-auto flex flex-col md:flex-row items-center bg-white shadow-lg rounded-xl overflow-hidden border border-gray px-4 md:px-6 lg:px-8 py-6 md:py-8 lg:py-10"
+      className="mt-8 mx-4 sm:mx-8 md:mx-16 lg:mx-32 xl:mx-48 mb-8 flex flex-col md:flex-row items-center bg-white shadow-sm rounded-xl overflow-hidden border border-gray px-4 md:px-6 lg:px-8 py-6 md:py-8 lg:py-10"
     >
       {/* Image Column */}
       <div className="w-full md:w-1/2 p-4 flex justify-center">
