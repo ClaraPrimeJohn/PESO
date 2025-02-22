@@ -207,7 +207,7 @@ const Navbar = () => {
                             </span>
                                 <Link
                                     to="/profile"
-                                    className="text-sm text-black w-full hover:text-darkblue text-center mx-2 mt-2 py-2 border rounded-md bg-gray-100"
+                                    className="text-sm text-black w-full hover:text-darkblue text-center mx-2 mt-2 py-2 border rounded-md bg-gray-100" onClick={() => setIsDrawerOpen(false)}
                                 >
                                     Profile
                                 </Link>
@@ -216,6 +216,7 @@ const Navbar = () => {
                             <Link
                                 to="/login"
                                 className="text-black hover:text-darkblue py-2 border rounded-md bg-gray-100"
+                                onClick={() => setIsDrawerOpen(false)}
                             >
                                 Login
                             </Link>
@@ -224,19 +225,19 @@ const Navbar = () => {
 
                     {/* Navigation Links */}
                     <nav className="flex flex-col p-5 mx-2 text-sm space-y-8 text-center">
-                        <Link to="/" className={`${getActiveClass("/")} nav-effects`}>
+                        <Link to="/" className={`${getActiveClass("/")} nav-effects`} onClick={() => setIsDrawerOpen(false)}>
                             Home
                         </Link>
-                        <Link to="/about-us" className={`${getActiveClass("/about-us")} nav-effects`}>
+                        <Link to="/about-us" className={`${getActiveClass("/about-us")} nav-effects`} onClick={() => setIsDrawerOpen(false)}>
                             About us
                         </Link>
-                        <Link to="/announcement" className={`${getActiveClass("/announcement")} nav-effects`}>
+                        <Link to="/announcement" className={`${getActiveClass("/announcement")} nav-effects`} onClick={() => setIsDrawerOpen(false)}>
                             Announcement
                         </Link>
-                        <Link to="/job-listing" className={`${getActiveClass("/job-listing")} nav-effects`}>
+                        <Link to="/job-listing" className={`${getActiveClass("/job-listing")} nav-effects`}onClick={() => setIsDrawerOpen(false)}>
                             Job listing
                         </Link>
-                        <Link to="/contact-us" className={`${getActiveClass("/contact-us")} nav-effects`}>
+                        <Link to="/contact-us" className={`${getActiveClass("/contact-us")} nav-effects`} onClick={() => setIsDrawerOpen(false)}>
                             Contact us
                         </Link>
                     </nav>
@@ -245,7 +246,10 @@ const Navbar = () => {
                     <div className="p-6 mt-auto">
                         {user && (
                             <button
-                                onClick={handleLogout}
+                            onClick={() => {
+                                handleLogout();
+                                setIsDrawerOpen(false);
+                              }}
                                 className="text-red hover:font-bold w-full text-sm bg-gray-100 border border-red rounded-md p-3"
                             >
                                 Log out
