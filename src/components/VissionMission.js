@@ -41,7 +41,7 @@ const VisionMission = () => {
           Mission & Vision
         </motion.h2>
         <motion.h1
-          className="text-3xl sm:text-3xl font-bold mt-3 mb-6 drop-shadow-lg bg-gradient-to-r from-orange to-blue text-white px-3 py-2 rounded-lg"
+          className="text-3xl sm:text-3xl font-bold mt-3 mb-6 drop-shadow-lg text-white px-3 py-2 rounded-lg"
           variants={fadeInUp}
         >
           Empowering Growth through Innovative Employment
