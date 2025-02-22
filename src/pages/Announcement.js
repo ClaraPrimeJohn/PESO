@@ -149,18 +149,19 @@ const Announcement = () => {
   };
 
   return (
-    <PageLoader>
-      <div className="bg-white py-8 px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col lg:flex-row gap-8">
+    <div className="h-screen overflow-y-auto">
+      <PageLoader>
+      <div className="mx-4 sm:mx-8 md:mx-16 lg:mx-32 xl:mx-48 text-center py-8 my-4 mx-4 sm:mx-8 md:mx-18 lg:mx-32">
+        <div className="flex flex-col lg:flex-row gap-6">
           {/* Sidebar */}
-          <div className="lg:w-1/4">
-            <div className="bg-gray-100 p-6 rounded-lg shadow-sm border">
-              <h3 className="text-2xl font-bold text-darkblue mb-4">PESO Announcements</h3>
+          <div className="w-full lg:w-1/4">
+            <div className="bg-gray-100 p-4 sm:p-6 rounded-lg shadow-sm border">
+              <h3 className="text-xl sm:text-2xl font-bold text-darkblue mb-4 break-words">PESO Announcements</h3>
               <p className="text-gray-700 text-sm mb-6">
                 Stay informed with the latest announcements from the Public Employment Service Office (PESO).
               </p>
 
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 <div>
                   <h2 className="font-semibold text-base mb-2">Search Announcements</h2>
                   <input
@@ -171,7 +172,7 @@ const Announcement = () => {
                       setCurrentPage(1);
                     }}
                     placeholder="Search by title, description, or location"
-                    className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue"
                   />
                 </div>
 
@@ -183,7 +184,7 @@ const Announcement = () => {
                       setSelectedMonth(e.target.value);
                       setCurrentPage(1);
                     }}
-                    className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue"
                   >
                     <option value="">All Months</option>
                     {[...Array(12)].map((_, i) => (
@@ -202,7 +203,7 @@ const Announcement = () => {
                       setSelectedLocation(e.target.value);
                       setCurrentPage(1);
                     }}
-                    className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full p-2 sm:p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue"
                   >
                     <option value="">All Locations</option>
                     {locations.map((location) => (
@@ -213,7 +214,7 @@ const Announcement = () => {
 
                 <button
                   onClick={clearFilters}
-                  className="w-full bg-blue text-white py-2 rounded-lg hover:bg-darkblue transition-colors"
+                  className="w-full bg-blue hover:bg-blue-700 text-white py-2 rounded-lg transition"
                 >
                   Clear Filters
                 </button>
@@ -249,7 +250,7 @@ const Announcement = () => {
                 className="bg-white shadow-sm border rounded-lg overflow-hidden transition-transform transform hover:-translate-y-1 hover:shadow-md duration-300 ease-out mb-6"
               >
                 <div className="px-6 py-4">
-                  <p className="text-sm text-gray-500 text-right">
+                  <p className="text-sm text-gray-500 text-left">
                     {new Date(announcement.date.seconds * 1000).toLocaleDateString(
                       "en-US",
                       {
@@ -259,13 +260,13 @@ const Announcement = () => {
                       }
                     )}
                   </p>
-                  <h1 className="text-xl font-bold text-darkblue pt-2 mb-4">
+                  <h1 className="text-xl font-bold text-left text-darkblue pt-2 mb-4">
                     {announcement.title}
                   </h1>
-                  <p className="text-gray-700 mb-4 text-base leading-relaxed" style={{ whiteSpace: "pre-wrap" }}>
+                  <p className="text-gray-700 mb-4 text-base text-left leading-relaxed" style={{ whiteSpace: "pre-wrap" }}>
                     {announcement.description}
                   </p>
-                  <p className="text-gray-700 mb-4 text-sm">
+                  <p className="text-gray-700 mb-4 text-sm text-left">
                     <strong className="text-darkblue">Location:</strong>{" "}
                     {announcement.location}
                   </p>
@@ -284,12 +285,12 @@ const Announcement = () => {
                 </button>
               </div>
             )}
-
             <PaginationControls />
           </div>
-        </div>
+        </div> 
       </div>
-    </PageLoader>
+      </PageLoader>
+      </div>
   );
 };
 

@@ -169,7 +169,7 @@ const Joblist = () => {
       <PageLoader>
         <HowItWorks />
 
-        <div className="text-center p-4 mx-4 sm:mx-8 md:mx-16 lg:mx-32 rounded-lg bg-cover bg-center bg-no-repeat bg-gray-100 border">
+        <div className="text-center p-4 mx-4 lg:px-32 mx-4 sm:mx-8 md:mx-16 lg:mx-32 xl:mx-48 rounded-lg bg-cover bg-center bg-no-repeat bg-gray-100 border">
           <div className="mx-auto p-4">
             <h1 className="text-darkblue font-extrabold text-xl">
               Available Jobs for You
@@ -180,7 +180,7 @@ const Joblist = () => {
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row py-10 lg:px-32 px-6">
+        <div className="flex flex-col lg:flex-row py-4 mx-4 lg:px-32 mx-4 sm:mx-8 md:mx-16">
           {/* Filter Component */}
           <div className="lg:w-1/4 w-full p-4 bg-gray-100 rounded-lg mb-6 lg:mb-0 h-full border">
             <h2 className="font-bold text-lg mb-4">Search Filter</h2>
