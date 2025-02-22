@@ -300,12 +300,18 @@ const Joblist = () => {
                 </div>
 
                 <div className="flex flex-col items-end mt-4 lg:mt-0 w-full lg:w-1/3">
-                  <button
-                    className="px-4 py-2 bg-blue text-white rounded-lg hover:bg-darkblue"
-                    onClick={() => handleApplyNow(job.id)}
-                  >
-                    Apply Now
-                  </button>
+                <button
+                  className={`px-4 py-2 rounded-lg transition-all ${
+                    job.isOpen
+                      ? "bg-blue text-white hover:bg-darkblue"
+                      : "bg-gray-400 text-white cursor-not-allowed"
+                  }`}
+                  onClick={() => job.isOpen && handleApplyNow(job.id)}
+                  disabled={!job.isOpen}
+                  title={!job.isOpen ? "Not accepting applicants" : ""}
+                >
+                  Apply Now
+                </button>
 
                   <div className="mt-2 text-gray-500 text-sm">
                     Date Posted:{" "}
