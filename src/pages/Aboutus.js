@@ -3,6 +3,8 @@ import VisionMission from '../components/VissionMission';
 import aboutBanner from "../assets/aboutbanner.jpg";
 import LogoCarousel from '../components/LogoCarousel';
 import PESOHistory from '../components/History';
+import AboutCity from '../components/AboutCity';
+import HiredGallery from '../components/HiredGallery';
 import PageLoader from '../components/PageLoader'
 
 const Aboutus = () => {
@@ -15,7 +17,9 @@ const Aboutus = () => {
       <div className='lg:px-32 px-8'>
         <VisionMission />
       </div>
+      <AboutCity/>
       <PESOHistory/>
+      <HiredGallery/>
       <LogoCarousel />
     </div>
     </PageLoader>
