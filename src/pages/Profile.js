@@ -27,6 +27,7 @@ const Profile = () => {
         contactNumber: "", 
         profileImage: "" 
     });
+    const [selectedFile, setSelectedFile] = useState(null);
     const [previewImage, setPreviewImage] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -83,10 +84,10 @@ const Profile = () => {
         if (originalProfile) {
             const hasChanges = Object.keys(originalProfile).some(
                 key => originalProfile[key] !== profile[key]
-            );
+            ) || selectedFile !== null;
             setIsDirty(hasChanges);
         }
-    }, [profile, originalProfile]);
+    }, [profile, originalProfile, selectedFile]);
 
     const fetchProfileData = async (uid) => {
         try {
@@ -112,6 +113,24 @@ const Profile = () => {
         setProfile(prevProfile => ({ ...prevProfile, [name]: value }));
     };
 
+    const uploadImageToCloudinary = async (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+        formData.append("folder", "profiles");
+
+        const res = await fetch(
+            `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+            {
+                method: "POST",
+                body: formData,
+            }
+        );
+        const data = await res.json();
+        if (!data.secure_url) throw new Error("Image upload failed");
+        return data.secure_url;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!isDirty) {
@@ -123,13 +142,31 @@ const Profile = () => {
         try {
             if (!user) return;
             setLoading(true);
-            const updatedProfile = {
+            
+            let updatedProfile = {
                 ...profile,
                 email: user.email || profile.email
             };
+
+            // Upload image if there's a selected file
+            if (selectedFile) {
+                setUploadingImage(true);
+                try {
+                    const imageUrl = await uploadImageToCloudinary(selectedFile);
+                    updatedProfile.profileImage = imageUrl;
+                } catch (error) {
+                    console.error("Error uploading image:", error);
+                    toast.error("Failed to upload image");
+                    return;
+                } finally {
+                    setUploadingImage(false);
+                }
+            }
+
             await setDoc(doc(db, "profiles", user.uid), updatedProfile, { merge: true });
             setProfile(updatedProfile);
             setOriginalProfile(updatedProfile);
+            setSelectedFile(null);
             setIsDirty(false);
             setIsEditing(false);
             toast.success("Profile updated successfully!");
@@ -144,50 +181,25 @@ const Profile = () => {
         }
     };
 
-    const handleFileUpload = async (e) => {
+    const handleFileSelect = (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
-        setUploadingImage(true);
+        setSelectedFile(file);
+        
+        // Create preview
         const reader = new FileReader();
         reader.onloadend = () => {
             setPreviewImage(reader.result);
         };
         reader.readAsDataURL(file);
-
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-        formData.append("folder", "profiles");
-
-        try {
-            const res = await fetch(
-                `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
-                {
-                    method: "POST",
-                    body: formData,
-                }
-            );
-            const data = await res.json();
-            if (!data.secure_url) throw new Error("Image upload failed");
-            
-            setProfile(prevProfile => ({ 
-                ...prevProfile, 
-                profileImage: data.secure_url 
-            }));
-            setIsDirty(true);
-            toast.success("Profile image uploaded successfully!");
-        } catch (error) {
-            console.error("Error uploading image:", error);
-            toast.error("Failed to upload image");
-        } finally {
-            setUploadingImage(false);
-        }
+        setIsDirty(true);
     };
 
     const handleCancel = () => {
         setProfile(originalProfile);
         setPreviewImage(null);
+        setSelectedFile(null);
         setIsEditing(false);
         setIsDirty(false);
     };
@@ -240,7 +252,7 @@ const Profile = () => {
                                             id="image-upload"
                                             type="file" 
                                             accept="image/*" 
-                                            onChange={handleFileUpload}
+                                            onChange={handleFileSelect}
                                             className="hidden"
                                         />
                                     </label>
@@ -336,9 +348,9 @@ const Profile = () => {
                                     <>
                                         <button 
                                             type="submit" 
-                                            disabled={!isDirty}
+                                            disabled={!isDirty || uploadingImage}
                                             className={`flex items-center px-6 py-2 rounded-lg text-white
-                                                ${isDirty 
+                                                ${isDirty && !uploadingImage
                                                     ? 'bg-blue hover:bg-blue' 
                                                     : 'bg-gray-400 cursor-not-allowed'
                                                 } transition-colors duration-200`}
