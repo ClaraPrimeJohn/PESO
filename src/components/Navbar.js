@@ -16,9 +16,34 @@ const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [user, setUser] = useState(null);
     const [lastScrollTop, setLastScrollTop] = useState(0);
-    const [profileData, setProfileData] = useState(null); 
+    const [profileData, setProfileData] = useState(null);  
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [showGodView, setShowGodView] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
+    
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged((user) => {
+          if (user && user.email === 'primiel1423@gmail.com') {
+            setIsAdmin(true);
+          } else {
+            setIsAdmin(false);
+            setShowGodView(false);
+          }
+        });
+    
+        return () => unsubscribe();
+    }, []);
+    
+    const handleGodViewToggle = () => {
+        const newState = !showGodView;
+        setShowGodView(newState);
+        if (newState) {
+          navigate('/god-view');
+        } else {
+          navigate('/');
+        }
+    };    
 
     useEffect(() => {
         const handleScroll = () => {
@@ -96,6 +121,7 @@ const Navbar = () => {
                     }`}
             >
                 <img className="w-auto h-12 p-1" src={mainLogo} alt="logo" />
+                
                 {/* Hamburger Menu Button for mobile */}
                 <button
                     className="lg:hidden text-2xl text-black"
@@ -121,22 +147,36 @@ const Navbar = () => {
                     <Link to="/contact-us" className={`${getActiveClass("/contact-us")} nav-effects`}>
                         Contact us
                     </Link>
+                    
+                    {/* God View Toggle for Desktop */}
+                    {isAdmin && (
+                        <button
+                            onClick={handleGodViewToggle}
+                            className={`px-4 py-1.5 rounded font-mono text-sm transition-colors
+                            ${showGodView 
+                                ? 'bg-red-100 text-red-800 hover:bg-red-200' 
+                                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                            }`}
+                        >
+                            {showGodView ? '⚡ GOD MODE ACTIVE' : '👁️ GOD VIEW'}
+                        </button>
+                    )}
                 </nav>
 
                 {/* Login/Profile Dropdown */}
                 <div className="relative hidden lg:block">
                     {user ? (
                         <button className="flex items-center text-black hover:text-darkblue min-w-max" onClick={() => setIsLoginDropdownOpen(!isLoginDropdownOpen)}>
-                        <img
-                            src={profileData?.profileImage || user.photoURL || "/default-avatar.png"}
-                            alt="Profile"
-                            className="w-10 h-10 rounded-full object-cover"
-                        />
-                        <span className="text-sm pl-2 overflow-hidden text-ellipsis whitespace-nowrap flex-1">
-                            {profileData?.name || user.displayName || "Profile"}
-                        </span>
-                        <RiArrowDropDownLine className={`text-4xl transform transition-transform duration-300 ${isLoginDropdownOpen ? "rotate-180" : ""}`} />
-                    </button>
+                            <img
+                                src={profileData?.profileImage || user.photoURL || "/default-avatar.png"}
+                                alt="Profile"
+                                className="w-10 h-10 rounded-full object-cover"
+                            />
+                            <span className="text-sm pl-2 overflow-hidden text-ellipsis whitespace-nowrap flex-1">
+                                {profileData?.name || user.displayName || "Profile"}
+                            </span>
+                            <RiArrowDropDownLine className={`text-4xl transform transition-transform duration-300 ${isLoginDropdownOpen ? "rotate-180" : ""}`} />
+                        </button>
                     ) : (
                         <Link
                             to="/login"
@@ -183,7 +223,7 @@ const Navbar = () => {
                 {/* Drawer */}
                 <div
                     className={`absolute top-0 left-0 h-full bg-white shadow-lg transition-transform duration-300 ease-in-out flex flex-col 
-      ${isDrawerOpen ? "translate-x-0 delay-500" : "-translate-x-full"}`}
+                    ${isDrawerOpen ? "translate-x-0 delay-500" : "-translate-x-full"}`}
                     style={{ width: "calc(80vw)", maxWidth: "400px" }}
                 >
                     <div className="flex items-center justify-between px-6 py-4 border-b">
@@ -196,18 +236,19 @@ const Navbar = () => {
                     {/* Profile Section */}
                     <div className="flex flex-col items-center py-4 border-b px-6">
                         {user ? (
-                                <div className="flex flex-col items-center w-full">
-                                    <img
-                                src={profileData?.profileImage || user.photoURL || "/default-avatar.png"}
-                                alt="Profile"
-                                className="w-10 h-10 rounded-full object-cover"
-                            />
-                            <span className="text-sm pl-2 overflow-hidden text-ellipsis whitespace-nowrap flex-1">
-                                {profileData?.name || user.displayName || "Profile"}
-                            </span>
+                            <div className="flex flex-col items-center w-full">
+                                <img
+                                    src={profileData?.profileImage || user.photoURL || "/default-avatar.png"}
+                                    alt="Profile"
+                                    className="w-10 h-10 rounded-full object-cover"
+                                />
+                                <span className="text-sm pl-2 overflow-hidden text-ellipsis whitespace-nowrap flex-1">
+                                    {profileData?.name || user.displayName || "Profile"}
+                                </span>
                                 <Link
                                     to="/profile"
-                                    className="text-sm text-black w-full hover:text-darkblue text-center mx-2 mt-2 py-2 border rounded-md bg-gray-100" onClick={() => setIsDrawerOpen(false)}
+                                    className="text-sm text-black w-full hover:text-darkblue text-center mx-2 mt-2 py-2 border rounded-md bg-gray-100"
+                                    onClick={() => setIsDrawerOpen(false)}
                                 >
                                     Profile
                                 </Link>
@@ -234,22 +275,39 @@ const Navbar = () => {
                         <Link to="/announcement" className={`${getActiveClass("/announcement")} nav-effects`} onClick={() => setIsDrawerOpen(false)}>
                             Announcement
                         </Link>
-                        <Link to="/job-listing" className={`${getActiveClass("/job-listing")} nav-effects`}onClick={() => setIsDrawerOpen(false)}>
+                        <Link to="/job-listing" className={`${getActiveClass("/job-listing")} nav-effects`} onClick={() => setIsDrawerOpen(false)}>
                             Job listing
                         </Link>
                         <Link to="/contact-us" className={`${getActiveClass("/contact-us")} nav-effects`} onClick={() => setIsDrawerOpen(false)}>
                             Contact us
                         </Link>
+                        
+                        {/* God View Toggle for Mobile */}
+                        {isAdmin && (
+                            <button
+                                onClick={() => {
+                                    handleGodViewToggle();
+                                    setIsDrawerOpen(false);
+                                }}
+                                className={`px-4 py-1.5 rounded font-mono text-sm transition-colors
+                                ${showGodView 
+                                    ? 'bg-red-100 text-red-800 hover:bg-red-200' 
+                                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                                }`}
+                            >
+                                {showGodView ? '⚡ GOD MODE ACTIVE' : '👁️ GOD VIEW'}
+                            </button>
+                        )}
                     </nav>
 
                     {/* Logout Section */}
                     <div className="p-6 mt-auto">
                         {user && (
                             <button
-                            onClick={() => {
-                                handleLogout();
-                                setIsDrawerOpen(false);
-                              }}
+                                onClick={() => {
+                                    handleLogout();
+                                    setIsDrawerOpen(false);
+                                }}
                                 className="text-red hover:font-bold w-full text-sm bg-gray-100 border border-red rounded-md p-3"
                             >
                                 Log out

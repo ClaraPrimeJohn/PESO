@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { ActivityProvider } from './ActivityContext';
+import { useActivityMonitor } from './useActivityMonitor';
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer"; 
 import Contactus from "./pages/Contactus";
@@ -11,18 +13,22 @@ import Login from "./components/Login";
 import Profile from "./pages/Profile"; 
 import Signup from "./components/Signup";
 import ForgotPassword from "./components/ForgotPassword";
+import GodView from './GodView';
 
 function App() {
     return (
         <Router>
-            <AppContent />
+            <ActivityProvider>
+                <AppContent />
+            </ActivityProvider>
         </Router>
     );
 }
 
 function AppContent() {
     const location = useLocation();
-    const hideNavbarRoutes = ["/login", "/signup", "/forgot"]; 
+    const hideNavbarRoutes = ["/login", "/signup", "/forgot", "/god-view"];
+    useActivityMonitor(); 
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -38,7 +44,8 @@ function AppContent() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
                     <Route path="/forgot" element={<ForgotPassword />} /> 
-                    <Route path="/profile" element={<Profile />} /> 
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/god-view" element={<GodView />} />
                 </Routes>
             </main>
             {!hideNavbarRoutes.includes(location.pathname) && <Footer />}
