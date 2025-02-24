@@ -174,7 +174,7 @@ const JobDetails = () => {
                 className="-ml-2 bg-white hover:text-blue transition duration-300 flex items-center group"
                 title="Back to Job List"
               >
-                <div className="flex items-center space-x-1 group-hover:text-blue">
+                <div className="flex items-center group-hover:text-blue">
                   <IoIosArrowBack className="text-lg text-gray-700 group-hover:text-blue" />
                   <span className="text-sm">Back to Job List</span>
                 </div>
