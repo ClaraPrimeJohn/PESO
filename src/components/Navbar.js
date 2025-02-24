@@ -17,33 +17,8 @@ const Navbar = () => {
     const [user, setUser] = useState(null);
     const [lastScrollTop, setLastScrollTop] = useState(0);
     const [profileData, setProfileData] = useState(null);  
-    const [isAdmin, setIsAdmin] = useState(false);
-    const [showGodView, setShowGodView] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
-    
-    useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged((user) => {
-          if (user && user.email === 'primiel1423@gmail.com') {
-            setIsAdmin(true);
-          } else {
-            setIsAdmin(false);
-            setShowGodView(false);
-          }
-        });
-    
-        return () => unsubscribe();
-    }, []);
-    
-    const handleGodViewToggle = () => {
-        const newState = !showGodView;
-        setShowGodView(newState);
-        if (newState) {
-          navigate('/god-view');
-        } else {
-          navigate('/');
-        }
-    };    
 
     useEffect(() => {
         const handleScroll = () => {
@@ -148,19 +123,6 @@ const Navbar = () => {
                         Contact us
                     </Link>
                     
-                    {/* God View Toggle for Desktop */}
-                    {isAdmin && (
-                        <button
-                            onClick={handleGodViewToggle}
-                            className={`px-4 py-1.5 rounded font-mono text-sm transition-colors
-                            ${showGodView 
-                                ? 'bg-red-100 text-red-800 hover:bg-red-200' 
-                                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                            }`}
-                        >
-                            {showGodView ? '⚡ GOD MODE ACTIVE' : '👁️ GOD VIEW'}
-                        </button>
-                    )}
                 </nav>
 
                 {/* Login/Profile Dropdown */}
@@ -282,22 +244,6 @@ const Navbar = () => {
                             Contact us
                         </Link>
                         
-                        {/* God View Toggle for Mobile */}
-                        {isAdmin && (
-                            <button
-                                onClick={() => {
-                                    handleGodViewToggle();
-                                    setIsDrawerOpen(false);
-                                }}
-                                className={`px-4 py-1.5 rounded font-mono text-sm transition-colors
-                                ${showGodView 
-                                    ? 'bg-red-100 text-red-800 hover:bg-red-200' 
-                                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                                }`}
-                            >
-                                {showGodView ? '⚡ GOD MODE ACTIVE' : '👁️ GOD VIEW'}
-                            </button>
-                        )}
                     </nav>
 
                     {/* Logout Section */}
