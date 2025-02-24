@@ -175,8 +175,8 @@ const JobDetails = () => {
                 title="Back to Job List"
               >
                 <div className="flex items-center space-x-1 group-hover:text-blue">
-                  <IoIosArrowBack className="text-3xl text-gray-700 group-hover:text-blue" />
-                  <span className="text-lg">Back to Job List</span>
+                  <IoIosArrowBack className="text-lg text-gray-700 group-hover:text-blue" />
+                  <span className="text-sm">Back to Job List</span>
                 </div>
               </button>
             </div>
@@ -186,7 +186,7 @@ const JobDetails = () => {
               </h1>
             </div>
 
-            <div className="space-y-4 text-gray-700 pl-0 md:pl-12">
+            <div className="space-y-4 text-gray-700">
               <p>
                 <strong>Location:</strong> {job.location}
               </p>

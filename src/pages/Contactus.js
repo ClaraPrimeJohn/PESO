@@ -5,7 +5,7 @@ import { IoIosMail } from "react-icons/io";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import Banner from '../assets/banner.jpg';
 import PageLoader from '../components/PageLoader';
-// import FaqIllustration from '../assets/contactus.png';
+import FaqIllustration from '../assets/contactus.png';
 
 const Contactus = () => {
     const [openIndex, setOpenIndex] = useState(null);
@@ -102,7 +102,7 @@ const Contactus = () => {
 
                 {/* Illustration / Icons */}
                 <div className="flex justify-center">
-                    {/* <img src={FaqIllustration} alt="FAQ Illustration" className="w-full max-w-md object-cover" /> */}
+                    <img src={FaqIllustration} alt="FAQ Illustration" className="w-full max-w-md object-cover" />
                 </div>
             </div>
         </div>
