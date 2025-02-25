@@ -13,7 +13,6 @@ import "react-toastify/dist/ReactToastify.css";
 const Navbar = () => {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [isLoginDropdownOpen, setIsLoginDropdownOpen] = useState(false);
-    const [isScrolled, setIsScrolled] = useState(false);
     const [user, setUser] = useState(null);
     const [lastScrollTop, setLastScrollTop] = useState(0);
     const [profileData, setProfileData] = useState(null);  
@@ -23,13 +22,6 @@ const Navbar = () => {
     useEffect(() => {
         const handleScroll = () => {
             let currentScroll = window.scrollY || document.documentElement.scrollTop;
-
-            if (currentScroll > 10) {
-                setIsScrolled(true);
-            } else {
-                setIsScrolled(false);
-            }
-
             setLastScrollTop(currentScroll <= 0 ? 0 : currentScroll); 
         };
 
@@ -89,11 +81,7 @@ const Navbar = () => {
     return (
         <div>
             <header
-                className={`bg-white shadow-md px-6 py-2 flex items-center justify-between w-full z-50 transition-all duration-300 
-                    ${isScrolled
-                        ? "fixed top-0 shadow-md bg-white/80 backdrop-blur-md py-2 text-gray-900 smooth-transition"
-                        : " py-3 bg-transparent"
-                    }`}
+                className="fixed top-0 left-0 bg-white shadow-md px-6 py-2 flex items-center justify-between w-full z-50 transition-all duration-300"
             >
                 <img className="w-auto h-12 p-1" src={mainLogo} alt="logo" />
                 
@@ -173,6 +161,9 @@ const Navbar = () => {
                     )}
                 </div>
             </header>
+
+            {/* Add a spacer div to prevent content from being hidden behind the fixed navbar */}
+            <div className="h-16"></div>
 
             {/* Drawer and Overlay */}
             <div className={`fixed inset-0 z-50 transition-transform duration-300 ease-in-out ${isDrawerOpen ? "translate-x-0" : "-translate-x-full"}`}>
