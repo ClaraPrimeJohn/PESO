@@ -318,7 +318,7 @@ const JobDetails = () => {
 
               {!auth.currentUser ? (
                 <p className="text-black text-sm text-center mt-2">
-                  Log in first to create an account.{" "}
+                  Log in first to apply.{" "}
                   <button
                     className="text-blue font-bold underline"
                     onClick={() => navigate("/login")}
