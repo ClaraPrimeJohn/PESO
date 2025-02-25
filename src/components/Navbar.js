@@ -81,7 +81,7 @@ const Navbar = () => {
     return (
         <div>
             <header
-                className="fixed top-0 left-0 bg-white shadow-md px-6 py-2 flex items-center justify-between w-full z-50 transition-all duration-300"
+                className="fixed top-0 left-0 bg-white shadow-md bg-white/80 backdrop-blur-md px-6 py-2 flex items-center justify-between w-full z-50 transition-all duration-300"
             >
                 <img className="w-auto h-12 p-1" src={mainLogo} alt="logo" />
                 
