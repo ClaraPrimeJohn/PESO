@@ -92,7 +92,7 @@ const Navbar = () => {
                 className={`bg-white shadow-md px-6 py-2 flex items-center justify-between w-full z-50 transition-all duration-300 
                     ${isScrolled
                         ? "fixed top-0 shadow-md bg-white/80 backdrop-blur-md py-2 text-gray-900 smooth-transition"
-                        : "relative py-3 bg-transparent"
+                        : " py-3 bg-transparent"
                     }`}
             >
                 <img className="w-auto h-12 p-1" src={mainLogo} alt="logo" />

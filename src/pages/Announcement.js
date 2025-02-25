@@ -149,7 +149,7 @@ const Announcement = () => {
   };
 
   return (
-    <div className="h-screen overflow-y-auto">
+    <div>
       <PageLoader>
       <div className="mx-4 sm:mx-8 md:mx-16 lg:mx-32 xl:mx-48 text-center py-8 my-4 mx-4 sm:mx-8 md:mx-18 lg:mx-32">
         <div className="flex flex-col lg:flex-row gap-6">
