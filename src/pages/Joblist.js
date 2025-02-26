@@ -1,23 +1,34 @@
 import React, { useState, useEffect } from "react";
 import { auth, db } from "../firebase";
 import { toast } from "react-toastify";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import HowItWorks from "../components/HowItWorks";
 import { useNavigate } from "react-router-dom";
 import placeholder from "../assets/companycolored.png";
 import PageLoader from "../components/PageLoader";
+import { MdDone } from "react-icons/md";
+
 
 const Joblist = () => {
   const [jobs, setJobs] = useState([]);
+  const [appliedJobIds, setAppliedJobIds] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedJobType, setSelectedJobType] = useState([]);
   const [selectedExperience, setSelectedExperience] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState("");
-  const [, setUser] = useState(null);
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   
   const [currentPage, setCurrentPage] = useState(1);
   const [jobsPerPage] = useState(5);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -36,22 +47,47 @@ const Joblist = () => {
     };
 
     fetchJobs();
-
-    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
-      setUser(currentUser);
-    });
-    return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    const fetchAppliedJobs = async () => {
+      try {
+        if (!user || !user.email) {
+          setIsLoading(false);
+          return;
+        }
+
+        const applicationsRef = collection(db, "applications");
+        const q = query(applicationsRef, where("applicant_email", "==", user.email));
+        
+        const querySnapshot = await getDocs(q);
+        const appliedIds = querySnapshot.docs.map(doc => doc.data().job_id);
+        
+        setAppliedJobIds(appliedIds);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching applied jobs:", error);
+        toast.error("Failed to load your applied jobs.");
+        setIsLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchAppliedJobs();
+    } else {
+      setIsLoading(false);
+    }
+  }, [user]);
 
   const applyFilters = () => {
     const filteredJobs = jobs.filter((job) => {
-      const jobDate = job.date_posted.toDate();
-      const jobMonth = jobDate.toLocaleString("default", { month: "long" });
+      const jobDate = job.date_posted?.toDate();
+      const jobMonth = jobDate?.toLocaleString("default", { month: "long" });
 
       return (
         (searchTerm === "" ||
-          job.job_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          job.company.toLowerCase().includes(searchTerm.toLowerCase())) &&
+          job.job_title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          job.company?.toLowerCase().includes(searchTerm.toLowerCase())) &&
         (selectedJobType.length === 0 || selectedJobType.includes(job.job_type)) &&
         (selectedExperience.length === 0 || selectedExperience.includes(job.experience)) &&
         (selectedMonth === "" || jobMonth === selectedMonth)
@@ -61,8 +97,8 @@ const Joblist = () => {
   };
 
   const filteredJobs = applyFilters().sort((a, b) => {
-    const dateA = a.date_posted instanceof Date ? a.date_posted : new Date(a.date_posted.seconds * 1000);
-    const dateB = b.date_posted instanceof Date ? b.date_posted : new Date(b.date_posted.seconds * 1000);
+    const dateA = a.date_posted instanceof Date ? a.date_posted : new Date(a.date_posted?.seconds * 1000);
+    const dateB = b.date_posted instanceof Date ? b.date_posted : new Date(b.date_posted?.seconds * 1000);
     return dateB - dateA;
   });
 
@@ -89,6 +125,10 @@ const Joblist = () => {
 
   const handleApplyNow = (jobId) => {
     navigate(`/job/${jobId}`);
+  };
+
+  const isJobApplied = (jobId) => {
+    return appliedJobIds.includes(jobId);
   };
 
   const PaginationControls = () => {
@@ -271,68 +311,98 @@ const Joblist = () => {
               </div>
             </div>
 
-            {currentJobs.map((job) => (
-              <div
-                key={job.id}
-                className="flex flex-col lg:flex-row justify-between border items-start lg:items-center p-6 bg-white shadow-sm rounded-lg mb-4 transition-transform transform hover:-translate-y-1 hover:scale-10 hover:shadow-md duration-300 ease-out"
-              >
-                <div className="flex flex-col lg:flex-row items-start lg:items-center w-full lg:w-2/3">
-                  <div className="flex items-center space-x-4">
-                    <img
-                      src={job.logo || placeholder}
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = placeholder;
-                      }}
-                      alt={`${job.company} logo`}
-                      className="w-16 h-16 rounded-full object-cover"
-                    />
-                    <div>
-                      <h3 className="text-blue font-semibold">{job.company}</h3>
-                      <h2 className="text-xl font-bold">{job.job_title}</h2>
-                      <p className="text-gray-500">{job.location}</p>
-                      <p className="text-gray-500 text-sm">
-                        <strong>Salary:</strong> ₱{job.salary_min} - ₱{job.salary_max}
-                      </p>
+            {isLoading ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue"></div>
+              </div>
+            ) : (
+              currentJobs.map((job) => {
+                const applied = isJobApplied(job.id);
+                
+                return (
+                  <div
+                    key={job.id}
+                    className="flex flex-col lg:flex-row justify-between border items-start lg:items-center p-6 bg-white shadow-sm rounded-lg mb-4 transition-transform transform hover:-translate-y-1 hover:scale-10 hover:shadow-md duration-300 ease-out"
+                  >
+                    <div className="flex flex-col lg:flex-row items-start lg:items-center w-full lg:w-2/3">
+                      <div className="flex items-center space-x-4">
+                        <img
+                          src={job.logo || placeholder}
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = placeholder;
+                          }}
+                          alt={`${job.company} logo`}
+                          className="w-16 h-16 rounded-full object-cover"
+                        />
+                        <div>
+                          <div className="flex items-center">
+                            <h3 className="text-blue font-semibold">{job.company}</h3>
+                            {applied && (
+                              <span className="ml-2 px-2 py-1 text-xs rounded-full text-green font-medium flex items-center">
+                                Applied
+                                <MdDone className="ml-1 w-4 h-4 text-green" />
+                              </span>
+                            )}
+                          </div>
+                          <h2 className="text-xl font-bold">{job.job_title}</h2>
+                          <p className="text-gray-500">{job.location}</p>
+                          <p className="text-gray-500 text-sm">
+                            <strong>Salary:</strong> ₱{job.salary_min} - ₱{job.salary_max}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col items-end mt-4 lg:mt-0 w-full lg:w-1/3">
+                      <button
+                        className={`px-4 py-2 rounded-lg transition-all ${
+                          !job.isOpen || applied
+                            ? "bg-gray-400 text-white cursor-not-allowed"
+                            : "bg-blue text-white hover:bg-darkblue"
+                        }`}
+                        onClick={() => !applied && job.isOpen && handleApplyNow(job.id)}
+                        disabled={!job.isOpen || applied}
+                        title={
+                          applied 
+                            ? "You have already applied to this job" 
+                            : !job.isOpen 
+                              ? "Not accepting applicants" 
+                              : "Apply Now"
+                        }
+                      >
+                        {applied ? "Applied" : "Apply Now"}
+                      </button>
+
+                      <div className="mt-2 text-gray-500 text-sm">
+                        Date Posted:{" "}
+                        <span className="font-medium text-gray-700">
+                          {job.date_posted instanceof Date
+                            ? job.date_posted.toLocaleDateString("en-GB", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              })
+                            : new Date(job.date_posted?.seconds * 1000).toLocaleDateString("en-GB", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              })}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
+                );
+              })
+            )}
 
-                <div className="flex flex-col items-end mt-4 lg:mt-0 w-full lg:w-1/3">
-                  <button
-                    className={`px-4 py-2 rounded-lg transition-all ${
-                      job.isOpen
-                        ? "bg-blue text-white hover:bg-darkblue"
-                        : "bg-gray-400 text-white cursor-not-allowed"
-                    }`}
-                    onClick={() => job.isOpen && handleApplyNow(job.id)}
-                    disabled={!job.isOpen}
-                    title={!job.isOpen ? "Not accepting applicants" : ""}
-                  >
-                    Apply Now
-                  </button>
-
-                  <div className="mt-2 text-gray-500 text-sm">
-                    Date Posted:{" "}
-                    <span className="font-medium text-gray-700">
-                      {job.date_posted instanceof Date
-                        ? job.date_posted.toLocaleDateString("en-GB", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          })
-                        : new Date(job.date_posted.seconds * 1000).toLocaleDateString("en-GB", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          })}
-                    </span>
-                  </div>
-                </div>
+            {!isLoading && currentJobs.length === 0 && (
+              <div className="text-center py-10">
+                <p className="text-gray-500 text-lg">No jobs match your current filters.</p>
               </div>
-            ))}
+            )}
 
-            <PaginationControls />
+            {!isLoading && currentJobs.length > 0 && <PaginationControls />}
           </div>
         </div>
       </PageLoader>
