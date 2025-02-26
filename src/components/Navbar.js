@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import mainLogo from "../assets/mainLogo.png";
 import { CgProfile } from "react-icons/cg";
 import { RiMenu3Line, RiCloseLine, RiArrowDropDownLine } from "react-icons/ri";
-import { FaUserEdit } from "react-icons/fa";
+import { FaUserEdit, FaBriefcase } from "react-icons/fa";
 import { auth } from "../firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
@@ -148,6 +148,15 @@ const Navbar = () => {
                                     </Link>
                                 </li>
                                 <li className="px-4 py-2 cursor-pointer nav-effects">
+                                    <Link
+                                        to="/applied"
+                                        className="flex items-center text-sm space-x-2 w-full"
+                                    >
+                                        <FaBriefcase className="text-xl" />
+                                        <span>Applied Jobs</span>
+                                    </Link>
+                                </li>
+                                <li className="px-4 py-2 cursor-pointer nav-effects">
                                     <button
                                         onClick={handleLogout}
                                         className="flex items-center text-sm space-x-2 w-full"
@@ -204,6 +213,13 @@ const Navbar = () => {
                                     onClick={() => setIsDrawerOpen(false)}
                                 >
                                     Profile
+                                </Link>
+                                <Link
+                                    to="/applied"
+                                    className="text-sm text-black w-full hover:text-darkblue text-center mx-2 mt-2 py-2 border rounded-md bg-gray-100"
+                                    onClick={() => setIsDrawerOpen(false)}
+                                >
+                                    Applied Jobs
                                 </Link>
                             </div>
                         ) : (

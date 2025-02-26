@@ -11,6 +11,7 @@ import Login from "./components/Login";
 import Profile from "./pages/Profile"; 
 import Signup from "./components/Signup";
 import ForgotPassword from "./components/ForgotPassword";
+import AppliedJobs from "./pages/AppliedJobs";
 
 function App() {
     return (
@@ -39,6 +40,7 @@ function AppContent() {
                     <Route path="/signup" element={<Signup />} />
                     <Route path="/forgot" element={<ForgotPassword />} /> 
                     <Route path="/profile" element={<Profile />} />
+                    <Route path="/applied" element={<AppliedJobs />} />
                 </Routes>
             </main>
             {!hideNavbarRoutes.includes(location.pathname) && <Footer />}
