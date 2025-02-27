@@ -1,31 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { auth, db } from "../firebase";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { updateProfile } from "firebase/auth";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { 
-    FaCamera, 
-    FaSpinner, 
-    FaUser, 
-    FaMapMarkerAlt, 
-    FaPhone, 
-    FaEnvelope,
-    FaPencilAlt,
-    FaSave,
-    FaTimes
-} from 'react-icons/fa';
+import { FaCamera, FaSpinner, FaUser, FaMapMarkerAlt, FaPhone, FaEnvelope, FaPencilAlt, FaSave, FaTimes } from "react-icons/fa";
 
 const CLOUDINARY_UPLOAD_PRESET = "ybbfcbyk";
 const CLOUDINARY_CLOUD_NAME = "drg1csmnn";
 
 const Profile = () => {
     const [user, setUser] = useState(null);
-    const [profile, setProfile] = useState({ 
-        name: "", 
+    const [profile, setProfile] = useState({
+        name: "",
         email: "",
-        address: "", 
-        contactNumber: "", 
-        profileImage: "" 
+        address: "",
+        contactNumber: "",
+        profileImage: ""
     });
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewImage, setPreviewImage] = useState(null);
@@ -34,34 +25,39 @@ const Profile = () => {
     const [uploadingImage, setUploadingImage] = useState(false);
     const [originalProfile, setOriginalProfile] = useState(null);
     const [isDirty, setIsDirty] = useState(false);
+    const [isNewUser, setIsNewUser] = useState(false);
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
             if (currentUser) {
                 setUser(currentUser);
-                await fetchProfileData(currentUser.uid);
-                
+
                 const profileRef = doc(db, "profiles", currentUser.uid);
                 const profileSnap = await getDoc(profileRef);
-                
-                if (!profileSnap.exists() || !profileSnap.data().name) {
+
+                if (!profileSnap.exists()) {
+                    setIsNewUser(true);
                     const newProfile = {
-                        name: currentUser.displayName || "",
+                        name: "",
                         email: currentUser.email || "",
-                        profileImage: currentUser.photoURL || "",
+                        profileImage: "",
                         address: "",
                         contactNumber: ""
                     };
-                    
+
                     try {
-                        await setDoc(profileRef, newProfile, { merge: true });
+                        await setDoc(profileRef, newProfile);
                         setProfile(newProfile);
                         setOriginalProfile(newProfile);
-                        toast.success("Profile set up with Google data!");
+                        setIsEditing(true);
+                        toast.success("Please complete your profile information.");
                     } catch (error) {
                         console.error("Error initializing profile:", error);
-                        toast.error("Failed to initialize profile");
+                        toast.error("Failed to initialize profile.");
                     }
+                } else {
+                    setIsNewUser(false);
+                    await fetchProfileData(currentUser.uid);
                 }
             } else {
                 setUser(null);
@@ -71,46 +67,33 @@ const Profile = () => {
         return () => unsubscribe();
     }, []);
 
-    useEffect(() => {
-        if (user && user.email) {
-            setProfile(prevProfile => ({
-                ...prevProfile,
-                email: user.email
-            }));
-        }
-    }, [user]);
-
-    useEffect(() => {
-        if (originalProfile) {
-            const hasChanges = Object.keys(originalProfile).some(
-                key => originalProfile[key] !== profile[key]
-            ) || selectedFile !== null;
-            setIsDirty(hasChanges);
-        }
-    }, [profile, originalProfile, selectedFile]);
-
     const fetchProfileData = async (uid) => {
         try {
             const profileRef = doc(db, "profiles", uid);
             const profileSnap = await getDoc(profileRef);
             if (profileSnap.exists()) {
                 const data = profileSnap.data();
-                const updatedData = {
-                    ...data,
-                    email: auth.currentUser?.email || data.email
-                };
-                setProfile(updatedData);
-                setOriginalProfile(updatedData);
+                setProfile(data);
+                setOriginalProfile(data);
             }
         } catch (error) {
             console.error("Error fetching profile data:", error);
-            toast.error("Failed to fetch profile data");
+            toast.error("Failed to fetch profile data.");
         }
     };
 
+    useEffect(() => {
+        if (originalProfile) {
+            const hasChanges = Object.keys(profile).some(
+                (key) => key !== "email" && originalProfile[key] !== profile[key]
+            ) || selectedFile !== null;
+            setIsDirty(hasChanges);
+        }
+    }, [profile, originalProfile, selectedFile]);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setProfile(prevProfile => ({ ...prevProfile, [name]: value }));
+        setProfile((prevProfile) => ({ ...prevProfile, [name]: value }));
     };
 
     const uploadImageToCloudinary = async (file) => {
@@ -133,8 +116,9 @@ const Profile = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         if (!isDirty) {
-            toast.info("No changes to save");
+            toast.info("No changes to save.");
             setIsEditing(false);
             return;
         }
@@ -142,13 +126,14 @@ const Profile = () => {
         try {
             if (!user) return;
             setLoading(true);
-            
+
             let updatedProfile = {
-                ...profile,
-                email: user.email || profile.email
+                name: profile.name,
+                address: profile.address,
+                contactNumber: profile.contactNumber,
+                profileImage: profile.profileImage
             };
 
-            // Upload image if there's a selected file
             if (selectedFile) {
                 setUploadingImage(true);
                 try {
@@ -156,26 +141,35 @@ const Profile = () => {
                     updatedProfile.profileImage = imageUrl;
                 } catch (error) {
                     console.error("Error uploading image:", error);
-                    toast.error("Failed to upload image");
+                    toast.error("Failed to upload image.");
+                    setLoading(false);
+                    setUploadingImage(false);
                     return;
                 } finally {
                     setUploadingImage(false);
                 }
             }
 
-            await setDoc(doc(db, "profiles", user.uid), updatedProfile, { merge: true });
-            setProfile(updatedProfile);
-            setOriginalProfile(updatedProfile);
+            const profileRef = doc(db, "profiles", user.uid);
+            await updateDoc(profileRef, updatedProfile);
+
+            if (profile.name && profile.name !== originalProfile.name) {
+                await updateProfile(auth.currentUser, {
+                    displayName: profile.name
+                });
+            }
+
+            await fetchProfileData(user.uid);
+
             setSelectedFile(null);
+            setPreviewImage(null);
             setIsDirty(false);
             setIsEditing(false);
+            setIsNewUser(false);
             toast.success("Profile updated successfully!");
-            setTimeout(() => {
-                window.location.reload();
-            }, 500);
         } catch (error) {
             console.error("Error updating profile:", error);
-            toast.error("Failed to update profile");
+            toast.error("Failed to update profile.");
         } finally {
             setLoading(false);
         }
@@ -186,14 +180,11 @@ const Profile = () => {
         if (!file) return;
 
         setSelectedFile(file);
-        
-        // Create preview
         const reader = new FileReader();
         reader.onloadend = () => {
             setPreviewImage(reader.result);
         };
         reader.readAsDataURL(file);
-        setIsDirty(true);
     };
 
     const handleCancel = () => {
@@ -208,6 +199,7 @@ const Profile = () => {
         setIsEditing(true);
     };
 
+
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
@@ -219,6 +211,14 @@ const Profile = () => {
     return (
         <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto">
+                {isNewUser && (
+                    <div className="mb-6 bg-green-50 p-4 rounded-lg border border-green-200">
+                        <p className="text-green-800 text-center">
+                            Please complete your profile information below.
+                        </p>
+                    </div>
+                )}
+                
                 <div className="bg-white rounded-2xl shadow-xl overflow-hidden transform transition-all duration-300 hover:shadow-2xl">
                     {/* Header Section */}
                     <div className="relative h-40 bg-gradient-to-r from-blue to-blue">
@@ -271,116 +271,116 @@ const Profile = () => {
                         </div>
 
                         <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <label className="flex items-center text-sm font-medium text-gray-700">
-                                        <FaUser className="w-4 h-4 mr-2 text-blue" />
-                                        Full Name
-                                    </label>
-                                    <input
-                                        name="name"
-                                        value={profile.name}
-                                        onChange={handleChange}
-                                        disabled={!isEditing}
-                                        required
-                                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 
-                                            ${isEditing 
-                                                ? 'border-blue focus:ring-blue bg-white' 
-                                                : 'border-gray-200 bg-gray-50'
-                                            } transition-all duration-200`}
-                                    />
-                                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                    <label className="flex items-center text-sm font-medium text-gray-700">
+                        <FaUser className="w-4 h-4 mr-2 text-blue" />
+                        Full Name
+                    </label>
+                    <input
+                        name="name"
+                        value={profile.name}
+                        onChange={handleChange}
+                        disabled={!isEditing}
+                        placeholder="Enter your full name"
+                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 
+                            ${isEditing 
+                                ? 'border-blue focus:ring-darkblue bg-white' 
+                                : 'border-gray-200 bg-gray-50'
+                            } transition-all duration-200`}
+                    />
+                </div>
 
-                                <div className="space-y-2">
-                                    <label className="flex items-center text-sm font-medium text-gray-700">
-                                        <FaPhone className="w-4 h-4 mr-2 text-blue" />
-                                        Contact Number
-                                    </label>
-                                    <input
-                                        name="contactNumber"
-                                        value={profile.contactNumber}
-                                        onChange={handleChange}
-                                        disabled={!isEditing}
-                                        required
-                                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 
-                                            ${isEditing 
-                                                ? 'border-blue focus:ring-blue bg-white' 
-                                                : 'border-gray-200 bg-gray-50'
-                                            } transition-all duration-200`}
-                                    />
-                                </div>
-                            </div>
+                <div className="space-y-2">
+                    <label className="flex items-center text-sm font-medium text-gray-700">
+                        <FaPhone className="w-4 h-4 mr-2 text-blue" />
+                        Contact Number
+                    </label>
+                    <input
+                        name="contactNumber"
+                        value={profile.contactNumber}
+                        onChange={handleChange}
+                        disabled={!isEditing}
+                        placeholder="Enter your contact number"
+                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 
+                            ${isEditing 
+                                ? 'border-blue focus:ring-darkblue bg-white' 
+                                : 'border-gray-200 bg-gray-50'
+                            } transition-all duration-200`}
+                    />
+                </div>
+            </div>
 
-                            <div className="space-y-2">
-                                <label className="flex items-center text-sm font-medium text-gray-700">
-                                    <FaMapMarkerAlt className="w-4 h-4 mr-2 text-blue" />
-                                    Address
-                                </label>
-                                <input
-                                    name="address"
-                                    value={profile.address}
-                                    onChange={handleChange}
-                                    disabled={!isEditing}
-                                    required
-                                    className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 
-                                        ${isEditing 
-                                            ? 'border-blue focus:ring-blue bg-white' 
-                                            : 'border-gray-200 bg-gray-50'
-                                        } transition-all duration-200`}
-                                />
-                            </div>
+            <div className="space-y-2">
+                <label className="flex items-center text-sm font-medium text-gray-700">
+                    <FaMapMarkerAlt className="w-4 h-4 mr-2 text-blue" />
+                    Address
+                </label>
+                <input
+                    name="address"
+                    value={profile.address}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    placeholder="Enter your address"
+                    className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 
+                        ${isEditing 
+                            ? 'border-blue focus:ring-darkblue bg-white' 
+                            : 'border-gray-200 bg-gray-50'
+                        } transition-all duration-200`}
+                />
+            </div>
 
-                            <div className="space-y-2">
-                                <label className="flex items-center text-sm font-medium text-gray-700">
-                                    <FaEnvelope className="w-4 h-4 mr-2 text-blue" />
-                                    Email
-                                </label>
-                                <input
-                                    type="email"
-                                    value={profile.email || ""}
-                                    disabled
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50"
-                                />
-                            </div>
+            <div className="space-y-2">
+                <label className="flex items-center text-sm font-medium text-gray-700">
+                    <FaEnvelope className="w-4 h-4 mr-2 text-blue" />
+                    Email
+                </label>
+                <input
+                    type="email"
+                    value={profile.email || ""}
+                    disabled
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50"
+                />
+            </div>
 
-                            <div className="pt-6 flex justify-center gap-4">
-                                {isEditing ? (
-                                    <>
-                                        <button 
-                                            type="submit" 
-                                            disabled={!isDirty || uploadingImage}
-                                            className={`flex items-center px-6 py-2 rounded-lg text-white
-                                                ${isDirty && !uploadingImage
-                                                    ? 'bg-blue hover:bg-blue' 
-                                                    : 'bg-gray-400 cursor-not-allowed'
-                                                } transition-colors duration-200`}
-                                        >
-                                            <FaSave className="w-4 h-4 mr-2" />
-                                            Save Changes
-                                        </button>
-                                        <button 
-                                            type="button" 
-                                            onClick={handleCancel}
-                                            className="flex items-center px-6 py-2 border border-gray-300 rounded-lg text-gray-700 
-                                                hover:bg-gray-50 transition-colors duration-200"
-                                        >
-                                            <FaTimes className="w-4 h-4 mr-2" />
-                                            Cancel
-                                        </button>
-                                    </>
-                                ) : (
-                                    <button 
-                                        type="button" 
-                                        onClick={handleEditClick}
-                                        className="flex items-center px-6 py-2 bg-blue text-white rounded-lg 
-                                            hover:bg-blue transition-colors duration-200"
-                                    >
-                                        <FaPencilAlt className="w-4 h-4 mr-2" />
-                                        Edit Profile
-                                    </button>
-                                )}
-                            </div>
-                        </form>
+            <div className="pt-6 flex justify-center gap-4">
+                {isEditing ? (
+                    <>
+                        <button 
+                            type="submit" 
+                            disabled={!isDirty || uploadingImage}
+                            className={`flex items-center px-6 py-2 rounded-lg text-white
+                                ${isDirty && !uploadingImage
+                                    ? 'bg-blue hover:bg-darkblue' 
+                                    : 'bg-gray-400 cursor-not-allowed'
+                                } transition-colors duration-200`}
+                        >
+                            <FaSave className="w-4 h-4 mr-2" />
+                            Save Changes
+                        </button>
+                        <button 
+                            type="button" 
+                            onClick={handleCancel}
+                            className="flex items-center px-6 py-2 border border-gray-300 rounded-lg text-gray-700 
+                                hover:bg-gray-50 transition-colors duration-200"
+                        >
+                            <FaTimes className="w-4 h-4 mr-2" />
+                            Cancel
+                        </button>
+                    </>
+                ) : (
+                    <button 
+                        type="button" 
+                        onClick={handleEditClick}
+                        className="flex items-center px-6 py-2 bg-blue text-white rounded-lg 
+                            hover:bg-blue transition-colors duration-200"
+                    >
+                        <FaPencilAlt className="w-4 h-4 mr-2" />
+                        Edit Profile
+                    </button>
+                )}
+            </div>
+        </form>
                     </div>
                 </div>
             </div>
