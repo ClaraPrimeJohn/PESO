@@ -342,8 +342,8 @@ const Joblist = () => {
                         <div className="flex items-center">
                           <h2 className="text-xl font-bold">{job.job_title}</h2>
                           {!job.isOpen && (
-                            <span className="ml-2 px-2 py-0.5 text-sm rounded-full text-red font-medium">
-                              - Closed
+                            <span className="ml-2 px-4 py-0.5 text-sm rounded-full text-red font-medium">
+                             Closed
                             </span>
                           )}
                         </div>
