@@ -67,26 +67,39 @@ const JobDetails = () => {
     fetchJob();
   }, [jobId]);
 
-  // Fetch user profile
+  // Fetch user profile with improved handling
   useEffect(() => {
     const fetchUserProfile = async () => {
-      const currentUser = auth.currentUser;
-      if (!currentUser) {
-        setLoadingProfile(false);
-        return;
-      }
-
+      setLoadingProfile(true);
+      
       try {
+        const currentUser = auth.currentUser;
+        
+        if (!currentUser) {
+          console.log("No user logged in");
+          setLoadingProfile(false);
+          setIsProfileComplete(false);
+          return;
+        }
+
         const profileRef = doc(db, "profiles", currentUser.uid);
         const profileSnap = await getDoc(profileRef);
 
         if (profileSnap.exists()) {
           const profileData = profileSnap.data();
+          
+          // Check if essential fields exist and are not empty strings
           const isComplete = Boolean(
             profileData.name && 
+            profileData.name.trim() !== "" && 
             profileData.address && 
-            profileData.contactNumber
+            profileData.address.trim() !== "" && 
+            profileData.contactNumber && 
+            profileData.contactNumber.trim() !== ""
           );
+          
+          console.log("Profile data:", profileData);
+          console.log("Profile complete:", isComplete);
           
           setIsProfileComplete(isComplete);
           setApplicationForm({
@@ -96,6 +109,7 @@ const JobDetails = () => {
             address: profileData.address || ""
           });
         } else {
+          console.log("Profile document does not exist");
           setIsProfileComplete(false);
         }
       } catch (error) {
@@ -107,7 +121,18 @@ const JobDetails = () => {
       }
     };
 
-    fetchUserProfile();
+    // Add an auth state listener to handle changes
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        fetchUserProfile();
+      } else {
+        setLoadingProfile(false);
+        setIsProfileComplete(false);
+      }
+    });
+
+    // Clean up the listener
+    return () => unsubscribe();
   }, []);
 
   const handleFileChange = (e) => {
@@ -195,7 +220,7 @@ const JobDetails = () => {
       });
 
       toast.success("Application submitted successfully!");
-      handleCloseModal(); // Use the new handleCloseModal function
+      handleCloseModal();
     } catch (error) {
       console.error("Error submitting application:", error);
       toast.error("Failed to submit application. Please try again.");
@@ -203,8 +228,6 @@ const JobDetails = () => {
       setUploading(false);
     }
   };
-
-  // Previous imports and function definitions remain the same...
 
   if (error) {
     return (
@@ -326,7 +349,7 @@ const JobDetails = () => {
                     LOG IN
                   </button>
                 </p>
-              ) : !isProfileComplete && (
+              ) : !isProfileComplete && !loadingProfile && (
                 <p className="text-black text-sm text-center mt-2">
                   Please complete your{" "}
                   <button
@@ -473,10 +496,10 @@ const JobDetails = () => {
               </form>
             </div>
           </div>
-          )}
-        </div>
-      </PageLoader>
-    );
-  };
-  
-  export default JobDetails;
+        )}
+      </div>
+    </PageLoader>
+  );
+};
+
+export default JobDetails;
