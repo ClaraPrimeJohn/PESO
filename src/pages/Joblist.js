@@ -336,44 +336,50 @@ const Joblist = () => {
                           className="w-16 h-16 rounded-full object-cover"
                         />
                         <div>
-                          <div className="flex items-center">
-                            <h3 className="text-blue font-semibold">{job.company}</h3>
-                            {applied && (
-                              <span className="ml-2 px-2 py-1 text-xs rounded-full text-green font-medium flex items-center">
-                                Applied
-                                <MdDone className="ml-1 w-4 h-4 text-green" />
-                              </span>
-                            )}
-                          </div>
-                          <h2 className="text-xl font-bold">{job.job_title}</h2>
-                          <p className="text-gray-500">{job.location}</p>
-                          <p className="text-gray-500 text-sm">
-                            <strong>Salary:</strong> ₱{job.salary_min} - ₱{job.salary_max}
-                          </p>
+                        <div className="flex items-center">
+                          <h3 className="text-blue font-semibold">{job.company}</h3>
                         </div>
+                        <div className="flex items-center">
+                          <h2 className="text-xl font-bold">{job.job_title}</h2>
+                          {!job.isOpen && (
+                            <span className="ml-2 px-2 py-0.5 text-sm rounded-full text-red font-medium">
+                              - Closed
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-gray-500">{job.location}</p>
+                        <p className="text-gray-500 text-sm">
+                          <strong>Salary:</strong> ₱{job.salary_min} - ₱{job.salary_max}
+                        </p>
                       </div>
-                    </div>
+                      </div>
+                      </div>
 
-                    <div className="flex flex-col items-end mt-4 lg:mt-0 w-full lg:w-1/3">
+                      <div className="flex flex-col items-end mt-4 lg:mt-0 w-full lg:w-1/3">
                       <button
-                        className={`px-4 py-2 rounded-lg transition-all ${
-                          !job.isOpen || applied
-                            ? "bg-gray-400 text-white cursor-not-allowed"
-                            : "bg-blue text-white hover:bg-darkblue"
-                        }`}
-                        onClick={() => !applied && job.isOpen && handleApplyNow(job.id)}
-                        disabled={!job.isOpen || applied}
-                        title={
-                          applied 
-                            ? "You have already applied to this job" 
-                            : !job.isOpen 
-                              ? "Not accepting applicants" 
-                              : "Apply Now"
-                        }
-                      >
-                        {applied ? "Applied" : "Apply Now"}
-                      </button>
-
+                          className={`px-4 py-2 rounded-lg ${
+                            applied 
+                              ? "bg-transparent text-green cursor-not-allowed"
+                              : !job.isOpen
+                                ? "bg-blue text-white cursor-not-allowed"
+                                : "bg-blue text-white hover:bg-darkblue transition-all"
+                          }`} 
+                          onClick={() => !applied && job.isOpen && handleApplyNow(job.id)} 
+                          disabled={!job.isOpen || applied} 
+                          title={
+                            applied 
+                              ? "You have already applied to this job" 
+                              : !job.isOpen 
+                                ? "Not accepting applicants" 
+                                : "Apply Now"
+                          }
+                        > 
+                          {applied ? (
+                            <span className="flex items-center justify-center">
+                              Applied <MdDone className="ml-1 w-4 h-4" />
+                            </span>
+                          ) : "Apply Now"}
+                        </button>
                       <div className="mt-2 text-gray-500 text-sm">
                         Date Posted:{" "}
                         <span className="font-medium text-gray-700">
