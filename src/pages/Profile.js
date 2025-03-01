@@ -6,8 +6,8 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaCamera, FaSpinner, FaUser, FaMapMarkerAlt, FaPhone, FaEnvelope, FaPencilAlt, FaSave, FaTimes } from "react-icons/fa";
 
-const CLOUDINARY_UPLOAD_PRESET = "ybbfcbyk";
-const CLOUDINARY_CLOUD_NAME = "drg1csmnn";
+const CLOUDINARY_UPLOAD_PRESET = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET;
+const CLOUDINARY_CLOUD_NAME = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME;
 
 const Profile = () => {
     const [user, setUser] = useState(null);

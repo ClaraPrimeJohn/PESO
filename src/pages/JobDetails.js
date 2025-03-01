@@ -11,8 +11,8 @@ import "react-toastify/dist/ReactToastify.css";
 import placeholder from "../assets/companycolored.png";
 import PageLoader from "../components/PageLoader";
 
-const CLOUD_NAME = "drg1csmnn";
-const UPLOAD_PRESET = "ybbfcbyk";
+const CLOUDINARY_UPLOAD_PRESET = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET;
+const CLOUDINARY_CLOUD_NAME = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME;
 
 const JobDetails = () => {
   const { jobId } = useParams();
@@ -171,12 +171,12 @@ const JobDetails = () => {
   const uploadToCloudinary = async (file) => {
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", UPLOAD_PRESET);
+    formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
     formData.append("folder", "resumes");
 
     try {
       const response = await axios.post(
-        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`,
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`,
         formData
       );
       return response.data.secure_url;
