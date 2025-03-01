@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import mainLogo from "../assets/mainLogo.png";
+import mainLogo from "../assets/peso-logo.webp";
 import { CgProfile } from "react-icons/cg";
 import { RiMenu3Line, RiCloseLine, RiArrowDropDownLine } from "react-icons/ri";
-import { FaUserEdit, FaBriefcase } from "react-icons/fa";
+import { FaUserEdit, FaClipboardList } from "react-icons/fa";
 import { auth } from "../firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
@@ -14,15 +14,15 @@ const Navbar = () => {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [isLoginDropdownOpen, setIsLoginDropdownOpen] = useState(false);
     const [user, setUser] = useState(null);
-    const [lastScrollTop, setLastScrollTop] = useState(0);
-    const [profileData, setProfileData] = useState(null);  
+    const [scrollPosition, setScrollPosition] = useState(0);
+    const [profileData, setProfileData] = useState(null);
     const navigate = useNavigate();
     const location = useLocation();
 
     useEffect(() => {
         const handleScroll = () => {
-            let currentScroll = window.scrollY || document.documentElement.scrollTop;
-            setLastScrollTop(currentScroll <= 0 ? 0 : currentScroll); 
+            const position = window.scrollY;
+            setScrollPosition(position);
         };
 
         window.addEventListener("scroll", handleScroll);
@@ -38,7 +38,7 @@ const Navbar = () => {
             window.removeEventListener("scroll", handleScroll);
             unsubscribe();
         };
-    }, [lastScrollTop]);
+    }, []);
 
     const handleLogout = async () => {
         try {
@@ -75,148 +75,174 @@ const Navbar = () => {
 
     const getActiveClass = (path) =>
         location.pathname === path
-            ? "border-b-2 border-darkblue text-darkblue"
-            : "text-black hover:text-darkblue";
+            ? "text-darkblue relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-darkblue"
+            : "text-gray-700 hover:text-darkblue transition-colors duration-300";
+
+    const navbarHeight = scrollPosition > 50 ? "h-16" : "h-20";
+    const navbarPadding = scrollPosition > 50 ? "py-2" : "py-3";
+    const navbarBackground = scrollPosition > 50 ? "bg-white/90 backdrop-blur-md shadow-md" : "bg-white";
+    const logoSize = scrollPosition > 50 ? "h-12" : "h-14";
 
     return (
         <div>
             <header
-                className="fixed top-0 left-0 bg-white shadow-md bg-white/80 backdrop-blur-md px-6 py-2 flex items-center justify-between w-full z-50 transition-all duration-300"
+                className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 border border-b-neutral-300 ${navbarBackground} ${navbarPadding} ${navbarHeight}`}
             >
-                <img className="w-auto h-12 p-1" src={mainLogo} alt="logo" />
-                
-                {/* Hamburger Menu Button for mobile */}
-                <button
-                    className="lg:hidden text-2xl text-black"
-                    onClick={() => setIsDrawerOpen(true)}
-                >
-                    <RiMenu3Line />
-                </button>
+                <div className="container mx-auto px-4 flex items-center justify-between">
+                    <div className="flex items-center">
+                        <img
+                            className={`w-auto ${logoSize} transition-all duration-300`}
+                            src={mainLogo}
+                            alt="logo"
+                        />
+                        <div className="ml-2 leading-tight font-bold text-black-secondary">
+                            <h1>Public Employment</h1>
+                            <h1>Service Office</h1>
+                        </div>
+                    </div>
 
-                {/* Desktop Navigation Links */}
-                <nav className="hidden lg:flex justify-center items-center text-sm w-full space-x-6">
-                    <Link to="/" className={`${getActiveClass("/")} nav-effects`}>
-                        Home
-                    </Link>
-                    <Link to="/about-us" className={`${getActiveClass("/about-us")} nav-effects`}>
-                        About us
-                    </Link>
-                    <Link to="/announcement" className={`${getActiveClass("/announcement")} nav-effects`}>
-                        Announcement
-                    </Link>
-                    <Link to="/job-listing" className={`${getActiveClass("/job-listing")} nav-effects`}>
-                        Job listing
-                    </Link>
-                    <Link to="/contact-us" className={`${getActiveClass("/contact-us")} nav-effects`}>
-                        Contact us
-                    </Link>
-                    
-                </nav>
 
-                {/* Login/Profile Dropdown */}
-                <div className="relative hidden lg:block">
-                    {user ? (
-                        <button className="flex items-center text-black hover:text-darkblue min-w-max" onClick={() => setIsLoginDropdownOpen(!isLoginDropdownOpen)}>
-                            <img
-                                src={profileData?.profileImage || user.photoURL || "/default-avatar.png"}
-                                alt="Profile"
-                                className="w-10 h-10 rounded-full object-cover"
-                            />
-                            <span className="text-sm pl-2 overflow-hidden text-ellipsis whitespace-nowrap flex-1">
-                                {profileData?.name || user.displayName || "Profile"}
-                            </span>
-                            <RiArrowDropDownLine className={`text-4xl transform transition-transform duration-300 ${isLoginDropdownOpen ? "rotate-180" : ""}`} />
-                        </button>
-                    ) : (
-                        <Link
-                            to="/login"
-                            className="flex items-center text-sm text-black hover:text-darkblue"
-                        >
-                            <CgProfile className="text-xl mx-2" /> Login
+
+                    {/* Hamburger Menu Button for mobile */}
+                    <button
+                        className="lg:hidden text-2xl text-gray-700 hover:text-darkblue transition-colors duration-300"
+                        onClick={() => setIsDrawerOpen(true)}
+                    >
+                        <RiMenu3Line />
+                    </button>
+
+                    {/* Desktop Navigation Links */}
+                    <nav className="hidden lg:flex justify-center items-center text-sm space-x-8">
+                        <Link to="/" className={`${getActiveClass("/")} font-medium py-2`}>
+                            Home
                         </Link>
-                    )}
-                    {isLoginDropdownOpen && user && (
-                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border">
+                        <Link to="/about-us" className={`${getActiveClass("/about-us")} font-medium py-2`}>
+                            About us
+                        </Link>
+                        <Link to="/announcement" className={`${getActiveClass("/announcement")} font-medium py-2`}>
+                            Announcement
+                        </Link>
+                        <Link to="/job-listing" className={`${getActiveClass("/job-listing")} font-medium py-2`}>
+                            Job listing
+                        </Link>
+                        <Link to="/contact-us" className={`${getActiveClass("/contact-us")} font-medium py-2`}>
+                            Contact us
+                        </Link>
+                    </nav>
+
+                    {/* Login/Profile Dropdown */}
+                    <div className="relative hidden lg:block">
+                        {user ? (
+                            <button
+                                className="flex items-center text-gray-700 hover:text-darkblue min-w-max bg-gray-100 rounded-full py-1 px-2 transition-all duration-300 hover:bg-gray-200"
+                                onClick={() => setIsLoginDropdownOpen(!isLoginDropdownOpen)}
+                            >
+                                <img
+                                    src={profileData?.profileImage || user.photoURL || "/default-avatar.png"}
+                                    alt="Profile"
+                                    className="w-8 h-8 rounded-full object-cover border-2 border-white"
+                                />
+                                <span className="text-sm pl-2 overflow-hidden text-ellipsis whitespace-nowrap max-w-32">
+                                    {profileData?.name || user.displayName || "Profile"}
+                                </span>
+                                <RiArrowDropDownLine className={`text-3xl transform transition-transform duration-300 ${isLoginDropdownOpen ? "rotate-180" : ""}`} />
+                            </button>
+                        ) : (
+                            <Link
+                                to="/login"
+                                className="flex items-center text-sm font-medium text-gray-700 hover:text-darkblue bg-gray-100 hover:bg-gray-200 rounded-full px-4 py-2 transition-all duration-300"
+                            >
+                                <CgProfile className="text-xl mr-2" /> Login
+                            </Link>
+                        )}
+                        {isLoginDropdownOpen && user && (
+                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border animate-fadeIn">
                             <ul className="py-2">
-                                <li className="px-4 py-2 cursor-pointer nav-effects">
+                                <li className="px-4 py-2 cursor-pointer hover:bg-gray-50 transition-colors duration-200">
                                     <Link
                                         to="/profile"
-                                        className="flex items-center text-sm space-x-2 w-full"
+                                        className="flex items-center text-sm space-x-2 w-full text-gray-700"
                                     >
                                         <CgProfile className="text-xl" />
                                         <span>Profile</span>
                                     </Link>
                                 </li>
-                                <li className="px-4 py-2 cursor-pointer nav-effects">
+                                <li className="px-4 py-2 cursor-pointer hover:bg-gray-50 transition-colors duration-200">
                                     <Link
                                         to="/applied"
-                                        className="flex items-center text-sm space-x-2 w-full"
+                                        className="flex items-center text-sm space-x-2 w-full text-gray-700"
                                     >
-                                        <FaBriefcase className="text-xl" />
+                                        <FaClipboardList className="text-xl" />
                                         <span>Applied Jobs</span>
                                     </Link>
                                 </li>
-                                <li className="px-4 py-2 cursor-pointer nav-effects">
+                                <li className="px-4 py-2 cursor-pointer hover:bg-gray-50 transition-colors duration-200">
                                     <button
                                         onClick={handleLogout}
-                                        className="flex items-center text-sm space-x-2 w-full"
+                                        className="flex items-center text-sm space-x-2 w-full text-gray-700"
                                     >
                                         <FaUserEdit className="text-xl" />
                                         <span>Log out</span>
                                     </button>
                                 </li>
                             </ul>
-                        </div>
-                    )}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </header>
 
-            {/* Add a spacer div to prevent content from being hidden behind the fixed navbar */}
-            <div className="h-16"></div>
+            {/* Add a spacer div that adjusts to navbar height */}
+            <div className={`transition-all duration-300 ${scrollPosition > 50 ? "h-16" : "h-20"}`}></div>
 
             {/* Drawer and Overlay */}
-            <div className={`fixed inset-0 z-50 transition-transform duration-300 ease-in-out ${isDrawerOpen ? "translate-x-0" : "-translate-x-full"}`}>
+            <div className={`fixed inset-0 z-50 transition-all duration-500 ${isDrawerOpen ? "visible" : "invisible"}`}>
                 {/* Overlay */}
                 <div
-                    className={`fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300 ease-in-out ${isDrawerOpen ? "opacity-100 delay-150" : "opacity-0 pointer-events-none"}`}
+                    className={`fixed inset-0 bg-black transition-opacity duration-300 ${isDrawerOpen ? "opacity-50" : "opacity-0"}`}
                     onClick={() => setIsDrawerOpen(false)}
                 ></div>
 
                 {/* Drawer */}
                 <div
-                    className={`absolute top-0 left-0 h-full bg-white shadow-lg transition-transform duration-300 ease-in-out flex flex-col 
-                    ${isDrawerOpen ? "translate-x-0 delay-500" : "-translate-x-full"}`}
-                    style={{ width: "calc(80vw)", maxWidth: "400px" }}
+                    className={`absolute top-0 left-0 h-full bg-white shadow-xl transition-transform duration-300 ease-in-out transform ${isDrawerOpen ? "translate-x-0" : "-translate-x-full"
+                        }`}
+                    style={{ width: "calc(80vw)", maxWidth: "320px" }}
                 >
-                    <div className="flex items-center justify-between px-6 py-4 border-b">
-                        <h2 className="text-lg font-bold">Menu</h2>
-                        <button className="text-2xl" onClick={() => setIsDrawerOpen(false)}>
+                    <div className="flex items-center justify-between p-5 border-b">
+                        <img className="w-auto h-8" src={mainLogo} alt="logo" />
+                        <button
+                            className="text-2xl text-gray-700 hover:text-darkblue transition-colors duration-200"
+                            onClick={() => setIsDrawerOpen(false)}
+                        >
                             <RiCloseLine />
                         </button>
                     </div>
 
                     {/* Profile Section */}
-                    <div className="flex flex-col items-center py-4 border-b px-6">
+                    <div className="flex flex-col items-center py-6 border-b px-6">
                         {user ? (
                             <div className="flex flex-col items-center w-full">
-                                <img
-                                    src={profileData?.profileImage || user.photoURL || "/default-avatar.png"}
-                                    alt="Profile"
-                                    className="w-10 h-10 rounded-full object-cover"
-                                />
-                                <span className="text-sm pl-2 overflow-hidden text-ellipsis whitespace-nowrap flex-1">
+                                <div className="relative">
+                                    <img
+                                        src={profileData?.profileImage || user.photoURL || "/default-avatar.png"}
+                                        alt="Profile"
+                                        className="w-16 h-16 rounded-full object-cover border-4 border-gray-100 shadow-sm"
+                                    />
+                                </div>
+                                <span className="text-sm font-medium mt-2 text-gray-800">
                                     {profileData?.name || user.displayName || "Profile"}
                                 </span>
                                 <Link
                                     to="/profile"
-                                    className="text-sm text-black w-full hover:text-darkblue text-center mx-2 mt-2 py-2 border rounded-md bg-gray-100"
+                                    className="text-sm w-full text-center mt-4 py-2 px-4 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors duration-300"
                                     onClick={() => setIsDrawerOpen(false)}
                                 >
-                                    Profile
+                                    View Profile
                                 </Link>
                                 <Link
                                     to="/applied"
-                                    className="text-sm text-black w-full hover:text-darkblue text-center mx-2 mt-2 py-2 border rounded-md bg-gray-100"
+                                    className="text-sm w-full text-center mt-2 py-2 px-4 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors duration-300"
                                     onClick={() => setIsDrawerOpen(false)}
                                 >
                                     Applied Jobs
@@ -225,48 +251,67 @@ const Navbar = () => {
                         ) : (
                             <Link
                                 to="/login"
-                                className="text-black hover:text-darkblue py-2 border rounded-md bg-gray-100"
+                                className="text-sm font-medium w-full text-center py-3 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors duration-300"
                                 onClick={() => setIsDrawerOpen(false)}
                             >
-                                Login
+                                <CgProfile className="inline-block mr-2" /> Login
                             </Link>
                         )}
                     </div>
 
                     {/* Navigation Links */}
-                    <nav className="flex flex-col p-5 mx-2 text-sm space-y-8 text-center">
-                        <Link to="/" className={`${getActiveClass("/")} nav-effects`} onClick={() => setIsDrawerOpen(false)}>
+                    <nav className="flex flex-col p-5 space-y-5">
+                        <Link
+                            to="/"
+                            className={`${location.pathname === "/" ? "text-darkblue font-medium" : "text-gray-700"} transition-colors duration-200 hover:text-darkblue py-2`}
+                            onClick={() => setIsDrawerOpen(false)}
+                        >
                             Home
                         </Link>
-                        <Link to="/about-us" className={`${getActiveClass("/about-us")} nav-effects`} onClick={() => setIsDrawerOpen(false)}>
+                        <Link
+                            to="/about-us"
+                            className={`${location.pathname === "/about-us" ? "text-darkblue font-medium" : "text-gray-700"} transition-colors duration-200 hover:text-darkblue py-2`}
+                            onClick={() => setIsDrawerOpen(false)}
+                        >
                             About us
                         </Link>
-                        <Link to="/announcement" className={`${getActiveClass("/announcement")} nav-effects`} onClick={() => setIsDrawerOpen(false)}>
+                        <Link
+                            to="/announcement"
+                            className={`${location.pathname === "/announcement" ? "text-darkblue font-medium" : "text-gray-700"} transition-colors duration-200 hover:text-darkblue py-2`}
+                            onClick={() => setIsDrawerOpen(false)}
+                        >
                             Announcement
                         </Link>
-                        <Link to="/job-listing" className={`${getActiveClass("/job-listing")} nav-effects`} onClick={() => setIsDrawerOpen(false)}>
+                        <Link
+                            to="/job-listing"
+                            className={`${location.pathname === "/job-listing" ? "text-darkblue font-medium" : "text-gray-700"} transition-colors duration-200 hover:text-darkblue py-2`}
+                            onClick={() => setIsDrawerOpen(false)}
+                        >
                             Job listing
                         </Link>
-                        <Link to="/contact-us" className={`${getActiveClass("/contact-us")} nav-effects`} onClick={() => setIsDrawerOpen(false)}>
+                        <Link
+                            to="/contact-us"
+                            className={`${location.pathname === "/contact-us" ? "text-darkblue font-medium" : "text-gray-700"} transition-colors duration-200 hover:text-darkblue py-2`}
+                            onClick={() => setIsDrawerOpen(false)}
+                        >
                             Contact us
                         </Link>
-                        
                     </nav>
 
                     {/* Logout Section */}
-                    <div className="p-6 mt-auto">
-                        {user && (
+                    {user && (
+                        <div className="p-6 mt-auto border-t">
                             <button
                                 onClick={() => {
                                     handleLogout();
                                     setIsDrawerOpen(false);
                                 }}
-                                className="text-red hover:font-bold w-full text-sm bg-gray-100 border border-red rounded-md p-3"
+                                className="w-full text-sm font-medium bg-gray-100 hover:bg-gray-200 text-red-600 rounded-full p-3 transition-colors duration-300 flex items-center justify-center"
                             >
-                                Log out
+                                <FaUserEdit className="mr-2" /> Log out
                             </button>
-                        )}
-                    </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

@@ -1,17 +1,13 @@
 import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
-import {
-    auth,
-    GoogleAuthProvider,
-    signInWithEmailAndPassword,
-    signInWithPopup,
-} from "../firebase";
+import { auth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ClipLoader } from "react-spinners";
-import { db } from "../firebase"; 
+import { db } from "../firebase";
 import { doc, setDoc, getDoc } from "firebase/firestore";
+import pesoLogo from "../assets/peso-logo.webp"; 
 
 function Login() {
     const [email, setEmail] = useState("");
@@ -19,31 +15,30 @@ function Login() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-
     const handleEmailSignIn = async (e) => {
         e.preventDefault();
         setLoading(true);
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
-    
-            await user.reload(); 
-    
+
+            await user.reload();
+
             if (!user.emailVerified) {
                 toast.error("Please verify your email before logging in.", {
                     position: "top-center",
                     autoClose: 3000,
                 });
-                await auth.signOut(); 
+                await auth.signOut();
                 setLoading(false);
                 return;
             }
-    
+
             toast.success("Signed in successfully!", {
                 position: "top-center",
                 autoClose: 1000,
             });
-    
+
             navigate("/");
         } catch (error) {
             console.error("Error signing in with email and password", error);
@@ -55,7 +50,6 @@ function Login() {
             setLoading(false);
         }
     };
-    
 
     const handleGoogleSignIn = async () => {
         setLoading(true);
@@ -63,12 +57,12 @@ function Login() {
             const provider = new GoogleAuthProvider();
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
-    
+
             const { uid, displayName, email, photoURL } = user;
-    
+
             const userRef = doc(db, "profiles", uid);
             const userSnap = await getDoc(userRef);
-    
+
             if (!userSnap.exists()) {
                 await setDoc(userRef, {
                     name: displayName || "Unnamed User",
@@ -77,12 +71,12 @@ function Login() {
                     createdAt: new Date(),
                 });
             }
-    
+
             toast.success("Signed in successfully with Google!", {
                 position: "top-center",
                 autoClose: 3000,
             });
-    
+
             navigate("/");
         } catch (error) {
             console.error("Error signing in with Google", error);
@@ -94,91 +88,92 @@ function Login() {
             setLoading(false);
         }
     };
-    
-    return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-200 px-4 sm:px-6 lg:px-8">
-            <div className="bg-white shadow-lg rounded-lg overflow-hidden w-full max-w-5xl">
-                <div className="flex flex-col sm:flex-row">
-                    {/* Left Side: Login Form */}
-                    <div className="w-full sm:w-1/2 lg:p-12 p-8 bg-gray-50">
-                        <h2 className="text-2xl font-bold mb-10 text-center">
-                            WELCOME | <span className="text-darkblue">PESO</span>
-                        </h2>
-                        <form className="space-y-4" onSubmit={handleEmailSignIn}>
-                            <div>
-                                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                                    Email:
-                                </label>
-                                <input
-                                    type="email"
-                                    id="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    required
-                                    className="w-full mt-2 mb-2 px-4 py-2 border border-gray-300  rounded-md focus:ring-2 focus:ring-darkblue focus:outline-none"
-                                />
-                            </div>
-                            {/* Password Input */}
-                            <div>
-                                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                                    Password:
-                                </label>
-                                <input
-                                    type="password"
-                                    id="password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                    className="w-full mt-2 mb-2 px-4 py-2 border border-gray-300   rounded-md focus:ring-2 focus:ring-darkblue focus:outline-none"
-                                />
-                            </div>
-                            {/* Sign In Button */}
-                            <div className="flex justify-between items-center">
-                                <button
-                                    type="submit"
-                                    className="bg-blue text-white px-4 py-2 rounded-md hover:bg-darkblue transition flex items-center justify-center gap-2"
-                                    disabled={loading} >
-                                    {loading && <ClipLoader size={20} color="white" />} 
-                                    {loading ? " " : "Sign In"}
-                                </button>
-                                <a href="/forgot" className="text-sm text-blue hover:underline">
-                                    Forgot Password?
-                                </a>
-                            </div>
-                        </form>
-                        {/* Sign Up Link */}
-                        <p className="mt-6 text-center text-sm">
-                            Don’t have an account yet?{" "}
-                            <a href="/signup" className="text-darkblue hover:underline">
-                                Create an account.
-                            </a>
-                        </p>
-                        {/* OR Divider */}
-                        <div className="relative flex items-center my-4">
-                            <div className="flex-grow border-t border-gray-300"></div>
-                            <span className="mx-4 text-sm text-gray-500">OR</span>
-                            <div className="flex-grow border-t border-gray-300"></div>
-                        </div>
-                        {/* Google Sign In */}
-                        <div className="mt-4 text-center">
-                            <button
-                                onClick={handleGoogleSignIn}
-                                className="flex items-center justify-center gap-2 w-full bg-gray-100 border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
-                            >
-                                <FcGoogle className="text-2xl" />
-                                Sign in with Google
-                            </button>
-                        </div>
-                    </div>
 
-                    {/* Right Side: Image */}
-                    <div className="hidden sm:block w-full sm:w-1/2">
-                        <img
-                            src={require("../assets/login-main.jpg")}
-                            alt="Login Visual"
-                            className="object-cover h-full w-full"
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-white px-4 py-6">
+            <div className="relative bg-white p-4 sm:p-6 md:p-8 w-full max-w-md border border-neutral-300 rounded-3xl">
+
+                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white px-2">
+                    <img src={pesoLogo} alt="PESO Logo" className="h-14 sm:h-16 md:h-20 object-contain" />
+                </div>
+
+                <h1 className="text-xl sm:text-2xl md:text-3xl mt-6 sm:mt-8 font-bold text-black-secondary text-center px-2 sm:px-6 md:px-8">
+                    Your Career Starts Here – PESO!
+                </h1>
+                <p className="text-sm sm:text-base text-neutral-600 text-center mb-4 sm:mb-6 md:mb-8 mt-2">
+                    Login to proceed
+                </p>
+
+                <form className="space-y-4 sm:space-y-6 w-full max-w-sm mx-auto" onSubmit={handleEmailSignIn}>
+                    <div>
+                        <label htmlFor="email" className="block text-xs sm:text-sm font-medium text-gray-700">
+                            Email:
+                        </label>
+                        <input
+                            type="email"
+                            id="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="Enter your email"
+                            required
+                            className="w-full mt-2 text-xs sm:text-sm px-3 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-black-secondary focus:outline-none"
                         />
                     </div>
+
+                    <div>
+                        <label htmlFor="password" className="block text-xs sm:text-sm font-medium text-gray-700">
+                            Password:
+                        </label>
+                        <input
+                            type="password"
+                            id="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Enter your password"
+                            required
+                            className="w-full mt-2 text-xs sm:text-sm px-3 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-black-secondary focus:outline-none"
+                        />
+                    </div>
+
+                    <div className="flex justify-between items-center mt-1 sm:mt-2">
+                        <a href="/forgot" className="text-xs sm:text-sm text-blue hover:underline">
+                            Forgot Password?
+                        </a>
+                    </div>
+
+                    <div className="mt-2 sm:mt-4">
+                        <button
+                            type="submit"
+                            className="w-full bg-black-secondary text-white px-4 py-2 text-xs sm:text-sm rounded-md hover:bg-black transition flex items-center justify-center gap-2"
+                            disabled={loading}
+                        >
+                            {loading && <ClipLoader size={16} color="white" />}
+                            {loading ? " " : "Login"}
+                        </button>
+                    </div>
+                </form>
+
+                <p className="mt-4 sm:mt-6 text-center text-xs sm:text-sm">
+                    Don't have an account yet?{" "}
+                    <a href="/signup" className="text-darkblue hover:underline">
+                        Create an account.
+                    </a>
+                </p>
+
+                <div className="relative flex items-center my-3 sm:my-4">
+                    <div className="flex-grow border-t border-gray-300"></div>
+                    <span className="mx-2 sm:mx-4 text-xs sm:text-sm text-gray-500">OR</span>
+                    <div className="flex-grow border-t border-gray-300"></div>
+                </div>
+
+                <div className="mt-3 sm:mt-4 text-center">
+                    <button
+                        onClick={handleGoogleSignIn}
+                        className="flex items-center text-xs sm:text-sm justify-center gap-2 w-full bg-gray-100 border border-gray-300 text-gray-700 px-3 py-2 rounded-md hover:bg-gray-200"
+                    >
+                        <FcGoogle className="text-lg sm:text-2xl" />
+                        Sign in with Google
+                    </button>
                 </div>
             </div>
         </div>
