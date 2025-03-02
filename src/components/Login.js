@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ClipLoader } from "react-spinners";
 import { db } from "../firebase";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
 import pesoLogo from "../assets/peso-logo.webp"; 
 
 function Login() {
@@ -18,7 +18,23 @@ function Login() {
     const handleEmailSignIn = async (e) => {
         e.preventDefault();
         setLoading(true);
+        
         try {
+            // check if the email exists in the profiles collection
+            const profilesRef = collection(db, "profiles");
+            const emailQuery = query(profilesRef, where("email", "==", email));
+            const querySnapshot = await getDocs(emailQuery);
+            
+            if (querySnapshot.empty) {
+                toast.error("Account not found", {
+                    position: "top-center",
+                    autoClose: 3000,
+                });
+                setLoading(false);
+                return;
+            }
+            
+            // if email is there proceed to checking credentials
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
