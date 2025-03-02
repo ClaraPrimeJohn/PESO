@@ -4,6 +4,7 @@ import aboutBanner from "../assets/aboutbanner.jpg";
 import LogoCarousel from '../components/LogoCarousel';
 import PESOHistory from '../components/History';
 import AboutCity from '../components/AboutCity';
+import HowItWorks from "../components/HowItWorks";
 import HiredGallery from '../components/HiredGallery';
 import PageLoader from '../components/PageLoader'
 
@@ -19,6 +20,7 @@ const Aboutus = () => {
       </div>
       <AboutCity/>
       <PESOHistory/>
+      <HowItWorks />
       <HiredGallery/>
       <LogoCarousel />
     </div>

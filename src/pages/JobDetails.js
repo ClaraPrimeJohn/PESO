@@ -3,16 +3,17 @@ import { useParams, useNavigate } from "react-router-dom";
 import { doc, getDoc, collection, addDoc } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { IoIosArrowBack } from "react-icons/io";
-import { IoClose } from "react-icons/io5";
-import { FaSpinner } from "react-icons/fa";
+import { IoClose, IoBriefcase, IoLocationSharp, IoCalendar } from "react-icons/io5";
+import { FaMoneyBillWave, FaClock, FaFileUpload } from "react-icons/fa";
+import { BsCheckCircleFill } from "react-icons/bs";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import placeholder from "../assets/companycolored.png";
 import PageLoader from "../components/PageLoader";
 
-const CLOUDINARY_UPLOAD_PRESET = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET;
-const CLOUDINARY_CLOUD_NAME = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME;
+const CLOUD_NAME = "drg1csmnn";
+const UPLOAD_PRESET = "ybbfcbyk";
 
 const JobDetails = () => {
   const { jobId } = useParams();
@@ -25,6 +26,8 @@ const JobDetails = () => {
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
   const [applicationForm, setApplicationForm] = useState({
     name: "",
     email: "",
@@ -32,11 +35,10 @@ const JobDetails = () => {
     address: ""
   });
 
-  // Handle modal close
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setSelectedFile(null); // Clear the selected file
-    setIsDragging(false); // Reset dragging state
+    setSelectedFile(null); 
+    setIsDragging(false);
   };
 
   // Fetch job details
@@ -44,6 +46,7 @@ const JobDetails = () => {
     const fetchJob = async () => {
       if (!jobId) {
         setError("Job ID is missing");
+        setLoading(false);
         return;
       }
 
@@ -53,6 +56,7 @@ const JobDetails = () => {
 
         if (jobSnap.exists()) {
           setJob({ id: jobSnap.id, ...jobSnap.data() });
+          setTimeout(() => setIsVisible(true), 100); 
         } else {
           setError("Job not found");
           toast.error("No such job found!");
@@ -61,46 +65,35 @@ const JobDetails = () => {
         console.error("Error fetching job details:", error);
         setError("Failed to load job details");
         toast.error("Failed to load job details.");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchJob();
   }, [jobId]);
 
-  // Fetch user profile with improved handling
+  
   useEffect(() => {
     const fetchUserProfile = async () => {
-      setLoadingProfile(true);
-      
-      try {
-        const currentUser = auth.currentUser;
-        
-        if (!currentUser) {
-          console.log("No user logged in");
-          setLoadingProfile(false);
-          setIsProfileComplete(false);
-          return;
-        }
+      const currentUser = auth.currentUser;
+      if (!currentUser) {
+        setLoadingProfile(false);
+        return;
+      }
 
+      try {
         const profileRef = doc(db, "profiles", currentUser.uid);
         const profileSnap = await getDoc(profileRef);
 
         if (profileSnap.exists()) {
           const profileData = profileSnap.data();
-          
-          // Check if essential fields exist and are not empty strings
           const isComplete = Boolean(
-            profileData.name && 
-            profileData.name.trim() !== "" && 
-            profileData.address && 
-            profileData.address.trim() !== "" && 
-            profileData.contactNumber && 
-            profileData.contactNumber.trim() !== ""
+            profileData.name &&
+            profileData.address &&
+            profileData.contactNumber
           );
-          
-          console.log("Profile data:", profileData);
-          console.log("Profile complete:", isComplete);
-          
+
           setIsProfileComplete(isComplete);
           setApplicationForm({
             name: profileData.name || "",
@@ -109,7 +102,6 @@ const JobDetails = () => {
             address: profileData.address || ""
           });
         } else {
-          console.log("Profile document does not exist");
           setIsProfileComplete(false);
         }
       } catch (error) {
@@ -121,24 +113,13 @@ const JobDetails = () => {
       }
     };
 
-    // Add an auth state listener to handle changes
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        fetchUserProfile();
-      } else {
-        setLoadingProfile(false);
-        setIsProfileComplete(false);
-      }
-    });
-
-    // Clean up the listener
-    return () => unsubscribe();
+    fetchUserProfile();
   }, []);
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
     if (file.type === "application/pdf") {
       setSelectedFile(file);
     } else {
@@ -157,7 +138,7 @@ const JobDetails = () => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
-    
+
     const file = e.dataTransfer.files?.[0];
     if (!file) return;
 
@@ -171,12 +152,12 @@ const JobDetails = () => {
   const uploadToCloudinary = async (file) => {
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+    formData.append("upload_preset", UPLOAD_PRESET);
     formData.append("folder", "resumes");
 
     try {
       const response = await axios.post(
-        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`,
+        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`,
         formData
       );
       return response.data.secure_url;
@@ -188,7 +169,7 @@ const JobDetails = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!selectedFile) {
       toast.error("Please select a resume to upload");
       return;
@@ -202,10 +183,10 @@ const JobDetails = () => {
     }
 
     setUploading(true);
-    
+
     try {
       const resumeUrl = await uploadToCloudinary(selectedFile);
-      
+
       await addDoc(collection(db, "applications"), {
         job_id: jobId,
         job_title: job.job_title,
@@ -221,6 +202,12 @@ const JobDetails = () => {
 
       toast.success("Application submitted successfully!");
       handleCloseModal();
+      
+      // Navigate back to job listings after a brief delay
+      setTimeout(() => {
+        navigate("/jobs");
+      }, 1500); // 1.5 second delay to allow the success toast to be visible
+      
     } catch (error) {
       console.error("Error submitting application:", error);
       toast.error("Failed to submit application. Please try again.");
@@ -229,275 +216,393 @@ const JobDetails = () => {
     }
   };
 
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <p className="text-red-500 text-xl mb-4">{error}</p>
-        <button
-          onClick={() => navigate(-1)}
-          className="text-blue-500 hover:text-blue-700"
-        >
-          Go Back
-        </button>
-      </div>
-    );
-  }
-
-  if (!job) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <FaSpinner className="animate-spin text-4xl text-blue" />
-      </div>
-    );
-  }
-
-  return (
-    <PageLoader>
-      <div className="relative">
-        <div className="mx-auto py-16 px-8 lg:px-48 grid grid-cols-1 md:grid-cols-3 gap-12">
-          {/* Left Column - Job Details */}
-          <div className="md:col-span-2">
+  // Content to render based on loading/error states
+  const renderContent = () => {
+    if (error) {
+      return (
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full text-center">
+            <div className="text-red text-5xl mb-4">⚠️</div>
+            <p className="text-red text-xl mb-4 font-semibold">{error}</p>
             <button
               onClick={() => navigate(-1)}
-              className="mb-4 -ml-2 bg-white hover:text-blue transition duration-300 flex items-center group"
+              className="text-blue bg-blue/10 hover:bg-blue/20 px-6 py-3 rounded-full font-medium transition-all duration-300"
+            >
+              Go Back to Job Listings
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    if (!job) {
+      return null; 
+    }
+
+    return (
+      <div className={`min-h-screen transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+        {/* Navigation Bar */}
+        <div className="bg-white">
+          <div className="container mx-auto px-4 md:px-8 pt-12">
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center text-gray-700 hover:text-blue transition duration-300 group font-medium"
               title="Back to Job List"
             >
-              <IoIosArrowBack className="text-lg text-gray-700 group-hover:text-blue" />
-              <span className="text-sm">Back to Job List</span>
+              <IoIosArrowBack className="text-lg mr-1 group-hover:text-blue" />
+              <span>Back to Job Listings</span>
             </button>
+          </div>
+        </div>
 
-            <h1 className="text-2xl md:text-3xl font-extrabold text-darkblue break-words mb-4">
-              {job.job_title}
-            </h1>
+        <div className="container mx-auto px-4 md:px-8 py-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Column - Job Details */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Responsive Job Header */}
+              <div className="bg-white rounded-xl border border-neutral-300 p-4 sm:p-6 md:p-8">
+                <div className="flex flex-col sm:flex-row items-start">
+                  <img
+                    src={job.logo || placeholder}
+                    alt={`${job.company} logo`}
+                    className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover shadow-md mb-4 sm:mb-0 sm:mr-6"
+                  />
+                  <div className="flex-1">
+                    <div className="flex flex-col md:flex-row md:justify-between md:items-start">
+                      <div>
+                        <h1 className="text-xl sm:text-2xl font-bold text-black-primary ">{job.job_title}</h1>
+                        <h2 className="text-lg font-semibold text-darkblue mb-1">{job.company}</h2>
+                        <div className="flex items-center text-black-secondary">
+                          <IoLocationSharp className="mr-1" />
+                          <span>{job.location}</span>
+                        </div>
+                      </div>
 
-            <div className="space-y-4 text-gray-700">
-              <p><strong>Location:</strong> {job.location}</p>
-              <p><strong>Skills Required:</strong> {job.skills || "Not specified"}</p>
-              
-              <div className="border-t border-gray-300 pt-4">
-                <p className="whitespace-pre-line">
-                  <strong>Job Description:</strong>{" "}
-                  {job.job_description?.trim() || "No description available."}
-                </p>
+                      <div className="flex flex-col space-y-2 items-start md:items-end mt-4 md:mt-0">
+                        <div className="flex items-center text-black-secondary text-sm md:text-base">
+                          <IoCalendar className="mr-1 text-lg" />
+                          <span>
+                            Posted:{" "}
+                            {new Date(job.date_posted.seconds * 1000).toLocaleDateString("en-GB", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })}
+                          </span>
+                        </div>
+                        <div className="flex items-center text-darkblue font-semibold text-sm md:text-lg">
+                          <FaMoneyBillWave className="mr-1 text-lg" />
+                          <span>
+                            ₱{job.salary_min.toLocaleString()} - ₱{job.salary_max.toLocaleString()}
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          <span className="bg-blue/10 text-blue px-3 py-1.5 rounded-full text-xs md:text-sm font-medium">
+                            {job.job_type}
+                          </span>
+                          <span className="bg-blue/10 text-blue px-3 py-1.5 rounded-full text-xs md:text-sm font-medium">
+                            {job.experience}
+                          </span>
+                          <span className="bg-blue/10 text-blue px-3 py-1.5 rounded-full text-xs md:text-sm font-medium">
+                            {job.job_category}
+                          </span>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Job Description */}
+              <div className="bg-white rounded-xl border border-neutral-300 p-8">
+                <h3 className="text-xl font-bold text-black-primary mb-6 flex items-center">
+                  <IoBriefcase className="mr-2 text-blue" />
+                  Job Description
+                </h3>
+
+                <div className="prose max-w-none text-black-secondary">
+                  <p className="whitespace-pre-line">
+                    {job.job_description?.trim() || "No description available."}
+                  </p>
+                </div>
+              </div>
+
+              {/* Skills Required */}
+              <div className="bg-white rounded-xl border border-neutral-300 p-8">
+                <h3 className="text-xl font-bold text-black-primary mb-6 flex items-center">
+                  <FaClock className="mr-2 text-blue" />
+                  Required Skills
+                </h3>
+
+                <div className="flex flex-wrap gap-2">
+                  {job.skills ? (
+                    job.skills.split(',').map((skill, index) => (
+                      <span
+                        key={index}
+                        className="bg-gray-100 text-black-secondary px-4 py-2 rounded-lg text-sm"
+                      >
+                        {skill.trim()}
+                      </span>
+                    ))
+                  ) : (
+                    <p className="text-gray-secondary italic">No specific skills mentioned</p>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Right Column - Company Info & Application */}
-          <div className="bg-gray-100 border rounded-lg p-6 flex flex-col space-y-6 min-h-auto self-start">
-            <div className="flex flex-col items-center space-y-4 mb-4">
-              <img
-                src={job.logo || placeholder}
-                alt={`${job.company} logo`}
-                className="w-24 h-24 rounded-full object-cover shadow-md"
-              />
-              <h2 className="text-xl font-bold text-darkblue">{job.company}</h2>
-            </div>
-
-            <div className="space-y-4 border-t border-gray-300 pt-4">
-              <p className="text-gray-700">
-                <strong>Experience Level:</strong> {job.experience}
-              </p>
-              <p className="text-gray-700">
-                <strong>Job Type:</strong> {job.job_type}
-              </p>
-              <p className="text-gray-600">
-                <strong>Category:</strong> {job.job_category}
-              </p>
-            </div>
-
-            <div className="space-y-4 border-t border-gray-300 pt-4">
-              <p className="text-gray-600">
-                <strong>Date Posted:</strong>{" "}
-                {new Date(job.date_posted.seconds * 1000).toLocaleDateString("en-GB", {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                })}
-              </p>
-              <p className="text-gray-600">
-                <strong>Salary:</strong> ₱{job.salary_min.toLocaleString()} - ₱{job.salary_max.toLocaleString()}
-              </p>
-            </div>
-
-            <div className="mt-6 w-full">
-              {loadingProfile ? (
-                <div className="flex justify-center">
-                  <FaSpinner className="animate-spin text-2xl text-gray-500" />
+            {/* Right Column - Apply Now */}
+            <div className="lg:col-span-1 space-y-6">
+              {/* Apply Now Card */}
+              <div className="bg-white rounded-xl border border-neutral-300 overflow-hidden sticky top-24">
+                <div className="bg-gradient-to-r from-blue to-darkblue p-6">
+                  <h3 className="text-xl font-bold text-white">Apply Now</h3>
+                  <p className="text-white/80 text-sm mt-1">Take the next step in your career</p>
                 </div>
-              ) : (
-                <button
-                  onClick={() => setIsModalOpen(true)}
-                  className={`w-full px-4 py-3 rounded-lg transition duration-300 shadow-md ${
-                    isProfileComplete
-                      ? "bg-gradient-to-r from-blue to-darkblue text-white hover:opacity-90"
-                      : "bg-gray-400 text-gray-200 cursor-not-allowed"
-                  }`}
-                  disabled={!isProfileComplete}
-                >
-                  Apply Now
-                </button>
-              )}
 
-              {!auth.currentUser ? (
-                <p className="text-black text-sm text-center mt-2">
-                  Log in first to apply.{" "}
-                  <button
-                    className="text-blue font-bold underline"
-                    onClick={() => navigate("/login")}
-                  >
-                    LOG IN
-                  </button>
-                </p>
-              ) : !isProfileComplete && !loadingProfile && (
-                <p className="text-black text-sm text-center mt-2">
-                  Please complete your{" "}
-                  <button
-                    className="text-blue font-bold underline"
-                    onClick={() => navigate("/profile")}
-                  >
-                    PROFILE
-                  </button>
-                  {" "}to apply.
-                </p>
-              )}
+                <div className="p-6 space-y-6">
+                  <div className="space-y-4">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-secondary">Job Type</span>
+                      <span className="font-medium text-black-primary">{job.job_type}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-secondary">Experience</span>
+                      <span className="font-medium text-black-primary">{job.experience}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-secondary">Category</span>
+                      <span className="font-medium text-black-primary">{job.job_category}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-secondary">Salary Range</span>
+                      <span className="font-medium text-darkblue">₱{job.salary_min.toLocaleString()} - ₱{job.salary_max.toLocaleString()}</span>
+                    </div>
+                  </div>
+
+                  <div className="pt-4">
+                    {loadingProfile ? (
+                      <div className="flex justify-center py-4">
+                        <div className="w-6 h-6 border-2 border-blue border-t-transparent rounded-full animate-spin"></div>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setIsModalOpen(true)}
+                        disabled={!isProfileComplete || !auth.currentUser}
+                        className={`w-full flex items-center justify-center px-4 py-3 rounded-xl transition duration-300 shadow-md text-white ${isProfileComplete && auth.currentUser
+                          ? "bg-gradient-to-r from-blue to-darkblue hover:shadow-lg"
+                          : "bg-gray-300 cursor-not-allowed"
+                          }`}
+                      >
+                        <span>Submit Application</span>
+                      </button>
+                    )}
+
+                    {!auth.currentUser ? (
+                      <div className="bg-yellow/10 border border-yellow/30 rounded-lg p-4 mt-4">
+                        <p className="text-sm text-center text-orange">
+                          You need to be logged in to apply.{" "}
+                          <button
+                            className="text-blue font-semibold hover:underline"
+                            onClick={() => navigate("/login")}
+                          >
+                            Log In Now
+                          </button>
+                        </p>
+                      </div>
+                    ) : !isProfileComplete && (
+                      <div className="bg-yellow/10 border border-yellow/30 rounded-lg p-4 mt-4">
+                        <p className="text-sm text-center text-orange">
+                          Please complete your{" "}
+                          <button
+                            className="text-blue font-semibold hover:underline"
+                            onClick={() => navigate("/profile")}
+                          >
+                            profile information
+                          </button>
+                          {" "}before applying.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Application Modal */}
         {isModalOpen && (
-        <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50 p-4">
-          <div className="bg-white w-full max-w-xl rounded-xl overflow-hidden shadow-lg">
-            <div className="bg-gradient-to-r from-blue to-darkblue px-6 py-6">
-              <div className="flex justify-between items-start">
-                <div className="pr-8">
-                  <h2 className="text-2xl font-bold text-white mb-2">Job Application</h2>
-                  <p className="text-white/90 text-lg font-semibold line-clamp-1">{job?.job_title}</p>
-                  <p className="text-white/75 text-sm line-clamp-1">{job?.company}</p>
+          <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50 p-4">
+            <div className="bg-white w-full max-w-xl rounded-xl overflow-hidden shadow-2xl transition-opacity duration-300 opacity-100">
+              <div className="bg-gradient-to-r from-blue to-darkblue px-6 py-6">
+                <div className="flex justify-between items-start">
+                  <div className="pr-8">
+                    <h2 className="text-2xl font-bold text-white mb-2">Job Application</h2>
+                    <p className="text-white/90 text-lg font-semibold line-clamp-1">{job?.job_title}</p>
+                    <p className="text-white/75 text-sm line-clamp-1">{job?.company}</p>
+                  </div>
+                  <button
+                    onClick={handleCloseModal}
+                    className="text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-2 transition-all duration-200"
+                  >
+                    <IoClose size={18} />
+                  </button>
                 </div>
-                <button 
-                  onClick={handleCloseModal}
-                  className="text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-2 transition-all duration-200"
-                >
-                  <IoClose size={18} />
-                </button>
               </div>
-            </div>
 
-            <form onSubmit={handleSubmit} className="p-6">
-              <div className="space-y-6">
-                {/* Personal Details - Only showing name and email */}
-                <div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-4">Personal Details</h3>
-                  <div className="grid gap-4">
-                    {/* Only map over name and email fields */}
-                    {['name', 'email'].map((field) => (
-                      <div key={field}>
-                        <label className="text-gray-700 text-base font-medium mb-1 block capitalize">
-                          {field}
-                        </label>
-                        <input
-                          type="text"
-                          value={applicationForm[field]}
-                          className="w-full h-10 px-3 rounded-lg border border-gray-200 text-gray-800 focus:border-blue focus:ring-0 disabled:bg-gray-50/50"
-                          disabled
-                        />
+              <form onSubmit={handleSubmit} className="p-6">
+                <div className="space-y-6">
+                  {/* Personal Details */}
+                  <div>
+                    <h3 className="font-bold text-black-primary mb-4 flex items-center">
+                      <BsCheckCircleFill className="text-green mr-2" />
+                      Personal Details
+                    </h3>
+                    <div className="rounded-lg p-5 border border-neutral-300">
+                      <div className="grid grid-cols-2 gap-4">
+                        {["name", "email"].map((field) => (
+                          <div key={field} className="flex flex-col">
+                            <label className="text-gray-secondary text-xs uppercase tracking-wide mb-1">
+                              {field}
+                            </label>
+                            <p className=" text-black-primary bg-white px-3 py-2 rounded-md text-sm border border-neutral-300">
+                              {applicationForm[field]}
+                            </p>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                      <div className="mt-3 text-center">
+                        <button
+                          type="button"
+                          onClick={() => navigate("/profile")}
+                          className="text-sm text-blue hover:text-darkblue font-medium"
+                        >
+                          Update Profile
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </div>
 
-                {/* Resume Upload Section */}
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-xl font-bold text-gray-800">Resume Upload</h3>
-                    <span className="text-xs text-red bg-gray-100 px-1 py-1 rounded-full">
-                      PDF files only
-                    </span>
-                  </div>
-                  <div 
-                    className={`border-2 border-dashed rounded-xl text-center transition-colors ${
-                      isDragging ? "border-blue bg-blue/5" : "border-gray-200 hover:border-blue"}`}
+
+                  {/* Resume Upload Section */}
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-bold text-black-primary flex items-center">
+                        <FaFileUpload className="text-blue mr-2" />
+                        Resume Upload
+                      </h3>
+                      <span className="text-xs bg-red/10 text-red px-2 py-1 rounded-full font-medium">
+                        PDF files only
+                      </span>
+                    </div>
+                    <div
+                      className={`border-2 border-dashed rounded-xl transition-colors ${isDragging
+                        ? "border-blue bg-blue/5"
+                        : selectedFile
+                          ? "border-green bg-green/10"
+                          : "border-gray-200 hover:border-blue"
+                        }`}
                       onDragOver={(e) => handleDrag(e, true)}
                       onDragLeave={(e) => handleDrag(e, false)}
                       onDrop={handleDrop}
                     >
-                      <input 
-                        type="file" 
-                        accept=".pdf" 
-                        onChange={handleFileChange} 
-                        className="hidden" 
-                        id="resume-upload" 
+                      <input
+                        type="file"
+                        accept=".pdf"
+                        onChange={handleFileChange}
+                        className="hidden"
+                        id="resume-upload"
                       />
-                      <label 
-                        htmlFor="resume-upload" 
+                      <label
+                        htmlFor="resume-upload"
                         className="cursor-pointer block p-4"
                       >
-                        <div className="space-y-3">
-                          <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto">
-                            <svg 
-                              className="w-6 h-6 text-gray-400" 
-                              fill="none" 
-                              viewBox="0 0 24 24" 
-                              stroke="currentColor"
-                            >
-                              <path 
-                                strokeLinecap="round" 
-                                strokeLinejoin="round" 
-                                strokeWidth={2} 
-                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" 
-                              />
-                            </svg>
+                        <div className="space-y-2 text-center">
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto ${selectedFile ? "bg-green/10" : "bg-gray-100"
+                            }`}>
+                            {selectedFile ? (
+                              <BsCheckCircleFill className="w-6 h-6 text-green" />
+                            ) : (
+                              <svg
+                                className="w-6 h-6 text-gray-400"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                                />
+                              </svg>
+                            )}
                           </div>
                           <div className="space-y-1">
-                            <p className="text-sm font-medium text-gray-700">
+                            <p className="font-medium">
                               {selectedFile ? (
-                                <span className="flex items-center justify-center space-x-2">
-                                  <span>Selected: </span>
-                                  <span className="font-semibold text-blue">
-                                    {selectedFile.name}
-                                  </span>
+                                <span className="text-green">
+                                  Resume selected
                                 </span>
                               ) : (
-                                "Drop your resume here"
+                                <span className="text-black-primary">Upload your resume</span>
                               )}
                             </p>
-                            <p className="text-xs text-gray-500">
-                              {selectedFile ? "Click to change file" : "Drag & drop or click to browse"}
+                            <p className="text-sm text-gray-secondary">
+                              {selectedFile ? (
+                                <>"{selectedFile.name}" <span className="underline">Change file</span></>
+                              ) : (
+                                "Drag & drop or click to browse"
+                              )}
                             </p>
                           </div>
                         </div>
                       </label>
                     </div>
                   </div>
-  
+
                   {/* Submit Button */}
                   <button
                     type="submit"
                     disabled={uploading || !selectedFile}
-                    className={`w-full py-3 rounded-lg text-white text-base font-medium transition-all duration-200 
-                      ${uploading || !selectedFile
-                        ? "bg-gray-300 cursor-not-allowed"
-                        : "bg-gradient-to-r from-blue to-darkblue hover:opacity-90"
+                    className={`w-full py-2 rounded-xl text-white font-medium transition-all duration-200 
+                    ${uploading
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : !selectedFile
+                          ? "bg-gray-300 cursor-not-allowed"
+                          : "bg-gradient-to-r from-blue to-darkblue hover:opacity-90 hover:shadow-lg"
                       }
-                    `}
+                  `}
                   >
                     {uploading ? (
                       <div className="flex items-center justify-center space-x-2">
-                        <FaSpinner className="animate-spin" />
-                        <span>Submitting...</span>
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Submitting Application...</span>
                       </div>
                     ) : (
                       "Submit Application"
                     )}
                   </button>
+
+                  {!selectedFile && (
+                    <p className="text-xs text-center text-gray-secondary">
+                      Please upload your resume to continue
+                    </p>
+                  )}
                 </div>
               </form>
             </div>
           </div>
         )}
       </div>
+    );
+  };
+
+  return (
+    <PageLoader isLoading={loading}>
+      {renderContent()}
     </PageLoader>
   );
 };

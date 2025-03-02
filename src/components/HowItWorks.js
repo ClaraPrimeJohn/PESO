@@ -5,7 +5,7 @@ const HowItWorks = () => {
         <div className="bg-white py-16 pb-12 px-8 lg:px-32 mx-4 sm:mx-8 md:mx-16 lg:mx-32 xl:mx-48">
             <div className="text-center mb-12">
                 <h2 className="text-blue text-sm font-bold uppercase">Our Work Process</h2>
-                <h3 className="text-3xl font-bold text-gray-800 mt-2">How it Works?</h3>
+                <h3 className="text-3xl font-bold text-gray-600 mt-2">How it Works?</h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 {/* Step 1 */}

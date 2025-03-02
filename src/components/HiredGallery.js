@@ -24,7 +24,7 @@
           initial={{ opacity: 0, y: -20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
-          className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-orange-500 mb-4 md:mb-6 uppercase"
+          className="text-xl md:text-2xl lg:text-3xl font-extrabold text-orange mb-4 md:mb-6 uppercase"
         >
           Hired Job Seekers
         </motion.h2>
