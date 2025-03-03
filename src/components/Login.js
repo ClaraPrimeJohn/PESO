@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ClipLoader } from "react-spinners";
 import { db } from "../firebase";
-import { doc, setDoc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
+import { doc, setDoc, getDoc, collection, query, where, getDocs, updateDoc } from "firebase/firestore";
 import pesoLogo from "../assets/peso-logo.webp"; 
 
 function Login() {
@@ -50,6 +50,30 @@ function Login() {
                 return;
             }
 
+            // Update user profile to mark as verified if it's not already
+            const userProfileRef = doc(db, "profiles", user.uid);
+            const userProfileSnap = await getDoc(userProfileRef);
+            
+            if (userProfileSnap.exists()) {
+                const userData = userProfileSnap.data();
+                
+                if (!userData.isVerified) {
+                    await updateDoc(userProfileRef, {
+                        isVerified: true
+                    });
+                }
+            } else {
+                // If for some reason the profile doesn't exist (unlikely at this point)
+                await setDoc(userProfileRef, {
+                    email: email,
+                    isVerified: true,
+                    createdAt: new Date(),
+                    name: null,
+                    number: null,
+                    address: null
+                });
+            }
+
             toast.success("Signed in successfully!", {
                 position: "top-center",
                 autoClose: 1000,
@@ -84,8 +108,19 @@ function Login() {
                     name: displayName || "Unnamed User",
                     email: email,
                     profileImage: photoURL || "",
+                    isVerified: true, // Google accounts are pre-verified
                     createdAt: new Date(),
+                    number: null,
+                    address: null
                 });
+            } else {
+                // Update the verification status if not already verified
+                const userData = userSnap.data();
+                if (!userData.isVerified) {
+                    await updateDoc(userRef, {
+                        isVerified: true
+                    });
+                }
             }
 
             toast.success("Signed in successfully with Google!", {

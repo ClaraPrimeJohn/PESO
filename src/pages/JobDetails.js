@@ -23,11 +23,13 @@ const JobDetails = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [isProfileComplete, setIsProfileComplete] = useState(false);
+  const [profileChecked, setProfileChecked] = useState(false);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isVisible, setIsVisible] = useState(false);
+  const [missingFields, setMissingFields] = useState([]);
   const [applicationForm, setApplicationForm] = useState({
     name: "",
     email: "",
@@ -39,6 +41,16 @@ const JobDetails = () => {
     setIsModalOpen(false);
     setSelectedFile(null); 
     setIsDragging(false);
+  };
+
+  const getFieldDisplayName = (fieldName) => {
+    const displayNames = {
+      'name': 'Full Name',
+      'email': 'Email Address',
+      'contactNumber': 'Contact Number',
+      'address': 'Address'
+    };
+    return displayNames[fieldName] || fieldName;
   };
 
   // Fetch job details
@@ -79,6 +91,7 @@ const JobDetails = () => {
       const currentUser = auth.currentUser;
       if (!currentUser) {
         setLoadingProfile(false);
+        setProfileChecked(true);
         return;
       }
 
@@ -88,13 +101,18 @@ const JobDetails = () => {
 
         if (profileSnap.exists()) {
           const profileData = profileSnap.data();
-          const isComplete = Boolean(
-            profileData.name &&
-            profileData.address &&
-            profileData.contactNumber
+          
+          // Check for all required fields
+          const requiredFields = ['address', 'contactNumber', 'email', 'name'];
+          
+          // Filter out fields that actually exist and have values
+          const missing = requiredFields.filter(field => 
+            !profileData[field] || profileData[field] === ""
           );
-
-          setIsProfileComplete(isComplete);
+          
+          setMissingFields(missing);
+          setIsProfileComplete(missing.length === 0);
+          
           setApplicationForm({
             name: profileData.name || "",
             email: profileData.email || currentUser.email || "",
@@ -103,6 +121,7 @@ const JobDetails = () => {
           });
         } else {
           setIsProfileComplete(false);
+          setMissingFields(['address', 'contactNumber', 'email', 'name']);
         }
       } catch (error) {
         console.error("Error fetching user profile:", error);
@@ -110,6 +129,7 @@ const JobDetails = () => {
         setIsProfileComplete(false);
       } finally {
         setLoadingProfile(false);
+        setProfileChecked(true);
       }
     };
 
@@ -382,18 +402,20 @@ const JobDetails = () => {
                   </div>
 
                   <div className="pt-4">
-                    {loadingProfile ? (
+                    {(loadingProfile || !profileChecked) ? (
                       <div className="flex justify-center py-4">
                         <div className="w-6 h-6 border-2 border-blue border-t-transparent rounded-full animate-spin"></div>
                       </div>
                     ) : (
                       <button
-                        onClick={() => setIsModalOpen(true)}
-                        disabled={!isProfileComplete || !auth.currentUser}
-                        className={`w-full flex items-center justify-center px-4 py-3 rounded-xl transition duration-300 shadow-md text-white ${isProfileComplete && auth.currentUser
+                        onClick={() => auth.currentUser && setIsModalOpen(true)}
+                        // Fixed condition here - now it's only disabled if there's no current user
+                        disabled={!auth.currentUser}
+                        className={`w-full flex items-center justify-center px-4 py-3 rounded-xl transition duration-300 shadow-md text-white ${
+                          auth.currentUser
                           ? "bg-gradient-to-r from-blue to-darkblue hover:shadow-lg"
                           : "bg-gray-300 cursor-not-allowed"
-                          }`}
+                        }`}
                       >
                         <span>Submit Application</span>
                       </button>
@@ -411,17 +433,20 @@ const JobDetails = () => {
                           </button>
                         </p>
                       </div>
-                    ) : !isProfileComplete && (
+                    ) : !isProfileComplete && missingFields.length > 0 && (
                       <div className="bg-yellow/10 border border-yellow/30 rounded-lg p-4 mt-4">
                         <p className="text-sm text-center text-orange">
-                          Please complete your{" "}
+                          Please complete your profile before applying. Missing: {" "}
+                          <span className="font-semibold">
+                          {missingFields.map(field => getFieldDisplayName(field)).join(', ')}
+                          </span>
+                          .{" "}
                           <button
                             className="text-blue font-semibold hover:underline"
                             onClick={() => navigate("/profile")}
                           >
-                            profile information
+                            Update profile
                           </button>
-                          {" "}before applying.
                         </p>
                       </div>
                     )}
@@ -498,12 +523,13 @@ const JobDetails = () => {
                       </span>
                     </div>
                     <div
-                      className={`border-2 border-dashed rounded-xl transition-colors ${isDragging
+                      className={`border-2 border-dashed rounded-xl transition-colors ${
+                        isDragging
                         ? "border-blue bg-blue/5"
                         : selectedFile
                           ? "border-green bg-green/10"
                           : "border-gray-200 hover:border-blue"
-                        }`}
+                      }`}
                       onDragOver={(e) => handleDrag(e, true)}
                       onDragLeave={(e) => handleDrag(e, false)}
                       onDrop={handleDrop}
@@ -520,8 +546,9 @@ const JobDetails = () => {
                         className="cursor-pointer block p-4"
                       >
                         <div className="space-y-2 text-center">
-                          <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto ${selectedFile ? "bg-green/10" : "bg-gray-100"
-                            }`}>
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto ${
+                            selectedFile ? "bg-green/10" : "bg-gray-100"
+                          }`}>
                             {selectedFile ? (
                               <BsCheckCircleFill className="w-6 h-6 text-green" />
                             ) : (

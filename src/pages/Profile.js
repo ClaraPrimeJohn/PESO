@@ -123,6 +123,13 @@ const Profile = () => {
             return;
         }
 
+        // Check if the user has a profile image or has selected a new one
+        const hasImage = profile.profileImage || selectedFile;
+        if (!hasImage) {
+            toast.error("Please upload a profile image before saving changes.");
+            return;
+        }
+
         try {
             if (!user) return;
             setLoading(true);
@@ -199,6 +206,8 @@ const Profile = () => {
         setIsEditing(true);
     };
 
+    // Check if profile has an image (either existing or new one selected)
+    const hasProfileImage = Boolean(profile.profileImage || selectedFile);
 
     if (loading) {
         return (
@@ -232,7 +241,7 @@ const Profile = () => {
                                             className="w-full h-full object-cover"
                                         />
                                     ) : (
-                                        <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                                        <div className="w-full h-32 bg-gray-200 flex items-center justify-center">
                                             <FaUser className="w-12 h-12 text-gray-400" />
                                         </div>
                                     )}
@@ -245,7 +254,7 @@ const Profile = () => {
                                 {isEditing && (
                                     <label 
                                         htmlFor="image-upload" 
-                                        className="absolute bottom-0 right-0 bg-blue p-2 rounded-full cursor-pointer hover:bg-blue transition-colors duration-200"
+                                        className={`absolute bottom-0 right-0 p-2 rounded-full cursor-pointer transition-colors duration-200 ${!hasProfileImage ? 'bg-red-500 animate-pulse' : 'bg-blue hover:bg-blue'}`}
                                     >
                                         <FaCamera className="w-4 h-4 text-white" />
                                         <input 
@@ -256,6 +265,11 @@ const Profile = () => {
                                             className="hidden"
                                         />
                                     </label>
+                                )}
+                                {isEditing && !hasProfileImage && (
+                                    <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-red-100 text-red-700 text-xs px-3 py-1 rounded-full whitespace-nowrap">
+                                        Profile image required
+                                    </div>
                                 )}
                             </div>
                         </div>
@@ -271,116 +285,116 @@ const Profile = () => {
                         </div>
 
                         <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                    <label className="flex items-center text-sm font-medium text-gray-700">
-                        <FaUser className="w-4 h-4 mr-2 text-blue" />
-                        Full Name
-                    </label>
-                    <input
-                        name="name"
-                        value={profile.name}
-                        onChange={handleChange}
-                        disabled={!isEditing}
-                        placeholder="Enter your full name"
-                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 
-                            ${isEditing 
-                                ? 'border-blue focus:ring-darkblue bg-white' 
-                                : 'border-gray-200 bg-gray-50'
-                            } transition-all duration-200`}
-                    />
-                </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="flex items-center text-sm font-medium text-gray-700">
+                                        <FaUser className="w-4 h-4 mr-2 text-blue" />
+                                        Full Name
+                                    </label>
+                                    <input
+                                        name="name"
+                                        value={profile.name}
+                                        onChange={handleChange}
+                                        disabled={!isEditing}
+                                        placeholder="Enter your full name"
+                                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 
+                                            ${isEditing 
+                                                ? 'border-blue focus:ring-darkblue bg-white' 
+                                                : 'border-gray-200 bg-gray-50'
+                                            } transition-all duration-200`}
+                                    />
+                                </div>
 
-                <div className="space-y-2">
-                    <label className="flex items-center text-sm font-medium text-gray-700">
-                        <FaPhone className="w-4 h-4 mr-2 text-blue" />
-                        Contact Number
-                    </label>
-                    <input
-                        name="contactNumber"
-                        value={profile.contactNumber}
-                        onChange={handleChange}
-                        disabled={!isEditing}
-                        placeholder="Enter your contact number"
-                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 
-                            ${isEditing 
-                                ? 'border-blue focus:ring-darkblue bg-white' 
-                                : 'border-gray-200 bg-gray-50'
-                            } transition-all duration-200`}
-                    />
-                </div>
-            </div>
+                                <div className="space-y-2">
+                                    <label className="flex items-center text-sm font-medium text-gray-700">
+                                        <FaPhone className="w-4 h-4 mr-2 text-blue" />
+                                        Contact Number
+                                    </label>
+                                    <input
+                                        name="contactNumber"
+                                        value={profile.contactNumber}
+                                        onChange={handleChange}
+                                        disabled={!isEditing}
+                                        placeholder="Enter your contact number"
+                                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 
+                                            ${isEditing 
+                                                ? 'border-blue focus:ring-darkblue bg-white' 
+                                                : 'border-gray-200 bg-gray-50'
+                                            } transition-all duration-200`}
+                                    />
+                                </div>
+                            </div>
 
-            <div className="space-y-2">
-                <label className="flex items-center text-sm font-medium text-gray-700">
-                    <FaMapMarkerAlt className="w-4 h-4 mr-2 text-blue" />
-                    Address
-                </label>
-                <input
-                    name="address"
-                    value={profile.address}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    placeholder="Enter your address"
-                    className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 
-                        ${isEditing 
-                            ? 'border-blue focus:ring-darkblue bg-white' 
-                            : 'border-gray-200 bg-gray-50'
-                        } transition-all duration-200`}
-                />
-            </div>
+                            <div className="space-y-2">
+                                <label className="flex items-center text-sm font-medium text-gray-700">
+                                    <FaMapMarkerAlt className="w-4 h-4 mr-2 text-blue" />
+                                    Address
+                                </label>
+                                <input
+                                    name="address"
+                                    value={profile.address}
+                                    onChange={handleChange}
+                                    disabled={!isEditing}
+                                    placeholder="Enter your address"
+                                    className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 
+                                        ${isEditing 
+                                            ? 'border-blue focus:ring-darkblue bg-white' 
+                                            : 'border-gray-200 bg-gray-50'
+                                        } transition-all duration-200`}
+                                />
+                            </div>
 
-            <div className="space-y-2">
-                <label className="flex items-center text-sm font-medium text-gray-700">
-                    <FaEnvelope className="w-4 h-4 mr-2 text-blue" />
-                    Email
-                </label>
-                <input
-                    type="email"
-                    value={profile.email || ""}
-                    disabled
-                    className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50"
-                />
-            </div>
+                            <div className="space-y-2">
+                                <label className="flex items-center text-sm font-medium text-gray-700">
+                                    <FaEnvelope className="w-4 h-4 mr-2 text-blue" />
+                                    Email
+                                </label>
+                                <input
+                                    type="email"
+                                    value={profile.email || ""}
+                                    disabled
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50"
+                                />
+                            </div>
 
-            <div className="pt-6 flex justify-center gap-4">
-                {isEditing ? (
-                    <>
-                        <button 
-                            type="submit" 
-                            disabled={!isDirty || uploadingImage}
-                            className={`flex items-center px-6 py-2 rounded-lg text-white
-                                ${isDirty && !uploadingImage
-                                    ? 'bg-blue hover:bg-darkblue' 
-                                    : 'bg-gray-400 cursor-not-allowed'
-                                } transition-colors duration-200`}
-                        >
-                            <FaSave className="w-4 h-4 mr-2" />
-                            Save Changes
-                        </button>
-                        <button 
-                            type="button" 
-                            onClick={handleCancel}
-                            className="flex items-center px-6 py-2 border border-gray-300 rounded-lg text-gray-700 
-                                hover:bg-gray-50 transition-colors duration-200"
-                        >
-                            <FaTimes className="w-4 h-4 mr-2" />
-                            Cancel
-                        </button>
-                    </>
-                ) : (
-                    <button 
-                        type="button" 
-                        onClick={handleEditClick}
-                        className="flex items-center px-6 py-2 bg-blue text-white rounded-lg 
-                            hover:bg-blue transition-colors duration-200"
-                    >
-                        <FaPencilAlt className="w-4 h-4 mr-2" />
-                        Edit Profile
-                    </button>
-                )}
-            </div>
-        </form>
+                            <div className="pt-6 flex justify-center gap-4">
+                                {isEditing ? (
+                                    <>
+                                        <button 
+                                            type="submit" 
+                                            disabled={!isDirty || uploadingImage || !hasProfileImage}
+                                            className={`flex items-center px-6 py-2 rounded-lg text-white
+                                                ${isDirty && !uploadingImage && hasProfileImage
+                                                    ? 'bg-blue hover:bg-darkblue' 
+                                                    : 'bg-gray-400 cursor-not-allowed'
+                                                } transition-colors duration-200`}
+                                        >
+                                            <FaSave className="w-4 h-4 mr-2" />
+                                            Save Changes
+                                        </button>
+                                        <button 
+                                            type="button" 
+                                            onClick={handleCancel}
+                                            className="flex items-center px-6 py-2 border border-gray-300 rounded-lg text-gray-700 
+                                                hover:bg-gray-50 transition-colors duration-200"
+                                        >
+                                            <FaTimes className="w-4 h-4 mr-2" />
+                                            Cancel
+                                        </button>
+                                    </>
+                                ) : (
+                                    <button 
+                                        type="button" 
+                                        onClick={handleEditClick}
+                                        className="flex items-center px-6 py-2 bg-blue text-white rounded-lg 
+                                            hover:bg-blue transition-colors duration-200"
+                                    >
+                                        <FaPencilAlt className="w-4 h-4 mr-2" />
+                                        Edit Profile
+                                    </button>
+                                )}
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>

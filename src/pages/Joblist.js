@@ -5,8 +5,8 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import placeholder from "../assets/companycolored.png";
 import PageLoader from "../components/PageLoader";
-
 import { IoFilterSharp } from "react-icons/io5";
+import TourGuideButton from "../components/TourGuideButton";
 
 const Joblist = () => {
   const [jobs, setJobs] = useState([]);
@@ -268,7 +268,7 @@ const Joblist = () => {
     }
 
     return (
-      <div className="flex justify-center items-center space-x-1 mt-8">
+      <div className="flex justify-center items-center space-x-1 mt-8 pagination-controls"> 
         <button
           onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
@@ -358,11 +358,11 @@ const Joblist = () => {
             <div className="flex items-center space-x-2 mb-1">
               <h3 className="text-blue font-semibold">{job.company}</h3>
               {job.isOpen ? (
-                <span className="inline-flex items-center gap-1 text-green text-xs px-2 py-1 rounded">
+                <span className="inline-flex items-center gap-1 text-green text-xs px-2 py-1 rounded job-status-badge"> {/* Added job-status-badge class */}
                   <span className="w-2 h-2 bg-green rounded-full shrink-0"></span> Active
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 text-red text-xs px-2 py-1 rounded">
+                <span className="inline-flex items-center gap-1 text-red text-xs px-2 py-1 rounded job-status-badge"> {/* Added job-status-badge class */}
                   <span className="w-2 h-2 bg-red rounded-full shrink-0"></span> Closed
                 </span>
               )}
@@ -393,23 +393,23 @@ const Joblist = () => {
 
         <div className="flex flex-col items-center lg:items-end justify-between lg:w-1/3 mt-6 lg:mt-0 w-full">
         <button
-        className={`px-6 py-2 rounded-lg font-medium transition-all duration-300 w-full lg:w-auto ${
-          appliedJobIds.includes(job.id)
-            ? "bg-transparent text-green border border-green cursor-default"
-            : job.isOpen
-              ? "bg-blue text-white hover:bg-darkblue"
-              : "bg-transparent border border-gray-600 text-gray-600 cursor-not-allowed"
-          }`}
-        onClick={() => job.isOpen && !appliedJobIds.includes(job.id) && handleApplyNow(job.id)}
-        disabled={!job.isOpen || appliedJobIds.includes(job.id)}
-        title={
-          appliedJobIds.includes(job.id)
-            ? "Already applied to this job"
-            : !job.isOpen
-              ? "Not accepting applicants"
-              : ""
-        }
-      >
+          className={`px-6 py-2 rounded-lg font-medium transition-all duration-300 w-full lg:w-auto apply-button ${
+            appliedJobIds.includes(job.id)
+              ? "bg-transparent text-green border border-green cursor-default"
+              : job.isOpen
+                ? "bg-blue text-white hover:bg-darkblue"
+                : "bg-transparent border border-gray-600 text-gray-600 cursor-not-allowed"
+            }`} // Added apply-button class
+          onClick={() => job.isOpen && !appliedJobIds.includes(job.id) && handleApplyNow(job.id)}
+          disabled={!job.isOpen || appliedJobIds.includes(job.id)}
+          title={
+            appliedJobIds.includes(job.id)
+              ? "Already applied to this job"
+              : !job.isOpen
+                ? "Not accepting applicants"
+                : ""
+          }
+        >
         {appliedJobIds.includes(job.id)
           ? "Applied"
           : job.isOpen
@@ -519,16 +519,16 @@ const Joblist = () => {
         </div>
 
         <button
-          className={`mt-6 px-6 py-3 rounded-lg font-medium text-sm transition-all duration-300 w-full ${job.isOpen
-            ? "bg-blue text-white hover:bg-darkblue"
-            : "bg-gray-300 text-gray-600 cursor-not-allowed"
-            }`}
-          onClick={() => job.isOpen && handleApplyNow(job.id)}
-          disabled={!job.isOpen}
-          title={!job.isOpen ? "Not accepting applicants" : ""}
-        >
-          {job.isOpen ? "Apply Now" : "Closed"}
-        </button>
+        className={`mt-6 px-6 py-3 rounded-lg font-medium text-sm transition-all duration-300 w-full apply-button ${job.isOpen
+          ? "bg-blue text-white hover:bg-darkblue"
+          : "bg-gray-300 text-gray-600 cursor-not-allowed"
+          }`} // Added apply-button class
+        onClick={() => job.isOpen && handleApplyNow(job.id)}
+        disabled={!job.isOpen}
+        title={!job.isOpen ? "Not accepting applicants" : ""}
+      >
+        {job.isOpen ? "Apply Now" : "Closed"}
+      </button>
       </div>
     </div>
   );
@@ -547,22 +547,22 @@ const Joblist = () => {
 
             <div className="mt-8 bg-white rounded-xl shadow-lg p-2 flex items-center">
               <div className="flex-grow">
-                <input
-                  type="text"
-                  placeholder="Search by job title or company..."
-                  value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  className="w-full p-2 bg-transparent text-black-primary focus:outline-none"
-                />
+              <input
+                type="text"
+                placeholder="Search by job title or company..."
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="w-full p-2 bg-transparent text-black-primary focus:outline-none search-bar" // Added search-bar class
+              />
               </div>
               <button
                 onClick={toggleFilter}
                 className="p-2 rounded-lg text-black-secondary hover:bg-gray-100 mr-2 border border-neutral-300 transition-all duration-300"
               >
-                <IoFilterSharp className="font-bold text-lg" />
+                <IoFilterSharp className="font-bold text-lg filter-icon" /> {/* Added filter-icon class */}
               </button>
               <button className="bg-blue text-white px-6 text-sm py-2 rounded-lg font-medium hover:bg-darkblue transition-all duration-300">
                 Search
@@ -660,11 +660,11 @@ const Joblist = () => {
               </div>
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-2">
-                  <button
-                    className={`p-2 rounded-lg transition-all duration-300 ${viewMode === 'list' ? 'bg-blue/10 text-blue' : 'text-gray-secondary hover:bg-gray-100'}`}
-                    onClick={() => handleViewModeChange('list')}
-                    title="List view"
-                  >
+                <button
+                  className={`p-2 rounded-lg transition-all duration-300 ${viewMode === 'list' ? 'bg-blue/10 text-blue' : 'text-gray-secondary hover:bg-gray-100'}`}
+                  onClick={() => handleViewModeChange('list')}
+                  title="List view"
+                >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                     </svg>
@@ -682,7 +682,7 @@ const Joblist = () => {
                 <div className="flex items-center">
                   <span className="mr-2 text-base">Sort by:</span>
                   <select
-                    className="bg-white border border-gray-200 text-sm text-black-secondary rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-500 transition-all duration-300"
+                    className="bg-white border border-gray-200 text-sm text-black-secondary rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-500 transition-all duration-300 sort-dropdown" // Added sort-dropdown class
                     value={sortBy}
                     onChange={(e) => handleSortChange(e.target.value)}
                   >
@@ -728,6 +728,7 @@ const Joblist = () => {
           </div>
         </div>
       </PageLoader>
+      <TourGuideButton />
     </div>
   );
 };

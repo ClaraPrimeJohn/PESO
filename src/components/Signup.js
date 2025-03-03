@@ -11,6 +11,7 @@ import pesoLogo from "../assets/peso-logo.webp";
 function Signup() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [name, setName] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
@@ -29,9 +30,12 @@ function Signup() {
 
             await setDoc(doc(db, "profiles", user.uid), {
                 email: user.email,
-                phone: "",
-                profileImageUrl: "",
+                name: name,
+                address: null,
+                contactNumber: null,
+                profileImage: null,
                 createdAt: new Date(),
+                isVerified: false
             });
 
             toast.success("Account created! Verify your email before signing in.", { position: "top-center", autoClose: 3000 });
@@ -60,6 +64,21 @@ function Signup() {
                 </p>
 
                 <form className="space-y-4 sm:space-y-6 w-full max-w-sm mx-auto" onSubmit={handleSignup}>
+                    <div>
+                        <label htmlFor="name" className="block text-xs sm:text-sm font-medium text-gray-700">
+                            Full Name:
+                        </label>
+                        <input
+                            type="text"
+                            id="name"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="Enter your full name"
+                            required
+                            className="w-full mt-2 text-xs sm:text-sm px-3 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-black-secondary focus:outline-none"
+                        />
+                    </div>
+
                     <div>
                         <label htmlFor="email" className="block text-xs sm:text-sm font-medium text-gray-700">
                             Email:
