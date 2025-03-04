@@ -69,7 +69,7 @@ function Login() {
                     isVerified: true,
                     createdAt: new Date(),
                     name: null,
-                    number: null,
+                    contactNumber: null,
                     address: null
                 });
             }
