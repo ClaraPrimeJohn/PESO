@@ -110,7 +110,7 @@ function Login() {
                     profileImage: photoURL || "",
                     isVerified: true, // Google accounts are pre-verified
                     createdAt: new Date(),
-                    number: null,
+                    contactNumber: null,
                     address: null
                 });
             } else {
