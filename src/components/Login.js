@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { auth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "../firebase";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-hot-toast";
 import { ClipLoader } from "react-spinners";
 import { db } from "../firebase";
 import { doc, setDoc, getDoc, collection, query, where, getDocs, updateDoc } from "firebase/firestore";
@@ -27,8 +26,7 @@ function Login() {
             
             if (querySnapshot.empty) {
                 toast.error("Account not found", {
-                    position: "top-center",
-                    autoClose: 3000,
+                    duration: 2000,
                 });
                 setLoading(false);
                 return;
@@ -42,8 +40,7 @@ function Login() {
 
             if (!user.emailVerified) {
                 toast.error("Please verify your email before logging in.", {
-                    position: "top-center",
-                    autoClose: 3000,
+                    duration: 2000,
                 });
                 await auth.signOut();
                 setLoading(false);
@@ -75,16 +72,14 @@ function Login() {
             }
 
             toast.success("Signed in successfully!", {
-                position: "top-center",
-                autoClose: 1000,
+                duration: 1000,
             });
 
             navigate("/");
         } catch (error) {
             console.error("Error signing in with email and password", error);
             toast.error(`Error signing in: ${error.message}`, {
-                position: "top-center",
-                autoClose: 1000,
+                duration: 1000,
             });
         } finally {
             setLoading(false);
@@ -124,16 +119,14 @@ function Login() {
             }
 
             toast.success("Signed in successfully with Google!", {
-                position: "top-center",
-                autoClose: 3000,
+                duration: 3000,
             });
 
             navigate("/");
         } catch (error) {
             console.error("Error signing in with Google", error);
             toast.error(`Error signing in with Google: ${error.message}`, {
-                position: "top-center",
-                autoClose: 3000,
+                duration: 3000,
             });
         } finally {
             setLoading(false);

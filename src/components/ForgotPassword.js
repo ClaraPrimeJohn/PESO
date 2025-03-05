@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { auth, sendPasswordResetEmail } from '../firebase';
 import { ClipLoader } from 'react-spinners';
-import { toast } from 'react-toastify';
+import { toast } from "react-hot-toast";
 import { useNavigate } from 'react-router-dom';
 import { HiMail } from 'react-icons/hi';
 import { FaArrowLeft, FaLock, FaShieldAlt } from 'react-icons/fa';
@@ -21,14 +21,12 @@ const ForgotPassword = () => {
       await sendPasswordResetEmail(auth, email);
       setEmailSent(true);
       toast.success('Password reset email sent! Please check your inbox.', {
-        position: 'top-center',
-        autoClose: 3000,
+        duration: 2000,
       });
     } catch (error) {
       console.error('Error sending password reset email:', error);
       toast.error(`Error: ${error.message}`, {
-        position: 'top-center',
-        autoClose: 3000,
+        duration: 3000,
       });
     } finally {
       setLoading(false);

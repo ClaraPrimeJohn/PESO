@@ -7,8 +7,7 @@ import { FaUserEdit, FaClipboardList } from "react-icons/fa";
 import { auth } from "../firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-hot-toast";
 
 const Navbar = () => {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -44,15 +43,14 @@ const Navbar = () => {
         try {
             await signOut(auth);
             toast.success("Logged out successfully!", {
-                position: "top-center",
-                autoClose: 1000,
+                duration: 1000,
             });
             navigate("/");
         } catch (error) {
             console.error("Error during sign out:", error);
             toast.error("Error logging out. Please try again.", {
                 position: "top-center",
-                autoClose: 1000,
+                duration: 1000,
             });
         }
     };

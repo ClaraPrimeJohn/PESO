@@ -3,8 +3,7 @@ import { auth, db } from "../firebase";
 import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-hot-toast";
 import { ClipLoader } from "react-spinners";
 import pesoLogo from "../assets/peso-logo.webp"; 
 
@@ -18,7 +17,7 @@ function Signup() {
     const handleSignup = async (e) => {
         e.preventDefault();
         if (password.length < 6) {
-            toast.error("Password must be at least 6 characters long.", { position: "top-center", autoClose: 3000 });
+            toast.error("Password must be at least 6 characters long.", { duration: 3000 });
             return;
         }
         setLoading(true);
@@ -38,10 +37,10 @@ function Signup() {
                 isVerified: false
             });
 
-            toast.success("Account created! Verify your email before signing in.", { position: "top-center", autoClose: 3000 });
+            toast.success("Account created! Verify your email before signing in.", {duration: 3000 });
             navigate("/login");
         } catch (error) {
-            toast.error(`Error signing up: ${error.message}`, { position: "top-center", autoClose: 3000 });
+            toast.error(`Error signing up: ${error.message}`, {duration: 3000 });
         } finally {
             setLoading(false);
         }

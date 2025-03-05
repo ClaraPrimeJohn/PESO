@@ -7,8 +7,7 @@ import { IoClose, IoBriefcase, IoLocationSharp, IoCalendar } from "react-icons/i
 import { FaMoneyBillWave, FaClock, FaFileUpload } from "react-icons/fa";
 import { BsCheckCircleFill } from "react-icons/bs";
 import axios from "axios";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-hot-toast";
 import placeholder from "../assets/companycolored.webp";
 import PageLoader from "../components/PageLoader";
 
@@ -225,7 +224,7 @@ const JobDetails = () => {
       
       // Navigate back to job listings after a brief delay
       setTimeout(() => {
-        navigate("/jobs");
+        navigate("/job-listing");
       }, 1500); // 1.5 second delay to allow the success toast to be visible
       
     } catch (error) {

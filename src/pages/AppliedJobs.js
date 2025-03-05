@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
 import { auth } from "../firebase";
 import { FaEye, FaSpinner, FaCalendarAlt, FaBriefcase, FaBuilding } from "react-icons/fa";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 
 const AppliedJobs = () => {
     const [appliedJobs, setAppliedJobs] = useState([]);
@@ -11,6 +11,9 @@ const AppliedJobs = () => {
     useEffect(() => {
         const fetchAppliedJobs = async () => {
             try {
+                // Add a delay to ensure auth is fully initialized
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
                 const user = auth.currentUser;
                 if (!user || !user.email) {
                     setIsLoading(false);
@@ -83,6 +86,7 @@ const AppliedJobs = () => {
                     </button>
                 </div>
             ) : (
+                // Rest of the component remains unchanged
                 <div className="grid grid-cols-1 gap-4">
                     {/* Desktop view (table) - Hidden on mobile */}
                     <div className="hidden md:block overflow-hidden bg-white rounded-lg shadow-sm border border-gray-100">

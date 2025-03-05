@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { auth, db } from "../firebase";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import placeholder from "../assets/companycolored.webp";
