@@ -16,54 +16,54 @@ const TourGuide = ({ onClose }) => {
   // Define all the steps in the tour with useMemo to prevent recreation on every render
   const tourSteps = useMemo(() => [
     {
-      selector: '.search-bar', // Add this class to your search input
+      selector: '.search-bar', 
       title: 'Search Jobs',
       content: 'Enter keywords like job titles or company names to find matching positions.',
       position: 'bottom'
     },
     {
-      selector: 'button:has(> .filter-icon)', // Add filter-icon class to your filter icon
+      selector: 'button:has(> .filter-icon)', 
       title: 'Advanced Filters',
       content: 'Click here to open filters for job type, experience level, and posting date.',
       position: 'bottom'
     },
     {
-      selector: '.view-controls', // Add this class to the view mode buttons container
+      selector: '.view-controls', 
       title: 'Change View',
       content: 'Switch between list and grid views to browse jobs differently.',
       position: 'bottom'
     },
     {
-      selector: '.sort-dropdown', // Add this class to your sort select element
+      selector: '.sort-dropdown', 
       title: 'Sort Jobs',
       content: 'Arrange jobs by latest, oldest, or relevance to your search.',
       position: 'bottom'
     },
     {
-      selector: '.job-status-badge', // Add this class to your job status indicators
+      selector: '.job-status-badge',
       title: 'Job Status',
       content: 'Green means the job is active and accepting applications. Red means it\'s closed.',
       position: 'right'
     },
     {
-      selector: '.apply-button', // Add this class to your apply buttons
+      selector: '.apply-button', 
       title: 'Apply for Jobs',
       content: 'Click this button to apply for positions that interest you.',
       position: 'left'
     },
     {
-      selector: '.pagination-controls', // Add this class to your pagination component
+      selector: '.pagination-controls',
       title: 'Navigate Pages',
       content: 'Use these controls to browse through all available job listings.',
       position: 'top'
     }
-  ], []); // Empty dependency array means this only runs once
+  ], []); 
 
-  // Determine the best position for the tooltip based on screen space
+ 
   const determineOptimalPosition = useCallback((rect, preferredPosition) => {
-    const tooltipWidth = Math.min(300, windowSize.width * 0.8); // Responsive width
+    const tooltipWidth = Math.min(300, windowSize.width * 0.8); 
     
-    // Check if there's enough space in the preferred position
+
     switch (preferredPosition) {
       case 'bottom':
         if (rect.bottom + TOOLTIP_HEIGHT + MARGIN > windowSize.height) {

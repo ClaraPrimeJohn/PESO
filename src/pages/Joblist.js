@@ -358,11 +358,11 @@ const Joblist = () => {
             <div className="flex items-center space-x-2 mb-1">
               <h3 className="text-blue font-semibold">{job.company}</h3>
               {job.isOpen ? (
-                <span className="inline-flex items-center gap-1 text-green text-xs px-2 py-1 rounded job-status-badge"> {/* Added job-status-badge class */}
+                <span className="inline-flex items-center gap-1 text-green text-xs px-2 py-1 rounded job-status-badge"> 
                   <span className="w-2 h-2 bg-green rounded-full shrink-0"></span> Active
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 text-red text-xs px-2 py-1 rounded job-status-badge"> {/* Added job-status-badge class */}
+                <span className="inline-flex items-center gap-1 text-red text-xs px-2 py-1 rounded job-status-badge"> 
                   <span className="w-2 h-2 bg-red rounded-full shrink-0"></span> Closed
                 </span>
               )}
@@ -399,7 +399,7 @@ const Joblist = () => {
               : job.isOpen
                 ? "bg-blue text-white hover:bg-darkblue"
                 : "bg-transparent border border-gray-600 text-gray-600 cursor-not-allowed"
-            }`} // Added apply-button class
+            }`} 
           onClick={() => job.isOpen && !appliedJobIds.includes(job.id) && handleApplyNow(job.id)}
           disabled={!job.isOpen || appliedJobIds.includes(job.id)}
           title={
@@ -461,11 +461,11 @@ const Joblist = () => {
             />
           </div>
           {job.isOpen ? (
-            <span className="inline-flex items-center gap-1 text-green text-xs px-2 py-1 rounded">
+            <span className="inline-flex items-center gap-1 text-green text-xs px-2 py-1 rounded job-status-badge">
               <span className="w-2 h-2 bg-green rounded-full shrink-0"></span> Active
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 text-red text-xs px-2 py-1 rounded">
+            <span className="inline-flex items-center gap-1 text-red text-xs px-2 py-1 rounded job-status-badge">
               <span className="w-2 h-2 bg-red rounded-full shrink-0"></span> Closed
             </span>
           )}
@@ -485,10 +485,7 @@ const Joblist = () => {
             <span className="text-sm">{job.location}</span>
           </div>
 
-          <div className="flex items-center text-black-secondary">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+          <div className="flex items-center text-black-secondary px-1">
             <span className="text-sm">₱{job.salary_min.toLocaleString()} - ₱{job.salary_max.toLocaleString()}</span>
           </div>
 
@@ -659,7 +656,7 @@ const Joblist = () => {
                 <span className="font-bold text-blue">{filteredJobs.length}</span> jobs
               </div>
               <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 view-controls">
                 <button
                   className={`p-2 rounded-lg transition-all duration-300 ${viewMode === 'list' ? 'bg-blue/10 text-blue' : 'text-gray-secondary hover:bg-gray-100'}`}
                   onClick={() => handleViewModeChange('list')}
@@ -682,7 +679,7 @@ const Joblist = () => {
                 <div className="flex items-center">
                   <span className="mr-2 text-base">Sort by:</span>
                   <select
-                    className="bg-white border border-gray-200 text-sm text-black-secondary rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-500 transition-all duration-300 sort-dropdown" // Added sort-dropdown class
+                    className="bg-white border border-gray-200 text-sm text-black-secondary rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue transition-all duration-300 sort-dropdown"
                     value={sortBy}
                     onChange={(e) => handleSortChange(e.target.value)}
                   >
