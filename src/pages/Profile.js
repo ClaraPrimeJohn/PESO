@@ -3,7 +3,7 @@ import { auth, db } from "../firebase";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { updateProfile } from "firebase/auth";
 import { toast } from "react-hot-toast";
-import { FaCamera, FaSpinner, FaUser, FaMapMarkerAlt, FaPhone, FaEnvelope, FaPencilAlt, FaSave, FaTimes } from "react-icons/fa";
+import { FaCamera, FaSpinner, FaUser, FaMapMarkerAlt, FaPhone, FaEnvelope, FaPencilAlt, FaSave, FaTimes, FaExclamationCircle  } from "react-icons/fa";
 
 const CLOUDINARY_UPLOAD_PRESET = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET;
 const CLOUDINARY_CLOUD_NAME = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME;
@@ -232,7 +232,8 @@ const Profile = () => {
                     <div className="relative h-40 bg-gradient-to-r from-blue to-blue">
                         <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2">
                             <div className="relative">
-                                <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-lg bg-white">
+                                <div className={`w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-lg bg-white 
+                                    ${isEditing && !hasProfileImage ? 'border-yellow animate-pulse' : 'border-white'}`}>
                                     {(previewImage || profile.profileImage) ? (
                                         <img 
                                             src={previewImage || profile.profileImage} 
@@ -253,9 +254,9 @@ const Profile = () => {
                                 {isEditing && (
                                     <label 
                                         htmlFor="image-upload" 
-                                        className={`absolute bottom-0 right-0 p-2 rounded-full cursor-pointer transition-colors duration-200 ${!hasProfileImage ? 'bg-red-500 animate-pulse' : 'bg-blue hover:bg-blue'}`}
+                                        className={`absolute bottom-0 right-0 p-2 rounded-full cursor-pointer transition-colors duration-200 ${!hasProfileImage ? 'bg-blue animate-pulse' : 'bg-blue hover:bg-blue'}`}
                                     >
-                                        <FaCamera className="w-4 h-4 text-white" />
+                                        <FaCamera className="w-6 h-6 text-white" />
                                         <input 
                                             id="image-upload"
                                             type="file" 
@@ -265,10 +266,13 @@ const Profile = () => {
                                         />
                                     </label>
                                 )}
-                                {isEditing && !hasProfileImage && (
-                                    <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-red-100 text-red-700 text-xs px-3 py-1 rounded-full whitespace-nowrap">
-                                        Profile image required
-                                    </div>
+                               {isEditing && !hasProfileImage && (
+                                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full 
+                                    text-yellow text-sm px-3 py-1 rounded-full flex items-center 
+                                    max-w-[90vw] whitespace-nowrap overflow-hidden text-ellipsis shadow-sm z-10">
+                                    <FaExclamationCircle className="mr-1 flex-shrink-0" />
+                                    <span className="truncate">Image required before saving</span>
+                                </div>
                                 )}
                             </div>
                         </div>
