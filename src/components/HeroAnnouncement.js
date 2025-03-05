@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import service3 from '../assets/service3.png';
+import service3 from '../assets/service3.webp';
 
 const HeroAnnouncement = () => {
   return (

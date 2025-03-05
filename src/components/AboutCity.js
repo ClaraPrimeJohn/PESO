@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import cityImage from "../assets/cityhall.jpg"; // Import image
+import cityImage from "../assets/cityhall.webp"; 
 
 const AboutCity = () => {
   return (

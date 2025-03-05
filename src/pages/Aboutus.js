@@ -1,6 +1,6 @@
 import React from 'react';
 import VisionMission from '../components/VissionMission';
-import aboutBanner from "../assets/aboutbanner.jpg";
+import aboutBanner from "../assets/aboutbanner.webp";
 import LogoCarousel from '../components/LogoCarousel';
 import PESOHistory from '../components/History';
 import AboutCity from '../components/AboutCity';

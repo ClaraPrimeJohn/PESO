@@ -1,5 +1,5 @@
 import React from 'react';
-import pesoJob from '../assets/peso-jobs.png';
+import pesoJob from '../assets/peso-jobs.webp';
 
 const Heromid = () => {
     return (

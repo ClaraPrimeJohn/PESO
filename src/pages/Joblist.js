@@ -3,7 +3,7 @@ import { auth, db } from "../firebase";
 import { toast } from "react-toastify";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
-import placeholder from "../assets/companycolored.png";
+import placeholder from "../assets/companycolored.webp";
 import PageLoader from "../components/PageLoader";
 import { IoFilterSharp } from "react-icons/io5";
 import TourGuideButton from "../components/TourGuideButton";

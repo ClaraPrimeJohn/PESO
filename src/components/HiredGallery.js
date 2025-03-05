@@ -1,13 +1,13 @@
   import React from "react";
   import { motion } from "framer-motion";
-  import img1 from "../assets/hired1.jpg";
-  import img2 from "../assets/hired2.jpg";
-  import img3 from "../assets/hired3.jpg";
-  import img4 from "../assets/hired4.jpg";
-  import img5 from "../assets/hired5.jpg";
-  import img6 from "../assets/hired6.jpg";
-  import img7 from "../assets/hired7.jpg";
-  import img8 from "../assets/hired8.jpg";
+  import img1 from "../assets/hired1.webp";
+  import img2 from "../assets/hired2.webp";
+  import img3 from "../assets/hired3.webp";
+  import img4 from "../assets/hired4.webp";
+  import img5 from "../assets/hired5.webp";
+  import img6 from "../assets/hired6.webp";
+  import img7 from "../assets/hired7.webp";
+  import img8 from "../assets/hired8.webp";
 
   const HiredGallery = () => {
     const images = [img1, img2, img3, img4, img5, img6, img7, img8];

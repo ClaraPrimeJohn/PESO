@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { FaBullseye, FaLightbulb } from "react-icons/fa";
-import bgImage from "../assets/about-6.png";
+import bgImage from "../assets/about-6.webp";
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },

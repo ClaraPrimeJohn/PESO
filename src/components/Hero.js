@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import heroImage from '../assets/jobfair3.jpg';
-import heroImage1 from '../assets/jobfair1.jpg';
-import heroImage2 from '../assets/jobfair.jpg';
-import heroImage3 from '../assets/jobfair2.jpg';
-import Banner from '../assets/try.jpg';
+import heroImage from '../assets/jobfair3.webp';
+import heroImage1 from '../assets/jobfair1.webp';
+import heroImage2 from '../assets/jobfair.webp';
+import heroImage3 from '../assets/jobfair2.webp';
+import Banner from '../assets/try.webp';
 
 const Hero = () => {
     useEffect(() => {

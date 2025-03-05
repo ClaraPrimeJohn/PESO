@@ -9,7 +9,7 @@ import { BsCheckCircleFill } from "react-icons/bs";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import placeholder from "../assets/companycolored.png";
+import placeholder from "../assets/companycolored.webp";
 import PageLoader from "../components/PageLoader";
 
 const CLOUD_NAME = "drg1csmnn";

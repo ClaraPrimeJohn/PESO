@@ -1,10 +1,10 @@
 import React from "react";
-import Logo from "../assets/svgexport-173.png";
-import Logo1 from "../assets/svgexport-293.png";
-import Logo2 from "../assets/svgexport-218.png";
-import Logo3 from "../assets/svgexport-257.png";
-import Logo4 from "../assets/svgexport-233.png";
-import Logo5 from "../assets/svgexport-299.png";
+import Logo from "../assets/svgexport-173.webp";
+import Logo1 from "../assets/svgexport-293.webp";
+import Logo2 from "../assets/svgexport-218.webp";
+import Logo3 from "../assets/svgexport-257.webp";
+import Logo4 from "../assets/svgexport-233.webp";
+import Logo5 from "../assets/svgexport-299.webp";
 
 function LogoCarousel() {
   const logos = [

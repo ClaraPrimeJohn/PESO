@@ -3,9 +3,9 @@ import { FaLocationDot } from "react-icons/fa6";
 import { IoCall } from "react-icons/io5";
 import { IoIosMail } from "react-icons/io";
 import { MdKeyboardArrowDown } from "react-icons/md";
-import Banner from '../assets/banner.jpg';
+import Banner from '../assets/banner.webp';
 import PageLoader from '../components/PageLoader';
-import FaqIllustration from '../assets/contactus.png';
+import FaqIllustration from '../assets/contactus.webp';
 
 const Contactus = () => {
     const [openIndex, setOpenIndex] = useState(null);

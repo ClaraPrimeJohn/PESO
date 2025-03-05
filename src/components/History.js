@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import history from "../assets/history.jpg";
-import history1 from "../assets/history1.jpg";
-import history2 from "../assets/history2.jpg";
+import history from "../assets/history.webp";
+import history1 from "../assets/history1.webp";
+import history2 from "../assets/history2.webp";
 
 const PESOHistory = () => {
   useEffect(() => {

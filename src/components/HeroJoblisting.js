@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import service from '../assets/service.png';
+import service from '../assets/service.webp';
 
 const HeroJoblistings = () => {
   return (
