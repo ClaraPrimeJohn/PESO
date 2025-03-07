@@ -109,10 +109,10 @@ const ContactUs = () => {
                 {/* Medium-sized Hero Banner */}
                 <div className="relative w-full h-[400px]">
                     <img src={Banner} alt="Contact Us" className="w-full h-full object-cover brightness-75" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-darkblue/90 to-green/90 flex flex-col items-center justify-center text-white p-8">
-                        <div className="bg-darkblue/50 px-8 py-6 rounded-lg backdrop-blur-sm">
-                            <h1 className="text-4xl md:text-5xl font-bold mb-8 text-center drop-shadow-md">Get in touch</h1>
-                            <p className="text-lg md:text-2xl max-w-3xl text-center drop-shadow-md">
+                      <div className="absolute inset-0 bg-gradient-to-r from-darkblue/90 to-green/90 flex flex-col items-center justify-center text-white p-8">
+                        <div className="bg-darkblue/60 px-8 py-8 rounded-lg backdrop-blur-sm">
+                            <h1 className="text-4xl md:text-5xl font-extrabold mb-6 text-center drop-shadow-md">Get in touch</h1>
+                            <p className="text-lg md:text-2xl max-w-3xl font-medium text-center drop-shadow-md">
                                 Find answers to your questions about job applications, employer services, and more.
                             </p>
                         </div>
