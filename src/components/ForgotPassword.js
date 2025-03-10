@@ -2,22 +2,36 @@ import React, { useState } from 'react';
 import { auth, sendPasswordResetEmail } from '../firebase';
 import { ClipLoader } from 'react-spinners';
 import { toast } from "react-hot-toast";
-import { useNavigate } from 'react-router-dom';
-import { HiMail } from 'react-icons/hi';
-import { FaArrowLeft, FaLock, FaShieldAlt } from 'react-icons/fa';
-import { MdEmail } from 'react-icons/md';
+import { Link } from 'react-router-dom';
+import pesoLogo from "../assets/peso-logo.webp";
+import { db } from '../firebase'; // Import Firestore
+import { collection, query, where, getDocs } from 'firebase/firestore'; // Import Firestore query methods
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
-  const navigate = useNavigate();
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
     setLoading(true);
     
     try {
+      // Check if email exists in profiles collection
+      const profilesRef = collection(db, 'profiles');
+      const q = query(profilesRef, where("email", "==", email));
+      const querySnapshot = await getDocs(q);
+      
+      if (querySnapshot.empty) {
+        // Email not found in profiles collection
+        toast.error('No account found with this email address.', {
+          duration: 3000,
+        });
+        setLoading(false);
+        return;
+      }
+      
+      // Email exists, proceed with password reset
       await sendPasswordResetEmail(auth, email);
       setEmailSent(true);
       toast.success('Password reset email sent! Please check your inbox.', {
@@ -34,111 +48,88 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray px-4 sm:px-6 lg:px-8">
-      <div className="bg-white rounded-2xl shadow-xl overflow-hidden w-full max-w-4xl flex flex-col md:flex-row">
-        <div className="w-full md:w-1/2 p-8 lg:p-12">
-          <div className="flex items-center mb-8">
-            <button
-              onClick={() => navigate('/login')}
-              className="flex items-center text-gray-600 hover:text-darkblue transition-colors"
-            >
-              <FaArrowLeft className="mr-2" />
-              Back to Login
-            </button>
-          </div>
+    <div className="min-h-screen flex items-center justify-center bg-white px-4 py-6">
+      <div className="relative bg-white p-4 sm:p-6 md:p-8 w-full max-w-md border border-neutral-300 rounded-3xl">
+        
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white px-2">
+          <img src={pesoLogo} alt="PESO Logo" className="h-14 sm:h-16 md:h-20 object-contain" />
+        </div>
 
-          {!emailSent ? (
-            <>
-              <div className="text-center mb-8">
-                <div className="inline-block p-3 rounded-full bg-blue/10 mb-4">
-                  <FaLock className="text-3xl text-darkblue" />
-                </div>
-                <h2 className="text-2xl font-bold mb-2">Forgot Password?</h2>
-                <p className="text-gray-600">
-                  No worries! Enter your email and we'll send you reset instructions.
-                </p>
+        <h1 className="text-xl sm:text-2xl md:text-3xl mt-6 sm:mt-8 font-bold text-black-secondary text-center px-2 sm:px-6 md:px-8">
+          Forgot Your Password?
+        </h1>
+        
+        {!emailSent ? (
+          <>
+            <p className="text-sm sm:text-base text-neutral-600 text-center mb-4 sm:mb-6 md:mb-8 mt-2">
+              Enter your email to receive a reset link
+            </p>
+
+            <form className="space-y-4 sm:space-y-6 w-full max-w-sm mx-auto" onSubmit={handleResetPassword}>
+              <div>
+                <label htmlFor="email" className="block text-xs sm:text-sm font-medium text-gray-700">
+                  Email:
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  required
+                  className="w-full mt-2 text-xs sm:text-sm px-3 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-black-secondary focus:outline-none"
+                />
               </div>
 
-              <form onSubmit={handleResetPassword} className="space-y-6">
-                <div className="relative">
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                    Email Address
-                  </label>
-                  <div className="relative">
-                    <MdEmail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl" />
-                    <input
-                      type="email"
-                      id="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue focus:border-transparent outline-none transition-all"
-                      placeholder="Enter your email"
-                    />
-                  </div>
-                </div>
-
+              <div className="mt-2 sm:mt-4">
                 <button
                   type="submit"
-                  className="w-full bg-darkblue text-white px-4 py-3 rounded-lg hover:bg-blue transition-colors flex items-center justify-center gap-2 font-medium"
+                  className="w-full bg-black-secondary text-white px-4 py-2 text-xs sm:text-sm rounded-md hover:bg-black transition flex items-center justify-center gap-2"
                   disabled={loading}
                 >
-                  {loading ? (
-                    <>
-                      <ClipLoader size={20} color="white" />
-                    </>
-                  ) : (
-                    <>
-                      <HiMail className="text-xl" />
-                      <span>Send Reset Link</span>
-                    </>
-                  )}
+                  {loading && <ClipLoader size={16} color="white" />}
+                  {loading ? " " : "Send Reset Link"}
                 </button>
-              </form>
-            </>
-          ) : (
-            <div className="text-center">
-              <div className="inline-block p-3 rounded-full bg-green-100 mb-4">
-                <HiMail className="text-3xl text-green-500" />
               </div>
-              <h2 className="text-2xl font-bold mb-4">Check Your Email</h2>
-              <p className="text-gray-600 mb-6">
-                We've sent a password reset link to:
-                <br />
-                <span className="font-medium text-gray-800">{email}</span>
-              </p>
-              <button
-                onClick={() => {
-                  setEmailSent(false);
-                  setEmail('');
-                }}
-                className="w-full bg-gray-100 text-gray-700 px-4 py-3 rounded-lg hover:bg-gray-200 transition-colors font-medium"
-              >
-                Send Another Link
-              </button>
-            </div>
-          )}
-        </div>
+            </form>
 
-        <div className="hidden md:block w-1/2 bg-slate-700 p-12">
-          <div className="h-full flex flex-col items-center justify-center relative">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2" />
-            
-            <div className="w-20 h-20 mb-8 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
-              <FaShieldAlt className="text-4xl text-white" />
-            </div>
-            <h3 className="text-2xl font-bold mb-6 text-white">Kalma Batang Kankaloo</h3>
-            <p className="text-center text-md text-white/90 max-w-sm">
-              Prayoridad namin ang seguridad ng account mo. Sundan mo lang ang instructions sa email para ma-reset ang iyong password.
+            <p className="mt-4 sm:mt-6 text-center text-xs sm:text-sm">
+              Remember your password?{" "}
+              <Link to="/login" className="text-darkblue hover:underline">
+                Back to login
+              </Link>
             </p>
-            <div className="absolute left-1/2 bottom-8 -translate-x-1/2 flex space-x-3">
-              <div className="w-16 h-1 rounded-full bg-white/30" />
-              <div className="w-8 h-1 rounded-full bg-white/20" />
-              <div className="w-8 h-1 rounded-full bg-white/20" />
+          </>
+        ) : (
+          <div className="text-center">
+            <p className="text-sm sm:text-base text-neutral-600 text-center mb-4 sm:mb-6 mt-2">
+              Check your email inbox
+            </p>
+            
+            <div className="bg-gray-50 rounded-lg p-4 mb-6">
+              <p className="text-sm text-gray-700 mb-2">
+                We've sent a password reset link to:
+              </p>
+              <p className="font-medium text-black-secondary">{email}</p>
             </div>
+            
+            <button
+              onClick={() => {
+                setEmailSent(false);
+                setEmail('');
+              }}
+              className="w-full bg-black-secondary text-white px-4 py-2 text-xs sm:text-sm rounded-md hover:bg-black transition"
+            >
+              Send Another Link
+            </button>
+            
+            <p className="mt-4 sm:mt-6 text-center text-xs sm:text-sm">
+              <Link to="/login" className="text-darkblue hover:underline">
+                Back to login
+              </Link>
+            </p>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

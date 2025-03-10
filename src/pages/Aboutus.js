@@ -1,6 +1,6 @@
 import React from 'react';
 import VisionMission from '../components/VissionMission';
-import aboutBanner from "../assets/aboutbanner.webp";
+import aboutBanner from "../assets/about-us-banner.webp";
 import LogoCarousel from '../components/LogoCarousel';
 import PESOHistory from '../components/History';
 import AboutCity from '../components/AboutCity';
@@ -11,19 +11,20 @@ import PageLoader from '../components/PageLoader'
 const Aboutus = () => {
   return (
     <PageLoader>
-    <div>
-      <div className="w-full py-16">
-        <img src={aboutBanner} alt="About Us Banner" className="w-full h-auto" />
+      <div>
+        <div className="w-full">
+          <img src={aboutBanner} alt="About Us Banner" className="w-full h-auto" />
+        </div>
+        <HowItWorks />
+        <AboutCity />
+      
+        <div className='lg:px-32 px-8 py-16'>
+          <VisionMission />
+        </div>
+        <PESOHistory />
+        <HiredGallery />
+        <LogoCarousel />
       </div>
-      <div className='lg:px-32 px-8'>
-        <VisionMission />
-      </div>
-      <AboutCity/>
-      <PESOHistory/>
-      <HowItWorks />
-      <HiredGallery/>
-      <LogoCarousel />
-    </div>
     </PageLoader>
   );
 };

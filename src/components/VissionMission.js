@@ -1,7 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { FaBullseye, FaLightbulb } from "react-icons/fa";
-import bgImage from "../assets/about-6.webp";
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -19,21 +18,10 @@ const staggerContainer = {
 const VisionMission = () => {
   return (
     <motion.div
-      id="vision-mission"
-      className="relative w-full bg-cover bg-center bg-no-repeat py-16"
-      style={{ 
-        backgroundImage: `url(${bgImage})`,
-        backgroundSize: 'cover',
-        width: '100vw',
-        marginLeft: '50%',
-        transform: 'translateX(-50%)'
-      }}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.2 }}
+      
     >
       {/* Dark Overlay for Readability */}
-      <div className="absolute inset-0 bg-black bg-opacity-60"></div>
+      <div className="relative inset-0 bg-white"></div>
 
       {/* Content Container */}
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -48,7 +36,7 @@ const VisionMission = () => {
             Mission & Vision
           </motion.h2>
           <motion.h1
-            className="text-3xl sm:text-3xl font-bold mt-3 mb-6 drop-shadow-lg text-white px-3 py-2 rounded-lg"
+            className="text-3xl sm:text-3xl font-bold mt-3 mb-6 drop-shadow-lg text-darkblue px-3 py-2 rounded-lg"
             variants={fadeInUp}
           >
             Empowering Growth through Innovative Employment

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { auth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "../firebase";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { ClipLoader } from "react-spinners";
 import { db } from "../firebase";
@@ -180,9 +180,9 @@ function Login() {
                     </div>
 
                     <div className="flex justify-between items-center mt-1 sm:mt-2">
-                        <a href="/forgot" className="text-xs sm:text-sm text-blue hover:underline">
+                        <Link to="/forgot" className="text-xs sm:text-sm text-blue hover:underline">
                             Forgot Password?
-                        </a>
+                        </Link>
                     </div>
 
                     <div className="mt-2 sm:mt-4">
@@ -199,9 +199,9 @@ function Login() {
 
                 <p className="mt-4 sm:mt-6 text-center text-xs sm:text-sm">
                     Don't have an account yet?{" "}
-                    <a href="/signup" className="text-darkblue hover:underline">
+                    <Link to="/signup" className="text-darkblue hover:underline">
                         Create an account.
-                    </a>
+                    </Link>
                 </p>
 
                 <div className="relative flex items-center my-3 sm:my-4">
