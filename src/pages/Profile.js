@@ -3,7 +3,7 @@ import { auth, db } from "../firebase";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { updateProfile } from "firebase/auth";
 import { toast } from "react-hot-toast";
-import { FaCamera, FaSpinner, FaUser, FaMapMarkerAlt, FaPhone, FaEnvelope, FaPencilAlt, FaSave, FaTimes, FaExclamationCircle  } from "react-icons/fa";
+import { FaCamera, FaSpinner, FaUser, FaMapMarkerAlt, FaPhone, FaEnvelope, FaPencilAlt, FaSave, FaTimes, FaExclamationCircle } from "react-icons/fa";
 
 const CLOUDINARY_UPLOAD_PRESET = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET;
 const CLOUDINARY_CLOUD_NAME = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME;
@@ -95,22 +95,73 @@ const Profile = () => {
         setProfile((prevProfile) => ({ ...prevProfile, [name]: value }));
     };
 
-    const uploadImageToCloudinary = async (file) => {
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-        formData.append("folder", "profiles");
+    // Generate a simple hash from a string
+    const generateSimpleHash = async (str) => {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(str);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    };
 
-        const res = await fetch(
-            `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
-            {
-                method: "POST",
-                body: formData,
+    // Generate a hash from file content
+    const getFileHash = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const hash = await generateSimpleHash(e.target.result);
+                    resolve(hash);
+                } catch (error) {
+                    reject(error);
+                }
+            };
+            reader.onerror = () => reject(new Error('Failed to read file'));
+            reader.readAsDataURL(file);  // Read as data URL to get content
+        });
+    };
+
+    const uploadImageToCloudinary = async (file) => {
+        try {
+            // Generate hash from file content
+            const contentHash = await getFileHash(file);
+            
+            // Create a unique identifier including user ID and content hash
+            const uniqueId = `${user.uid}_${contentHash}`;
+            
+            // Check if this is the same as the current image
+            if (profile.profileImage && profile.profileImage.includes(contentHash)) {
+                // Same image already uploaded, return the existing URL
+                return profile.profileImage;
             }
-        );
-        const data = await res.json();
-        if (!data.secure_url) throw new Error("Image upload failed");
-        return data.secure_url;
+            
+            // Create formData for Cloudinary upload
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+            formData.append("folder", "profiles");
+            formData.append("public_id", uniqueId);  // Use our unique ID for the file
+            
+            // Upload to Cloudinary
+            const res = await fetch(
+                `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+                {
+                    method: "POST",
+                    body: formData,
+                }
+            );
+            
+            const data = await res.json();
+            
+            if (!data.secure_url) {
+                throw new Error("Image upload failed");
+            }
+            
+            return data.secure_url;
+        } catch (error) {
+            console.error("Error in image upload:", error);
+            throw error;
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -143,6 +194,16 @@ const Profile = () => {
             if (selectedFile) {
                 setUploadingImage(true);
                 try {
+                    // Before uploading, check if it's a duplicate by content
+                    const isDuplicate = await checkIfImageIsDuplicate(selectedFile);
+                    
+                    if (isDuplicate) {
+                        toast.error(`This appears to be a duplicate image. Please choose a different image.`);
+                        setLoading(false);
+                        setUploadingImage(false);
+                        return;
+                    }
+                    
                     const imageUrl = await uploadImageToCloudinary(selectedFile);
                     updatedProfile.profileImage = imageUrl;
                 } catch (error) {
@@ -181,9 +242,51 @@ const Profile = () => {
         }
     };
 
+    // Check if the image is a duplicate based on content
+    const checkIfImageIsDuplicate = async (file) => {
+        try {
+            // Get hash of file being uploaded
+            const newFileHash = await getFileHash(file);
+            
+            // Extract content hash from the current profile image if it exists
+            if (profile.profileImage) {
+                // Extract hash from the image URL if the URL contains our hash format
+                const urlParts = profile.profileImage.split('/');
+                const filenamePart = urlParts[urlParts.length - 1];
+                
+                // If the filename includes our hash pattern, compare hashes
+                if (filenamePart.includes(user.uid)) {
+                    const existingHash = filenamePart.split('_')[1]?.split('.')[0];
+                    if (existingHash === newFileHash) {
+                        return true; // Same content, it's a duplicate
+                    }
+                }
+            }
+            
+            return false; // Not a duplicate
+        } catch (error) {
+            console.error("Error checking for duplicate image:", error);
+            return false; // In case of error, allow upload
+        }
+    };
+
     const handleFileSelect = (e) => {
         const file = e.target.files[0];
         if (!file) return;
+
+        // Validate file type
+        const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        if (!validTypes.includes(file.type)) {
+            toast.error("Please select a valid image file (JPEG, PNG, GIF, or WEBP)");
+            return;
+        }
+
+        // Validate file size (limit to 5MB)
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (file.size > maxSize) {
+            toast.error("Image is too large. Please select an image under 5MB");
+            return;
+        }
 
         setSelectedFile(file);
         const reader = new FileReader();
