@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { doc, getDoc, collection, addDoc } from "firebase/firestore";
+import { doc, getDoc, collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { IoIosArrowBack } from "react-icons/io";
 import { IoClose, IoBriefcase, IoLocationSharp, IoCalendar } from "react-icons/io5";
@@ -29,6 +29,9 @@ const JobDetails = () => {
   const [loading, setLoading] = useState(true);
   const [isVisible, setIsVisible] = useState(false);
   const [missingFields, setMissingFields] = useState([]);
+  const [previousResumes, setPreviousResumes] = useState([]);
+  const [loadingResumes, setLoadingResumes] = useState(false);
+  const [selectedExistingResume, setSelectedExistingResume] = useState(null);
   const [applicationForm, setApplicationForm] = useState({
     name: "",
     email: "",
@@ -39,6 +42,7 @@ const JobDetails = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedFile(null); 
+    setSelectedExistingResume(null);
     setIsDragging(false);
   };
 
@@ -84,17 +88,19 @@ const JobDetails = () => {
     fetchJob();
   }, [jobId]);
 
-  
+  // Fetch user profile and previous resumes
   useEffect(() => {
-    const fetchUserProfile = async () => {
+    const fetchUserData = async () => {
       const currentUser = auth.currentUser;
       if (!currentUser) {
         setLoadingProfile(false);
+        setLoadingResumes(false);
         setProfileChecked(true);
         return;
       }
 
       try {
+        // Fetch profile data
         const profileRef = doc(db, "profiles", currentUser.uid);
         const profileSnap = await getDoc(profileRef);
 
@@ -122,17 +128,46 @@ const JobDetails = () => {
           setIsProfileComplete(false);
           setMissingFields(['address', 'contactNumber', 'email', 'name']);
         }
+
+        // Fetch previous resumes from applications
+        setLoadingResumes(true);
+        const applicationsQuery = query(
+          collection(db, "applications"), 
+          where("applicant_id", "==", currentUser.uid)
+        );
+        
+        const applicationsSnap = await getDocs(applicationsQuery);
+        
+        const uniqueResumes = new Map();
+        applicationsSnap.forEach(doc => {
+          const data = doc.data();
+          if (data.resume_link && !uniqueResumes.has(data.resume_link)) {
+            uniqueResumes.set(data.resume_link, {
+              url: data.resume_link,
+              timestamp: data.timestamp,
+              job_title: data.job_title || "Previous application"
+            });
+          }
+        });
+        
+        // Sort by most recent first
+        const sortedResumes = Array.from(uniqueResumes.values())
+          .sort((a, b) => b.timestamp - a.timestamp);
+        
+        setPreviousResumes(sortedResumes);
+        
       } catch (error) {
-        console.error("Error fetching user profile:", error);
-        toast.error("Failed to load profile information");
+        console.error("Error fetching user data:", error);
+        toast.error("Failed to load user information");
         setIsProfileComplete(false);
       } finally {
         setLoadingProfile(false);
+        setLoadingResumes(false);
         setProfileChecked(true);
       }
     };
 
-    fetchUserProfile();
+    fetchUserData();
   }, []);
 
   const handleFileChange = (e) => {
@@ -141,6 +176,7 @@ const JobDetails = () => {
 
     if (file.type === "application/pdf") {
       setSelectedFile(file);
+      setSelectedExistingResume(null); // Clear any selected existing resume
     } else {
       toast.error("Please upload a PDF file");
       e.target.value = null;
@@ -163,9 +199,15 @@ const JobDetails = () => {
 
     if (file.type === "application/pdf") {
       setSelectedFile(file);
+      setSelectedExistingResume(null); // Clear any selected existing resume
     } else {
       toast.error("Please upload a PDF file");
     }
+  };
+
+  const selectExistingResume = (resumeUrl) => {
+    setSelectedExistingResume(resumeUrl);
+    setSelectedFile(null); // Clear any new file selection
   };
 
   const uploadToCloudinary = async (file) => {
@@ -189,8 +231,8 @@ const JobDetails = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!selectedFile) {
-      toast.error("Please select a resume to upload");
+    if (!selectedFile && !selectedExistingResume) {
+      toast.error("Please select or upload a resume");
       return;
     }
 
@@ -204,7 +246,8 @@ const JobDetails = () => {
     setUploading(true);
 
     try {
-      const resumeUrl = await uploadToCloudinary(selectedFile);
+      // Use existing resume URL or upload new file
+      const resumeUrl = selectedExistingResume || await uploadToCloudinary(selectedFile);
 
       await addDoc(collection(db, "applications"), {
         job_id: jobId,
@@ -233,6 +276,21 @@ const JobDetails = () => {
     } finally {
       setUploading(false);
     }
+  };
+
+  // Format date for display
+  const formatDate = (timestamp) => {
+    if (!timestamp) return "";
+    
+    const date = timestamp instanceof Date 
+      ? timestamp 
+      : new Date(timestamp.seconds * 1000);
+      
+    return date.toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    });
   };
 
   // Content to render based on loading/error states
@@ -302,11 +360,7 @@ const JobDetails = () => {
                           <IoCalendar className="mr-1 text-lg" />
                           <span>
                             Posted:{" "}
-                            {new Date(job.date_posted.seconds * 1000).toLocaleDateString("en-GB", {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                            })}
+                            {formatDate(job.date_posted)}
                           </span>
                         </div>
                         <div className="flex items-center text-darkblue font-semibold text-sm md:text-lg">
@@ -336,8 +390,7 @@ const JobDetails = () => {
               {/* Job Description */}
               <div className="bg-white rounded-xl border border-neutral-300 p-8">
                 <h3 className="text-xl font-bold text-black-primary mb-6 flex items-center">
-                  <IoBriefcase className="mr-2 text-blue" />
-                  Job Description
+                  <IoBriefcase className="mr-2 text-blue" />Job Description
                 </h3>
 
                 <div className="prose max-w-none text-black-secondary">
@@ -408,7 +461,6 @@ const JobDetails = () => {
                     ) : (
                       <button
                         onClick={() => auth.currentUser && setIsModalOpen(true)}
-                        // Fixed condition here - now it's only disabled if there's no current user
                         disabled={!auth.currentUser}
                         className={`w-full flex items-center justify-center px-4 py-3 rounded-xl transition duration-300 shadow-md text-white ${
                           auth.currentUser
@@ -509,13 +561,68 @@ const JobDetails = () => {
                     </div>
                   </div>
 
+                  {/* Previous Resumes Section */}
+                  {previousResumes.length > 0 && (
+                    <div>
+                      <h3 className="font-bold text-black-primary mb-4 flex items-center">
+                        <BsCheckCircleFill className="text-green mr-2" />
+                        Previous Resumes
+                      </h3>
+                      <div className="rounded-lg border border-neutral-300 divide-y">
+                        {loadingResumes ? (
+                          <div className="flex justify-center py-6">
+                            <div className="w-6 h-6 border-2 border-blue border-t-transparent rounded-full animate-spin"></div>
+                          </div>
+                        ) : (
+                          previousResumes.slice(0, 3).map((resume, index) => (
+                            <div 
+                              key={index}
+                              className={`p-4 cursor-pointer transition-colors ${
+                                selectedExistingResume === resume.url 
+                                  ? 'bg-blue/5 border-l-4 border-l-blue' 
+                                  : 'hover:bg-gray-50'
+                              }`}
+                              onClick={() => selectExistingResume(resume.url)}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-3">
+                                  <div className={`p-2 rounded-full ${
+                                    selectedExistingResume === resume.url 
+                                      ? 'bg-blue/10 text-blue' 
+                                      : 'bg-gray-100 text-gray-500'
+                                  }`}>
+                                    <FaFileUpload size={16} />
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-medium text-black-primary">Resume for {resume.job_title}</p>
+                                    <p className="text-xs text-gray-secondary">Uploaded {formatDate(resume.timestamp)}</p>
+                                  </div>
+                                </div>
+                                {selectedExistingResume === resume.url && (
+                                  <BsCheckCircleFill className="text-blue" size={18} />
+                                )}
+                              </div>
+                            </div>
+                          ))
+                        )}
+
+                        <div className="p-4 text-center">
+                          <p className="text-sm text-gray-secondary">
+                            {selectedExistingResume 
+                              ? "Resume selected. You can upload a new one instead."
+                              : "Select a previous resume or upload a new one."}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Resume Upload Section */}
                   <div>
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="font-bold text-black-primary flex items-center">
                         <FaFileUpload className="text-blue mr-2" />
-                        Resume Upload
+                        {previousResumes.length > 0 ? "Upload New Resume" : "Resume Upload"}
                       </h3>
                       <span className="text-xs bg-red/10 text-red px-2 py-1 rounded-full font-medium">
                         PDF files only
@@ -527,7 +634,9 @@ const JobDetails = () => {
                         ? "border-blue bg-blue/5"
                         : selectedFile
                           ? "border-green bg-green/10"
-                          : "border-gray-200 hover:border-blue"
+                          : selectedExistingResume
+                            ? "border-gray-200"
+                            : "border-gray-200 hover:border-blue"
                       }`}
                       onDragOver={(e) => handleDrag(e, true)}
                       onDragLeave={(e) => handleDrag(e, false)}
@@ -542,7 +651,7 @@ const JobDetails = () => {
                       />
                       <label
                         htmlFor="resume-upload"
-                        className="cursor-pointer block p-4"
+                        className={`block p-4 ${selectedExistingResume ? "opacity-50" : "cursor-pointer"}`}
                       >
                         <div className="space-y-2 text-center">
                           <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto ${
@@ -570,17 +679,23 @@ const JobDetails = () => {
                             <p className="font-medium">
                               {selectedFile ? (
                                 <span className="text-green">
-                                  Resume selected
+                                  New resume selected
                                 </span>
                               ) : (
-                                <span className="text-black-primary">Upload your resume</span>
+                                <span className="text-black-primary">
+                                  {selectedExistingResume 
+                                    ? "Using existing resume" 
+                                    : "Upload your resume"}
+                                </span>
                               )}
                             </p>
                             <p className="text-sm text-gray-secondary">
                               {selectedFile ? (
                                 <>"{selectedFile.name}" <span className="underline">Change file</span></>
                               ) : (
-                                "Drag & drop or click to browse"
+                                selectedExistingResume 
+                                  ? "Click to upload a new resume instead" 
+                                  : "Drag & drop or click to browse"
                               )}
                             </p>
                           </div>
@@ -592,11 +707,11 @@ const JobDetails = () => {
                   {/* Submit Button */}
                   <button
                     type="submit"
-                    disabled={uploading || !selectedFile}
+                    disabled={uploading || (!selectedFile && !selectedExistingResume)}
                     className={`w-full py-2 rounded-xl text-white font-medium transition-all duration-200 
                     ${uploading
                         ? "bg-gray-400 cursor-not-allowed"
-                        : !selectedFile
+                        : (!selectedFile && !selectedExistingResume)
                           ? "bg-gray-300 cursor-not-allowed"
                           : "bg-gradient-to-r from-blue to-darkblue hover:opacity-90 hover:shadow-lg"
                       }
@@ -607,14 +722,13 @@ const JobDetails = () => {
                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                         <span>Submitting Application...</span>
                       </div>
-                    ) : (
-                      "Submit Application"
+                    ) : ( "Submit Application"
                     )}
                   </button>
 
-                  {!selectedFile && (
+                  {(!selectedFile && !selectedExistingResume) && (
                     <p className="text-xs text-center text-gray-secondary">
-                      Please upload your resume to continue
+                      Please select a resume to continue
                     </p>
                   )}
                 </div>

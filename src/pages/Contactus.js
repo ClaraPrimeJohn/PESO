@@ -36,7 +36,7 @@ const ContactUs = () => {
                 <>
                     Globe: <a href="tel:+639945865688" className="text-blue hover:underline">0994-586-5688</a>
                     <br />
-                    Smart: <a href="tel:+639323849283" className="text-blue hover:underline">0932-384-9283</a>
+                    Smart: <a href="tel:+639323849283" className="text-blue hover:underline">0961-035-0529</a>
                 </>
             )
         },
@@ -70,11 +70,11 @@ const ContactUs = () => {
         },
         {
             question: "How can employers post job openings on PESO?",
-            answer: "Employers can register for a free account on our platform, verify their business information, and then post job openings through their dashboard. Our team reviews all listings to ensure they meet our guidelines before they become visible to job seekers."
+            answer: "Employers can register for an account on our platform, verify their business information, and then post job openings through their dashboard. Our team reviews all listings to ensure they meet our guidelines before they become visible to job seekers."
         },
         {
-            question: "What documents do I need to register as a job seeker?",
-            answer: "To register, you'll need a valid government ID, proof of address in Caloocan, your updated resume, and any relevant certificates or diplomas. Having these documents ready will streamline your registration process and job applications."
+            question: "How can I apply for a job?",
+            answer: "First, create an account and complete your profile with the required information. Then, upload your resume and apply to the job you want."
         },
         {
             question: "Is PESO only for Caloocan residents?",
