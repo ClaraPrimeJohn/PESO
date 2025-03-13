@@ -34,7 +34,7 @@ const ContactUs = () => {
             title: "Phone Support",
             details: (
                 <>
-                    Globe: <a href="tel:+639945865688" className="text-blue hover:underline">0994-586-5688</a>
+                    Globe: <a href="tel:+639945865688" className="text-blue hover:underline">0995-557-4478</a>
                     <br />
                     Smart: <a href="tel:+639323849283" className="text-blue hover:underline">0961-035-0529</a>
                 </>

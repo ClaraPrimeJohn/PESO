@@ -53,6 +53,7 @@ const Navbar = () => {
     const initiateLogout = () => {
         setIsLogoutConfirmOpen(true);
         setIsLoginDropdownOpen(false);
+        setIsDrawerOpen(false); // Close drawer when initiating logout
     };
 
     const confirmLogout = async () => {
@@ -168,8 +169,8 @@ const Navbar = () => {
                                 <span className="text-sm font-medium pl-2 overflow-hidden text-ellipsis whitespace-nowrap max-w-32">
                                     {profileData?.name || user.displayName || "Profile"}
                                 </span>
-                                <RiArrowDropDownLine 
-                                    className={`text-3xl transform transition-transform duration-300 ${isLoginDropdownOpen ? "rotate-180" : ""}`} 
+                                <RiArrowDropDownLine
+                                    className={`text-3xl transform transition-transform duration-300 ${isLoginDropdownOpen ? "rotate-180" : ""}`}
                                 />
                             </button>
                         ) : (
@@ -181,42 +182,42 @@ const Navbar = () => {
                             </Link>
                         )}
                         {isLoginDropdownOpen && user && (
-                        <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 animate-fadeIn overflow-hidden z-50">
-                            <div className="p-4 border-b border-gray-100 bg-gray-50">
-                                <p className="text-xs text-gray-500 font-medium">Signed in as</p>
-                                <p className="text-sm font-semibold text-darkblue truncate">{user.email}</p>
-                            </div>
-                            <ul className="py-2">
-                                <li>
-                                    <Link
-                                        to="/profile"
-                                        className="flex items-center px-4 py-2.5 text-sm space-x-3 w-full text-black-secondary hover:text-darkblue hover:bg-gray-50 transition-colors duration-200"
-                                        onClick={() => setIsLoginDropdownOpen(false)}
-                                    >
-                                        <CgProfile className="text-lg text-blue" />
-                                        <span>View Profile</span>
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link
-                                        to="/applied"
-                                        className="flex items-center px-4 py-2.5 text-sm space-x-3 w-full text-black-secondary hover:text-darkblue hover:bg-gray-50 transition-colors duration-200"
-                                        onClick={() => setIsLoginDropdownOpen(false)}
-                                    >
-                                        <FaClipboardList className="text-lg text-blue" />
-                                        <span>Applied Jobs</span>
-                                    </Link>
-                                </li>
-                                <li className="border-t border-gray-100 mt-1">
-                                    <button
-                                        onClick={initiateLogout}
-                                        className="flex items-center px-4 py-2.5 text-sm space-x-3 w-full text-red hover:bg-red/5 transition-colors duration-200"
-                                    >
-                                        <FaSignOutAlt className="text-lg" />
-                                        <span>Log out</span>
-                                    </button>
-                                </li>
-                            </ul>
+                            <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 animate-fadeIn overflow-hidden z-50">
+                                <div className="p-4 border-b border-gray-100 bg-gray-50">
+                                    <p className="text-xs text-gray-500 font-medium">Signed in as</p>
+                                    <p className="text-sm font-semibold text-darkblue truncate">{user.email}</p>
+                                </div>
+                                <ul className="py-2">
+                                    <li>
+                                        <Link
+                                            to="/profile"
+                                            className="flex items-center px-4 py-2.5 text-sm space-x-3 w-full text-black-secondary hover:text-darkblue hover:bg-gray-50 transition-colors duration-200"
+                                            onClick={() => setIsLoginDropdownOpen(false)}
+                                        >
+                                            <CgProfile className="text-lg text-blue" />
+                                            <span>View Profile</span>
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link
+                                            to="/applied"
+                                            className="flex items-center px-4 py-2.5 text-sm space-x-3 w-full text-black-secondary hover:text-darkblue hover:bg-gray-50 transition-colors duration-200"
+                                            onClick={() => setIsLoginDropdownOpen(false)}
+                                        >
+                                            <FaClipboardList className="text-lg text-blue" />
+                                            <span>Applied Jobs</span>
+                                        </Link>
+                                    </li>
+                                    <li className="border-t border-gray-100 mt-1">
+                                        <button
+                                            onClick={initiateLogout}
+                                            className="flex items-center px-4 py-2.5 text-sm space-x-3 w-full text-red hover:bg-red/5 transition-colors duration-200"
+                                        >
+                                            <FaSignOutAlt className="text-lg" />
+                                            <span>Log out</span>
+                                        </button>
+                                    </li>
+                                </ul>
                             </div>
                         )}
                     </div>
@@ -230,27 +231,26 @@ const Navbar = () => {
             <div className={`fixed inset-0 z-50 transition-all duration-500 ${isDrawerOpen ? "visible" : "invisible"}`}>
                 {/* Overlay */}
                 <div
-                    className={`fixed inset-0 bg-darkblue/40 backdrop-blur-sm transition-opacity duration-300 ${isDrawerOpen ? "opacity-100" : "opacity-0"}`}
+                    className={`fixed inset-0 bg-darkblue/50 backdrop-blur-sm transition-opacity duration-300 ${isDrawerOpen ? "opacity-100" : "opacity-0"}`}
                     onClick={() => setIsDrawerOpen(false)}
                 ></div>
 
-                {/* Drawer */}
+                {/* Drawer - Modernized Design with fixed height and scrollable content */}
                 <div
-                    className={`absolute top-0 left-0 h-full bg-white shadow-xl transition-transform duration-300 ease-in-out transform ${
-                        isDrawerOpen ? "translate-x-0" : "-translate-x-full"
-                    }`}
-                    style={{ width: "calc(80vw)", maxWidth: "320px" }}
+                    className={`absolute top-0 left-0 h-full bg-white shadow-2xl transition-transform duration-300 ease-in-out transform flex flex-col ${isDrawerOpen ? "translate-x-0" : "-translate-x-full"}`}
+                    style={{ width: "calc(80vw)", maxWidth: "300px" }}
                 >
-                    <div className="flex items-center justify-between p-5 border-b">
+                    {/* Header - Fixed at top */}
+                    <div className="flex items-center justify-between p-4 border-b border-gray-100">
                         <div className="flex items-center">
-                            <img className="w-auto h-8" src={mainLogo} alt="logo" />
-                            <div className="ml-2 leading-tight text-sm font-bold text-black-secondary">
+                            <img className="w-auto h-7" src={mainLogo} alt="logo" />
+                            <div className="ml-2 leading-tight text-xs font-bold text-black-secondary">
                                 <h1>Public Employment</h1>
                                 <h1>Service Office</h1>
                             </div>
                         </div>
                         <button
-                            className="text-2xl text-black-secondary hover:text-red transition-colors duration-200 p-1 rounded-full hover:bg-red/10"
+                            className="text-xl text-black-secondary hover:text-red transition-colors duration-200 p-1 rounded-full hover:bg-red/5"
                             onClick={() => setIsDrawerOpen(false)}
                             aria-label="Close menu"
                         >
@@ -258,153 +258,171 @@ const Navbar = () => {
                         </button>
                     </div>
 
-                    {/* Profile Section */}
-                    <div className="flex flex-col items-center py-6 border-b px-6 bg-gray-50">
+                    {/* Profile Section - More Compact */}
+                    <div className="py-4 border-b px-4 bg-gray-50">
                         {user ? (
-                            <div className="flex flex-col items-center w-full">
+                            <div className="flex items-center space-x-3 w-full">
                                 <div className="relative">
                                     <img
                                         src={profileData?.profileImage || user.photoURL || "/default-avatar.png"}
                                         alt="Profile"
-                                        className="w-16 h-16 rounded-full object-cover border-4 border-white shadow-sm"
+                                        className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm"
                                     />
-                                    <div className="absolute bottom-0 right-0 w-4 h-4 bg-green rounded-full border-2 border-white"></div>
+                                    <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green rounded-full border-2 border-white"></div>
                                 </div>
-                                <span className="text-sm font-medium mt-2 text-darkblue">
-                                    {profileData?.name || user.displayName || "Profile"}
-                                </span>
-                                <span className="text-xs text-gray-secondary mb-4 truncate max-w-full">
-                                    {user.email}
-                                </span>
-                                <Link
-                                    to="/profile"
-                                    className="text-sm w-full text-center mt-1 py-2 px-4 rounded-lg bg-blue text-white hover:bg-darkblue transition-colors duration-300 flex items-center justify-center space-x-2"
-                                    onClick={() => setIsDrawerOpen(false)}
-                                >
-                                    <CgProfile />
-                                    <span>View Profile</span>
-                                </Link>
-                                <Link
-                                    to="/applied"
-                                    className="text-sm w-full text-center mt-2 py-2 px-4 rounded-lg bg-green/20 text-black-secondary hover:bg-green/30 transition-colors duration-300 flex items-center justify-center space-x-2"
-                                    onClick={() => setIsDrawerOpen(false)}
-                                >
-                                    <FaClipboardList />
-                                    <span>Applied Jobs</span>
-                                </Link>
+                                <div className="flex-1 overflow-hidden">
+                                    <span className="text-xs font-medium text-darkblue block truncate">
+                                        {profileData?.name || user.displayName || "Profile"}
+                                    </span>
+                                    <span className="text-xs text-gray-secondary truncate block">
+                                        {user.email}
+                                    </span>
+                                </div>
                             </div>
                         ) : (
                             <Link
                                 to="/login"
-                                className="text-sm font-medium w-full text-center py-3 rounded-lg bg-yellow text-darkblue hover:bg-yellow/80 transition-colors duration-300 flex items-center justify-center space-x-2"
+                                className="text-xs font-medium w-full text-center py-2 rounded-lg bg-darkblue text-white hover:bg-blue transition-colors duration-300 flex items-center justify-center space-x-2"
                                 onClick={() => setIsDrawerOpen(false)}
                             >
-                                <CgProfile className="text-lg" /> 
+                                <CgProfile className="text-sm" />
                                 <span>Login</span>
                             </Link>
                         )}
                     </div>
 
-                    {/* Navigation Links */}
-                    <nav className="flex flex-col p-5 space-y-1">
-                        <Link
-                            to="/"
-                            className={`flex items-center space-x-3 ${
-                                location.pathname === "/" 
-                                ? "text-darkblue font-medium bg-blue/10 rounded-lg" 
-                                : "text-black-secondary"
-                            } transition-colors duration-200 hover:text-darkblue hover:bg-blue/5 py-3 px-4 rounded-lg`}
-                            onClick={() => setIsDrawerOpen(false)}
-                        >
-                            <span className={location.pathname === "/" ? "text-yellow font-bold" : ""}>Home</span>
-                        </Link>
-                        <Link
-                            to="/about-us"
-                            className={`flex items-center space-x-3 ${
-                                location.pathname === "/about-us" 
-                                ? "text-darkblue font-medium bg-blue/10 rounded-lg" 
-                                : "text-black-secondary"
-                            } transition-colors duration-200 hover:text-darkblue hover:bg-blue/5 py-3 px-4 rounded-lg`}
-                            onClick={() => setIsDrawerOpen(false)}
-                        >
-                            <span className={location.pathname === "/about-us" ? "text-yellow font-bold" : ""}>About Us</span>
-                        </Link>
-                        <Link
-                            to="/announcement"
-                            className={`flex items-center space-x-3 ${
-                                location.pathname === "/announcement" 
-                                ? "text-darkblue font-medium bg-blue/10 rounded-lg" 
-                                : "text-black-secondary"
-                            } transition-colors duration-200 hover:text-darkblue hover:bg-blue/5 py-3 px-4 rounded-lg`}
-                            onClick={() => setIsDrawerOpen(false)}
-                        >
-                            <span className={location.pathname === "/announcement" ? "text-yellow font-bold" : ""}>Announcement</span>
-                        </Link>
-                        <Link
-                            to="/job-listing"
-                            className={`flex items-center space-x-3 ${
-                                location.pathname === "/job-listing" 
-                                ? "text-darkblue font-medium bg-blue/10 rounded-lg" 
-                                : "text-black-secondary"
-                            } transition-colors duration-200 hover:text-darkblue hover:bg-blue/5 py-3 px-4 rounded-lg`}
-                            onClick={() => setIsDrawerOpen(false)}
-                        >
-                            <span className={location.pathname === "/job-listing" ? "text-yellow font-bold" : ""}>Job Listing</span>
-                        </Link>
-                        <Link
-                            to="/contact-us"
-                            className={`flex items-center space-x-3 ${
-                                location.pathname === "/contact-us" 
-                                ? "text-darkblue font-medium bg-blue/10 rounded-lg" 
-                                : "text-black-secondary"
-                            } transition-colors duration-200 hover:text-darkblue hover:bg-blue/5 py-3 px-4 rounded-lg`}
-                            onClick={() => setIsDrawerOpen(false)}
-                        >
-                            <span className={location.pathname === "/contact-us" ? "text-yellow font-bold" : ""}>Contact Us</span>
-                        </Link>
-                    </nav>
-
-                    {/* Logout Section */}
+                    {/* Actions Section - Only if logged in */}
                     {user && (
-                        <div className="p-5 mt-auto border-t">
-                            <button
-                                onClick={() => {
-                                    initiateLogout();
-                                    setIsDrawerOpen(false);
-                                }}
-                                className="w-full text-sm font-medium bg-red/10 hover:bg-red/20 text-red rounded-lg p-3 transition-colors duration-300 flex items-center justify-center space-x-2"
+                        <div className="px-3 py-3 border-b border-gray-100 flex space-x-2">
+                            <Link
+                                to="/profile"
+                                className="text-xs flex-1 text-center py-2 px-2 rounded-md bg-gray-100 text-darkblue hover:bg-gray-200 transition-colors duration-200 flex items-center justify-center space-x-1"
+                                onClick={() => setIsDrawerOpen(false)}
                             >
-                                <FaSignOutAlt />
-                                <span>Log out</span>
-                            </button>
+                                <CgProfile className="text-sm" />
+                                <span>View Profile</span>
+                            </Link>
+                            <Link
+                                to="/applied"
+                                className="text-xs flex-1 text-center py-2 px-2 rounded-md bg-gray-100 text-darkblue hover:bg-gray-200 transition-colors duration-200 flex items-center justify-center space-x-1"
+                                onClick={() => setIsDrawerOpen(false)}
+                            >
+                                <FaClipboardList className="text-sm" />
+                                <span>Applied Jobs</span>
+                            </Link>
                         </div>
                     )}
+
+                    {/* Navigation Links - Scrollable area */}
+                    <div className="flex flex-col h-full">
+                        <nav className="flex-1 overflow-y-auto py-2">
+                            <ul className="space-y-1 px-2">
+                                <li>
+                                    <Link
+                                        to="/"
+                                        className={`flex items-center px-3 py-3 rounded-lg text-sm ${location.pathname === "/" ? "bg-yellow/10 text-darkblue font-medium border-l-4 border-yellow" : "text-black-secondary hover:bg-gray-100"}`}
+                                        onClick={() => setIsDrawerOpen(false)}
+                                    >
+                                        Home
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link
+                                        to="/about-us"
+                                        className={`flex items-center px-3 py-3 rounded-lg text-sm ${location.pathname === "/about-us" ? "bg-yellow/10 text-darkblue font-medium border-l-4 border-yellow" : "text-black-secondary hover:bg-gray-100"}`}
+                                        onClick={() => setIsDrawerOpen(false)}
+                                    >
+                                        About Us
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link
+                                        to="/announcement"
+                                        className={`flex items-center px-3 py-3 rounded-lg text-sm ${location.pathname === "/announcement" ? "bg-yellow/10 text-darkblue font-medium border-l-4 border-yellow" : "text-black-secondary hover:bg-gray-100"}`}
+                                        onClick={() => setIsDrawerOpen(false)}
+                                    >
+                                        Announcement
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link
+                                        to="/job-listing"
+                                        className={`flex items-center px-3 py-3 rounded-lg text-sm ${location.pathname === "/job-listing" ? "bg-yellow/10 text-darkblue font-medium border-l-4 border-yellow" : "text-black-secondary hover:bg-gray-100"}`}
+                                        onClick={() => setIsDrawerOpen(false)}
+                                    >
+                                        Job Listing
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link
+                                        to="/contact-us"
+                                        className={`flex items-center px-3 py-3 rounded-lg text-sm ${location.pathname === "/contact-us" ? "bg-yellow/10 text-darkblue font-medium border-l-4 border-yellow" : "text-black-secondary hover:bg-gray-100"}`}
+                                        onClick={() => setIsDrawerOpen(false)}
+                                    >
+                                        Contact Us
+                                    </Link>
+                                </li>
+                            </ul>
+                        </nav>
+
+                        {/* Logout Button - Always visible at bottom */}
+                        {user && (
+                            <div className="border-t border-gray-100 p-4 sticky bottom-0 bg-white mt-auto">
+                                <button
+                                    onClick={initiateLogout}
+                                    className="w-full flex items-center justify-center space-x-2 px-3 py-2.5 rounded-lg text-sm text-white bg-red/90 hover:bg-red transition-colors duration-200"
+                                >
+                                    <FaSignOutAlt className="text-sm" />
+                                    <span>Log out</span>
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
             {/* Logout Confirmation Modal */}
             {isLogoutConfirmOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm transition-opacity duration-200">
-                    <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md mx-4 transform transition-all duration-200 scale-100 animate-fadeIn">
-                        <h3 className="text-xl font-semibold text-darkblue mb-6 text-center tracking-tight">
-                            Confirm Logout
-                        </h3>
-                        <p className="text-gray-secondary text-center mb-8 text-sm">
-                            Are you sure you want to end your session?
-                        </p>
-                        <div className="flex gap-4 justify-center">
-                            <button
-                                className="flex-1 bg-red text-white px-4 py-2.5 rounded-lg font-medium hover:bg-red/90 focus:ring-4 focus:ring-red/20 focus:outline-none transition-colors duration-150 text-sm"
-                                onClick={confirmLogout}
-                            >
-                                Log Out
-                            </button>
-                            <button
-                                className="flex-1 bg-gray-200 text-black-secondary px-4 py-2.5 rounded-lg font-medium hover:bg-gray-300 focus:ring-4 focus:ring-gray-200 focus:outline-none transition-colors duration-150 text-sm"
-                                onClick={cancelLogout}
-                            >
-                                Cancel
-                            </button>
+                <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                    <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                        {/* Background overlay */}
+                        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" aria-hidden="true"></div>
+
+                        {/* Modal panel */}
+                        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                            <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                <div className="sm:flex sm:items-start">
+                                    <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red/10 sm:mx-0 sm:h-10 sm:w-10">
+                                        <FaSignOutAlt className="h-6 w-6 text-red" aria-hidden="true" />
+                                    </div>
+                                    <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                                        <h3 className="text-lg leading-6 font-medium text-darkblue" id="modal-title">
+                                            Log out confirmation
+                                        </h3>
+                                        <div className="mt-2">
+                                            <p className="text-sm text-gray-500">
+                                                Are you sure you want to log out of your account? You will need to log in again to access your profile and applied jobs.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                <button
+                                    type="button"
+                                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red text-base font-medium text-white hover:bg-red/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red sm:ml-3 sm:w-auto sm:text-sm"
+                                    onClick={confirmLogout}
+                                >
+                                    Log out
+                                </button>
+                                <button
+                                    type="button"
+                                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-darkblue sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                                    onClick={cancelLogout}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
