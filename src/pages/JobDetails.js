@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { doc, getDoc, collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import { db, auth } from "../firebase";
+import { onAuthStateChanged } from "firebase/auth"; // Added import
 import { IoIosArrowBack } from "react-icons/io";
 import { IoClose, IoBriefcase, IoLocationSharp, IoCalendar } from "react-icons/io5";
 import { FaMoneyBillWave, FaClock, FaFileUpload } from "react-icons/fa";
@@ -32,6 +33,7 @@ const JobDetails = () => {
   const [previousResumes, setPreviousResumes] = useState([]);
   const [loadingResumes, setLoadingResumes] = useState(false);
   const [selectedExistingResume, setSelectedExistingResume] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null); // Added state for tracking current user
   const [applicationForm, setApplicationForm] = useState({
     name: "",
     email: "",
@@ -88,87 +90,93 @@ const JobDetails = () => {
     fetchJob();
   }, [jobId]);
 
-  // Fetch user profile and previous resumes
+  // Auth state listener
   useEffect(() => {
-    const fetchUserData = async () => {
-      const currentUser = auth.currentUser;
-      if (!currentUser) {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+      
+      if (user) {
+        // Fetch user data only when we have a confirmed user
+        fetchUserData(user);
+      } else {
         setLoadingProfile(false);
         setLoadingResumes(false);
         setProfileChecked(true);
-        return;
       }
+    });
+    
+    return () => unsubscribe();
+  }, []);
 
-      try {
-        // Fetch profile data
-        const profileRef = doc(db, "profiles", currentUser.uid);
-        const profileSnap = await getDoc(profileRef);
+  // Define the fetchUserData function outside of the useEffect
+  const fetchUserData = async (user) => {
+    try {
+      // Fetch profile data
+      const profileRef = doc(db, "profiles", user.uid);
+      const profileSnap = await getDoc(profileRef);
 
-        if (profileSnap.exists()) {
-          const profileData = profileSnap.data();
-          
-          // Check for all required fields
-          const requiredFields = ['address', 'contactNumber', 'email', 'name'];
-          
-          // Filter out fields that actually exist and have values
-          const missing = requiredFields.filter(field => 
-            !profileData[field] || profileData[field] === ""
-          );
-          
-          setMissingFields(missing);
-          setIsProfileComplete(missing.length === 0);
-          
-          setApplicationForm({
-            name: profileData.name || "",
-            email: profileData.email || currentUser.email || "",
-            contactNumber: profileData.contactNumber || "",
-            address: profileData.address || ""
-          });
-        } else {
-          setIsProfileComplete(false);
-          setMissingFields(['address', 'contactNumber', 'email', 'name']);
-        }
-
-        // Fetch previous resumes from applications
-        setLoadingResumes(true);
-        const applicationsQuery = query(
-          collection(db, "applications"), 
-          where("applicant_id", "==", currentUser.uid)
+      if (profileSnap.exists()) {
+        const profileData = profileSnap.data();
+        
+        // Check for all required fields
+        const requiredFields = ['address', 'contactNumber', 'email', 'name'];
+        
+        // Filter out fields that actually exist and have values
+        const missing = requiredFields.filter(field => 
+          !profileData[field] || profileData[field] === ""
         );
         
-        const applicationsSnap = await getDocs(applicationsQuery);
+        setMissingFields(missing);
+        setIsProfileComplete(missing.length === 0);
         
-        const uniqueResumes = new Map();
-        applicationsSnap.forEach(doc => {
-          const data = doc.data();
-          if (data.resume_link && !uniqueResumes.has(data.resume_link)) {
-            uniqueResumes.set(data.resume_link, {
-              url: data.resume_link,
-              timestamp: data.timestamp,
-              job_title: data.job_title || "Previous application"
-            });
-          }
+        setApplicationForm({
+          name: profileData.name || "",
+          email: profileData.email || user.email || "",
+          contactNumber: profileData.contactNumber || "",
+          address: profileData.address || ""
         });
-        
-        // Sort by most recent first
-        const sortedResumes = Array.from(uniqueResumes.values())
-          .sort((a, b) => b.timestamp - a.timestamp);
-        
-        setPreviousResumes(sortedResumes);
-        
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-        toast.error("Failed to load user information");
+      } else {
         setIsProfileComplete(false);
-      } finally {
-        setLoadingProfile(false);
-        setLoadingResumes(false);
-        setProfileChecked(true);
+        setMissingFields(['address', 'contactNumber', 'email', 'name']);
       }
-    };
 
-    fetchUserData();
-  }, []);
+      // Fetch previous resumes from applications
+      setLoadingResumes(true);
+      const applicationsQuery = query(
+        collection(db, "applications"), 
+        where("applicant_id", "==", user.uid)
+      );
+      
+      const applicationsSnap = await getDocs(applicationsQuery);
+      
+      const uniqueResumes = new Map();
+      applicationsSnap.forEach(doc => {
+        const data = doc.data();
+        if (data.resume_link && !uniqueResumes.has(data.resume_link)) {
+          uniqueResumes.set(data.resume_link, {
+            url: data.resume_link,
+            timestamp: data.timestamp,
+            job_title: data.job_title || "Previous application"
+          });
+        }
+      });
+      
+      // Sort by most recent first
+      const sortedResumes = Array.from(uniqueResumes.values())
+        .sort((a, b) => b.timestamp - a.timestamp);
+      
+      setPreviousResumes(sortedResumes);
+      
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      toast.error("Failed to load user information");
+      setIsProfileComplete(false);
+    } finally {
+      setLoadingProfile(false);
+      setLoadingResumes(false);
+      setProfileChecked(true);
+    }
+  };
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
@@ -205,9 +213,14 @@ const JobDetails = () => {
     }
   };
 
-  const selectExistingResume = (resumeUrl) => {
-    setSelectedExistingResume(resumeUrl);
-    setSelectedFile(null); // Clear any new file selection
+  const toggleExistingResume = (resumeUrl) => {
+    if (selectedExistingResume === resumeUrl) {
+      setSelectedExistingResume(null);
+    } else {
+      // If not selected or different resume selected, select this one
+      setSelectedExistingResume(resumeUrl);
+      setSelectedFile(null); // Clear any new file selection
+    }
   };
 
   const uploadToCloudinary = async (file) => {
@@ -230,45 +243,61 @@ const JobDetails = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!selectedFile && !selectedExistingResume) {
       toast.error("Please select or upload a resume");
       return;
     }
-
-    const currentUser = auth.currentUser;
-    if (!currentUser) {
+  
+    if (!currentUser) {  // Changed from auth.currentUser to currentUser
       toast.error("You need to be logged in to apply.");
       navigate("/login");
       return;
     }
-
+  
     setUploading(true);
-
+  
     try {
       // Use existing resume URL or upload new file
       const resumeUrl = selectedExistingResume || await uploadToCloudinary(selectedFile);
-
+      const timestamp = new Date(); 
+  
       await addDoc(collection(db, "applications"), {
         job_id: jobId,
         job_title: job.job_title,
         company: job.company,
         resume_link: resumeUrl,
-        applicant_id: currentUser.uid,
+        applicant_id: currentUser.uid,  // Changed from auth.currentUser.uid
         applicant_name: applicationForm.name,
         applicant_email: applicationForm.email,
         applicant_contact: applicationForm.contactNumber,
         applicant_address: applicationForm.address,
-        timestamp: new Date(),
+        timestamp: timestamp, 
       });
-
+  
+      if (selectedExistingResume) {
+        setPreviousResumes(prevResumes => {
+          const updatedResumes = prevResumes.map(resume => {
+            if (resume.url === selectedExistingResume) {
+              return {
+                ...resume,
+                timestamp: timestamp,
+                job_title: job.job_title
+              };
+            }
+            return resume;
+          });
+          
+          return updatedResumes.sort((a, b) => b.timestamp - a.timestamp);
+        });
+      }
+  
       toast.success("Application submitted successfully!");
       handleCloseModal();
       
-      // Navigate back to job listings after a brief delay
       setTimeout(() => {
         navigate("/job-listing");
-      }, 1500); // 1.5 second delay to allow the success toast to be visible
+      }, 1500);
       
     } catch (error) {
       console.error("Error submitting application:", error);
@@ -293,7 +322,6 @@ const JobDetails = () => {
     });
   };
 
-  // Content to render based on loading/error states
   const renderContent = () => {
     if (error) {
       return (
@@ -582,7 +610,7 @@ const JobDetails = () => {
                                   ? 'bg-blue/5 border-l-4 border-l-blue' 
                                   : 'hover:bg-gray-50'
                               }`}
-                              onClick={() => selectExistingResume(resume.url)}
+                              onClick={() => toggleExistingResume(resume.url)}
                             >
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-2">
