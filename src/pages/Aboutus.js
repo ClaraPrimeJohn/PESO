@@ -15,6 +15,7 @@ const Aboutus = () => {
         <div className="w-full">
           <img src={aboutBanner} alt="About Us Banner" className="w-full h-auto" />
         </div>
+    
         <HowItWorks />
         <AboutCity />
       

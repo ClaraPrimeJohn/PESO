@@ -4,7 +4,7 @@ import cityImage from "../assets/cityhall.webp";
 
 const AboutCity = () => {
   return (
-    <div className="bg-white py-16">
+    <div className="bg-white py-24">
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}

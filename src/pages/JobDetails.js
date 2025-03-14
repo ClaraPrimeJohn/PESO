@@ -511,13 +511,13 @@ const JobDetails = () => {
         {/* Application Modal */}
         {isModalOpen && (
           <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50 p-4">
-            <div className="bg-white w-full max-w-xl rounded-xl overflow-hidden shadow-2xl transition-opacity duration-300 opacity-100">
-              <div className="bg-gradient-to-r from-blue to-darkblue px-6 py-6">
+            <div className="bg-white w-full max-w-xl rounded-xl overflow-hidden shadow-2xl transition-opacity duration-300 opacity-100 max-h-[90vh] overflow-y-auto">
+              <div className="bg-gradient-to-r from-blue to-darkblue px-6 py-4">
                 <div className="flex justify-between items-start">
                   <div className="pr-8">
-                    <h2 className="text-2xl font-bold text-white mb-2">Job Application</h2>
-                    <p className="text-white/90 text-lg font-semibold line-clamp-1">{job?.job_title}</p>
-                    <p className="text-white/75 text-sm line-clamp-1">{job?.company}</p>
+                    <h2 className="text-xl font-bold text-white mb-1">Job Application</h2>
+                    <p className="text-white/90 text-base font-semibold line-clamp-1">{job?.job_title}</p>
+                    <p className="text-white/75 text-xs line-clamp-1">{job?.company}</p>
                   </div>
                   <button
                     onClick={handleCloseModal}
@@ -528,32 +528,32 @@ const JobDetails = () => {
                 </div>
               </div>
 
-              <form onSubmit={handleSubmit} className="p-6">
-                <div className="space-y-6">
+              <form onSubmit={handleSubmit} className="p-4">
+                <div className="space-y-4">
                   {/* Personal Details */}
                   <div>
-                    <h3 className="font-bold text-black-primary mb-4 flex items-center">
+                    <h3 className="font-bold text-black-primary mb-2 flex items-center text-sm">
                       <BsCheckCircleFill className="text-green mr-2" />
                       Personal Details
                     </h3>
-                    <div className="rounded-lg p-5 border border-neutral-300">
-                      <div className="grid grid-cols-2 gap-4">
+                    <div className="rounded-lg p-3 border border-neutral-300">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {["name", "email"].map((field) => (
                           <div key={field} className="flex flex-col">
                             <label className="text-gray-secondary text-xs uppercase tracking-wide mb-1">
                               {field}
                             </label>
-                            <p className=" text-black-primary bg-white px-3 py-2 rounded-md text-sm border border-neutral-300">
+                            <p className="text-black-primary bg-white px-3 py-2 rounded-md text-sm border border-neutral-300 truncate">
                               {applicationForm[field]}
                             </p>
                           </div>
                         ))}
                       </div>
-                      <div className="mt-3 text-center">
+                      <div className="mt-2 text-center">
                         <button
                           type="button"
                           onClick={() => navigate("/profile")}
-                          className="text-sm text-blue hover:text-darkblue font-medium"
+                          className="text-xs text-blue hover:text-darkblue font-medium"
                         >
                           Update Profile
                         </button>
@@ -564,20 +564,20 @@ const JobDetails = () => {
                   {/* Previous Resumes Section */}
                   {previousResumes.length > 0 && (
                     <div>
-                      <h3 className="font-bold text-black-primary mb-4 flex items-center">
+                      <h3 className="font-bold text-black-primary mb-2 flex items-center text-sm">
                         <BsCheckCircleFill className="text-green mr-2" />
                         Previous Resumes
                       </h3>
-                      <div className="rounded-lg border border-neutral-300 divide-y">
+                      <div className="rounded-lg border border-neutral-300 divide-y max-h-32 overflow-y-auto">
                         {loadingResumes ? (
-                          <div className="flex justify-center py-6">
-                            <div className="w-6 h-6 border-2 border-blue border-t-transparent rounded-full animate-spin"></div>
+                          <div className="flex justify-center py-4">
+                            <div className="w-5 h-5 border-2 border-blue border-t-transparent rounded-full animate-spin"></div>
                           </div>
                         ) : (
                           previousResumes.slice(0, 3).map((resume, index) => (
                             <div 
                               key={index}
-                              className={`p-4 cursor-pointer transition-colors ${
+                              className={`p-3 cursor-pointer transition-colors ${
                                 selectedExistingResume === resume.url 
                                   ? 'bg-blue/5 border-l-4 border-l-blue' 
                                   : 'hover:bg-gray-50'
@@ -585,29 +585,29 @@ const JobDetails = () => {
                               onClick={() => selectExistingResume(resume.url)}
                             >
                               <div className="flex items-center justify-between">
-                                <div className="flex items-center space-x-3">
-                                  <div className={`p-2 rounded-full ${
+                                <div className="flex items-center space-x-2">
+                                  <div className={`p-1 rounded-full ${
                                     selectedExistingResume === resume.url 
                                       ? 'bg-blue/10 text-blue' 
                                       : 'bg-gray-100 text-gray-500'
                                   }`}>
-                                    <FaFileUpload size={16} />
+                                    <FaFileUpload size={14} />
                                   </div>
-                                  <div>
-                                    <p className="text-sm font-medium text-black-primary">Resume for {resume.job_title}</p>
-                                    <p className="text-xs text-gray-secondary">Uploaded {formatDate(resume.timestamp)}</p>
+                                  <div className="max-w-[150px] sm:max-w-[200px]">
+                                    <p className="text-xs font-medium text-black-primary truncate">Resume for {resume.job_title}</p>
+                                    <p className="text-xs text-gray-secondary">{formatDate(resume.timestamp)}</p>
                                   </div>
                                 </div>
                                 {selectedExistingResume === resume.url && (
-                                  <BsCheckCircleFill className="text-blue" size={18} />
+                                  <BsCheckCircleFill className="text-blue" size={16} />
                                 )}
                               </div>
                             </div>
                           ))
                         )}
 
-                        <div className="p-4 text-center">
-                          <p className="text-sm text-gray-secondary">
+                        <div className="p-2 text-center">
+                          <p className="text-xs text-gray-secondary">
                             {selectedExistingResume 
                               ? "Resume selected. You can upload a new one instead."
                               : "Select a previous resume or upload a new one."}
@@ -619,17 +619,17 @@ const JobDetails = () => {
 
                   {/* Resume Upload Section */}
                   <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-bold text-black-primary flex items-center">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-bold text-black-primary flex items-center text-sm">
                         <FaFileUpload className="text-blue mr-2" />
                         {previousResumes.length > 0 ? "Upload New Resume" : "Resume Upload"}
                       </h3>
-                      <span className="text-xs bg-red/10 text-red px-2 py-1 rounded-full font-medium">
-                        PDF files only
+                      <span className="text-xs bg-red/10 text-red px-2 py-0.5 rounded-full font-medium">
+                        PDF only
                       </span>
                     </div>
                     <div
-                      className={`border-2 border-dashed rounded-xl transition-colors ${
+                      className={`border-2 border-dashed rounded-xl transition-colors p-3 ${
                         isDragging
                         ? "border-blue bg-blue/5"
                         : selectedFile
@@ -651,17 +651,17 @@ const JobDetails = () => {
                       />
                       <label
                         htmlFor="resume-upload"
-                        className={`block p-4 ${selectedExistingResume ? "opacity-50" : "cursor-pointer"}`}
+                        className={`block ${selectedExistingResume ? "opacity-50" : "cursor-pointer"}`}
                       >
-                        <div className="space-y-2 text-center">
-                          <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto ${
+                        <div className="space-y-1 text-center">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center mx-auto ${
                             selectedFile ? "bg-green/10" : "bg-gray-100"
                           }`}>
                             {selectedFile ? (
-                              <BsCheckCircleFill className="w-6 h-6 text-green" />
+                              <BsCheckCircleFill className="w-4 h-4 text-green" />
                             ) : (
                               <svg
-                                className="w-6 h-6 text-gray-400"
+                                className="w-4 h-4 text-gray-400"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
@@ -675,8 +675,8 @@ const JobDetails = () => {
                               </svg>
                             )}
                           </div>
-                          <div className="space-y-1">
-                            <p className="font-medium">
+                          <div>
+                            <p className="font-medium text-xs">
                               {selectedFile ? (
                                 <span className="text-green">
                                   New resume selected
@@ -689,9 +689,9 @@ const JobDetails = () => {
                                 </span>
                               )}
                             </p>
-                            <p className="text-sm text-gray-secondary">
+                            <p className="text-xs text-gray-secondary">
                               {selectedFile ? (
-                                <>"{selectedFile.name}" <span className="underline">Change file</span></>
+                                <span className="truncate block max-w-full">"{selectedFile.name}" <span className="underline">Change</span></span>
                               ) : (
                                 selectedExistingResume 
                                   ? "Click to upload a new resume instead" 
@@ -708,7 +708,7 @@ const JobDetails = () => {
                   <button
                     type="submit"
                     disabled={uploading || (!selectedFile && !selectedExistingResume)}
-                    className={`w-full py-2 rounded-xl text-white font-medium transition-all duration-200 
+                    className={`w-full py-2 rounded-xl text-white font-medium transition-all duration-200 text-sm
                     ${uploading
                         ? "bg-gray-400 cursor-not-allowed"
                         : (!selectedFile && !selectedExistingResume)
@@ -719,8 +719,8 @@ const JobDetails = () => {
                   >
                     {uploading ? (
                       <div className="flex items-center justify-center space-x-2">
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span>Submitting Application...</span>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Submitting...</span>
                       </div>
                     ) : ( "Submit Application"
                     )}
