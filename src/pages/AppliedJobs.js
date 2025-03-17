@@ -179,7 +179,7 @@ const AppliedJobs = () => {
     };
 
     return (
-        <div className="bg-gray-50 min-h-screen py-12 px-4 sm:px-8 md:px-16 lg:px-32 xl:px-48">
+        <div className="bg-white min-h-screen py-12 px-4 sm:px-8 md:px-16 lg:px-32 xl:px-48">
             <div className="container mx-auto max-w-6xl">
                 <div className="bg-gradient-to-r from-indigo-700 to-blue rounded-xl shadow-lg p-6 mb-8 text-white">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
