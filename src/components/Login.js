@@ -19,6 +19,19 @@ function Login() {
         setLoading(true);
         
         try {
+            // Check if the email exists in the deleted_logs collection
+            const deletedLogsRef = collection(db, "deleted_logs");
+            const deletedQuery = query(deletedLogsRef, where("email", "==", email));
+            const deletedSnapshot = await getDocs(deletedQuery);
+            
+            if (!deletedSnapshot.empty) {
+                toast.error("This account cannot be used for login.", {
+                    duration: 2000,
+                });
+                setLoading(false);
+                return;
+            }
+            
             // check if the email exists in the profiles collection
             const profilesRef = collection(db, "profiles");
             const emailQuery = query(profilesRef, where("email", "==", email));
@@ -94,6 +107,20 @@ function Login() {
             const user = result.user;
 
             const { uid, displayName, email, photoURL } = user;
+            
+            // Check if the email exists in the deleted_logs collection
+            const deletedLogsRef = collection(db, "deleted_logs");
+            const deletedQuery = query(deletedLogsRef, where("email", "==", email));
+            const deletedSnapshot = await getDocs(deletedQuery);
+            
+            if (!deletedSnapshot.empty) {
+                toast.error("This account cannot be used for login.", {
+                    duration: 3000,
+                });
+                await auth.signOut(); // Sign out the user
+                setLoading(false);
+                return;
+            }
 
             const userRef = doc(db, "profiles", uid);
             const userSnap = await getDoc(userRef);

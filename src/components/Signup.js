@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { auth, db } from "../firebase";
 import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { ClipLoader } from "react-spinners";
@@ -23,6 +23,16 @@ function Signup() {
         setLoading(true);
 
         try {
+            const deletedLogsRef = collection(db, "deleted_logs");
+            const deletedQuery = query(deletedLogsRef, where("email", "==", email));
+            const deletedSnapshot = await getDocs(deletedQuery);
+            
+            if (!deletedSnapshot.empty) {
+                toast.error("This email cannot be used for registration.", { duration: 3000 });
+                setLoading(false);
+                return;
+            }
+
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
             await sendEmailVerification(user);
