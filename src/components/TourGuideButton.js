@@ -40,12 +40,6 @@ const TourGuide = ({ onClose }) => {
       position: 'bottom'
     },
     {
-      selector: '.job-status-badge',
-      title: 'Job Status',
-      content: 'Green means the job is active and accepting applications. Red means it\'s closed.',
-      position: 'right'
-    },
-    {
       selector: '.apply-button', 
       title: 'Apply for Jobs',
       content: 'Click this button to apply for positions that interest you.',

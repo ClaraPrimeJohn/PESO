@@ -36,7 +36,8 @@ const Joblist = () => {
         const fetchedJobs = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
-        }));
+        }))
+        .filter(job => job.isOpen);
         setJobs(fetchedJobs);
 
         // Add this timeout to trigger the visibility transition after jobs are loaded
@@ -357,16 +358,6 @@ const Joblist = () => {
           <div className="ml-5">
             <div className="flex items-center space-x-2 mb-1">
               <h3 className="text-blue font-semibold">{job.company}</h3>
-              {job.isOpen ? (
-                <span className="inline-flex items-center gap-1 text-green text-xs px-2 py-1 rounded job-status-badge"> 
-                  <span className="w-2 h-2 bg-green rounded-full shrink-0"></span> Active
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1 text-red text-xs px-2 py-1 rounded job-status-badge"> 
-                  <span className="w-2 h-2 bg-red rounded-full shrink-0"></span> Closed
-                </span>
-              )}
-
             </div>
             <h2 className="text-xl font-bold text-black-primary">{job.job_title}</h2>
 
@@ -460,15 +451,6 @@ const Joblist = () => {
               className="w-14 h-14 object-contain"
             />
           </div>
-          {job.isOpen ? (
-            <span className="inline-flex items-center gap-1 text-green text-xs px-2 py-1 rounded job-status-badge">
-              <span className="w-2 h-2 bg-green rounded-full shrink-0"></span> Active
-            </span>
-          ) : (
-            <span className="inline-flex items-center gap-1 text-red text-xs px-2 py-1 rounded job-status-badge">
-              <span className="w-2 h-2 bg-red rounded-full shrink-0"></span> Closed
-            </span>
-          )}
         </div>
 
         <div className="mt-4">
