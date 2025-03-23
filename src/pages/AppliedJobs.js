@@ -15,7 +15,8 @@ const AppliedJobs = () => {
         company: "",
         dateSort: "newest",
         popularity: "all", 
-    });
+    }); // for sorting 
+
     const [activeFilterMenu, setActiveFilterMenu] = useState(null);
     const [user, setUser] = useState(null);
 
@@ -52,7 +53,7 @@ const AppliedJobs = () => {
                         resumeLink: data.resume_link || null,
                         jobId: data.job_id || null,
                         applicantCount: 0,
-                        isHot: false 
+                        isHot: false // defined below
                     };
                 });
                 
@@ -70,7 +71,7 @@ const AppliedJobs = () => {
                         const applicationsSnapshot = await getDocs(applicationsCountQuery);
                         const applicantCount = applicationsSnapshot.size;
                         
-                        const isHot = applicantCount >= 3;
+                        const isHot = applicantCount >= 3; // pwede customized depending on registered users
                         
                         return {
                             ...job,
@@ -95,6 +96,7 @@ const AppliedJobs = () => {
         fetchAppliedJobs();
     }, [user]); 
 
+    // filtering with search 
     const applyFilters = () => {
         let result = [...appliedJobs];
 
@@ -199,7 +201,7 @@ const AppliedJobs = () => {
                 
                 <div className="mb-6">
                     <div className="flex flex-wrap gap-2 mb-4">
-                        {/* Search Filter - Free flowing */}
+                        {/* search referenced yung functionality with job listings so working */}
                         <div className="relative">
                             <div className="flex items-center px-4 py-2 rounded-full shadow-md text-sm font-medium transition-colors bg-white text-gray-700">
                                 <FaSearch className="mr-2 text-gray-500" />
@@ -218,7 +220,7 @@ const AppliedJobs = () => {
                                 )}
                             </div>
                         </div>
-                        
+                        {/* invoker buttons ng filters */}
                         <div className="relative">
                             <button 
                                 onClick={() => toggleFilterMenu('company')}
@@ -277,7 +279,7 @@ const AppliedJobs = () => {
                                     <div className="space-y-2">
                                         <div className="flex items-center">
                                             <input
-                                                type="radio"
+                                                type="radio" // used radio to almost all para one tap filtering instead of checkbox
                                                 id="newest"
                                                 name="dateSort"
                                                 value="newest"
@@ -356,6 +358,7 @@ const AppliedJobs = () => {
                             )}
                         </div>
                         
+                        {/* filter counts result */}
                         {getActiveFilterCount() > 0 && (
                             <button
                                 onClick={resetFilters}
@@ -378,7 +381,7 @@ const AppliedJobs = () => {
                     <div className="flex justify-center items-center h-64 bg-white rounded-xl shadow-md border border-gray-100">
                         <div className="text-center">
                             <FaSpinner className="animate-spin text-3xl text-blue mx-auto mb-3" />
-                            <p className="text-gray-600">Loading your applications...</p>
+                            <p className="text-gray-600">Loading your applications...</p> {/* para iwas sa no applications found may set na timeout sa taas */}
                         </div>
                     </div>
                 ) : appliedJobs.length === 0 ? (
@@ -405,6 +408,7 @@ const AppliedJobs = () => {
                         
                     </div>
                 ) : (
+                    // if meron naman table
                     <div>
                         <div className="hidden md:block overflow-hidden bg-white rounded-xl shadow-md border border-gray-100">
                             <table className="min-w-full divide-y divide-gray-200">
@@ -480,7 +484,7 @@ const AppliedJobs = () => {
                             </table>
                         </div>
                         
-                        {/* Mobile view (cards) - Shown only on mobile */}
+                        {/* card or grid like view when responsive */}
                         <div className="md:hidden space-y-4">
                             {filteredJobs.map((job) => (
                                 <div key={job.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">

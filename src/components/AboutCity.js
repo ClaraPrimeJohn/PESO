@@ -4,7 +4,8 @@ import cityImage from "../assets/cityhall.webp";
 
 const AboutCity = () => {
   return (
-    <div className="bg-white py-24">
+    <div className="bg-white py-24">  
+    {/* main white bg with top bottom padding w/ timing*/}
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -12,7 +13,7 @@ const AboutCity = () => {
         className="container mx-auto px-4 md:px-8 lg:px-12"
       >
         <div className="grid md:grid-cols-2 gap-12 items-center bg-white rounded-xl shadow-md overflow-hidden border-2 border-gray-100">
-          {/* Image Column */}
+          {/* image change w/ transition & hover controls*/}
           <motion.div
             className="relative group"
             whileHover={{ scale: 1.02 }}
@@ -28,7 +29,6 @@ const AboutCity = () => {
                             transition-opacity duration-500 mix-blend-multiply"></div>
           </motion.div>
 
-          {/* Text Column */}
           <div className="p-8 lg:p-12">
             <motion.h1
               initial={{ x: -50, opacity: 0 }}

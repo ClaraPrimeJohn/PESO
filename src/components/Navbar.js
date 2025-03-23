@@ -34,7 +34,7 @@ const Navbar = () => {
             }
         });
 
-        // Close dropdown when clicking outside
+        // close dropdown when clicking outside
         const handleClickOutside = (event) => {
             if (isLoginDropdownOpen && !event.target.closest(".profile-dropdown")) {
                 setIsLoginDropdownOpen(false);
@@ -53,7 +53,7 @@ const Navbar = () => {
     const initiateLogout = () => {
         setIsLogoutConfirmOpen(true);
         setIsLoginDropdownOpen(false);
-        setIsDrawerOpen(false); // Close drawer when initiating logout
+        setIsDrawerOpen(false); // close dropdown when logginh out
     };
 
     const confirmLogout = async () => {
@@ -121,7 +121,7 @@ const Navbar = () => {
                         </div>
                     </Link>
 
-                    {/* Hamburger Menu Button for mobile */}
+                    {/* amberger walang eyts - for mobile */}
                     <button
                         className="lg:hidden text-2xl text-darkblue hover:text-blue transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-yellow rounded-md p-1"
                         onClick={() => setIsDrawerOpen(true)}
@@ -130,7 +130,7 @@ const Navbar = () => {
                         <RiMenu3Line />
                     </button>
 
-                    {/* Desktop Navigation Links */}
+                    {/* pc navs on top */}
                     <nav className="hidden lg:flex justify-center items-center text-sm space-x-10">
                         <Link to="/" className={`${getActiveClass("/")} font-medium py-2`}>
                             Home
@@ -149,7 +149,7 @@ const Navbar = () => {
                         </Link>
                     </nav>
 
-                    {/* Login/Profile Dropdown */}
+                    {/* login || dropdown navs */}
                     <div className="relative hidden lg:block profile-dropdown">
                         {user ? (
                             <button
@@ -181,6 +181,7 @@ const Navbar = () => {
                                 <CgProfile className="text-xl mr-2" /> Login
                             </Link>
                         )}
+                        {/* show dropdown 3 options*/}
                         {isLoginDropdownOpen && user && (
                             <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 animate-fadeIn overflow-hidden z-50">
                                 <div className="p-4 border-b border-gray-100 bg-gray-50">
@@ -224,12 +225,11 @@ const Navbar = () => {
                 </div>
             </header>
 
-            {/* Add a spacer div that adjusts to navbar height */}
+            {/* spacer - standardized */}
             <div className={`transition-all duration-300 ${scrollPosition > 50 ? "h-16" : "h-20"}`}></div>
 
-            {/* Drawer and Overlay */}
+            {/* dropdown drawer */}
             <div className={`fixed inset-0 z-50 transition-all duration-500 ${isDrawerOpen ? "visible" : "invisible"}`}>
-                {/* Overlay */}
                 <div
                     className={`fixed inset-0 bg-darkblue/50 backdrop-blur-sm transition-opacity duration-300 ${isDrawerOpen ? "opacity-100" : "opacity-0"}`}
                     onClick={() => setIsDrawerOpen(false)}
@@ -240,7 +240,7 @@ const Navbar = () => {
                     className={`absolute top-0 left-0 h-full bg-white shadow-2xl transition-transform duration-300 ease-in-out transform flex flex-col ${isDrawerOpen ? "translate-x-0" : "-translate-x-full"}`}
                     style={{ width: "calc(80vw)", maxWidth: "300px" }}
                 >
-                    {/* Header - Fixed at top */}
+                    {/* fixed at top */}
                     <div className="flex items-center justify-between p-4 border-b border-gray-100">
                         <div className="flex items-center">
                             <img className="w-auto h-7" src={mainLogo} alt="logo" />
@@ -258,7 +258,7 @@ const Navbar = () => {
                         </button>
                     </div>
 
-                    {/* Profile Section - More Compact */}
+                    {/* profile */}
                     <div className="py-4 border-b px-4 bg-gray-50">
                         {user ? (
                             <div className="flex items-center space-x-3 w-full">
@@ -291,7 +291,7 @@ const Navbar = () => {
                         )}
                     </div>
 
-                    {/* Actions Section - Only if logged in */}
+                    {/* if logged in can access these */}
                     {user && (
                         <div className="px-3 py-3 border-b border-gray-100 flex space-x-2">
                             <Link
@@ -313,7 +313,7 @@ const Navbar = () => {
                         </div>
                     )}
 
-                    {/* Navigation Links - Scrollable area */}
+                    {/* scrollable area auto overflow */}
                     <div className="flex flex-col h-full">
                         <nav className="flex-1 overflow-y-auto py-2">
                             <ul className="space-y-1 px-2">
@@ -365,9 +365,9 @@ const Navbar = () => {
                             </ul>
                         </nav>
 
-                        {/* Logout Button - Always visible at bottom */}
+                        {/* logout button */}
                         {user && (
-                            <div className="border-t border-gray-100 p-4 sticky bottom-0 bg-white mt-auto">
+                            <div className="border-t border-gray-100 p-4 sticky bottom-0 bg-white mt-auto"> {/* stick lagi bottom*/}
                                 <button
                                     onClick={initiateLogout}
                                     className="w-full flex items-center justify-center space-x-2 px-3 py-2.5 rounded-lg text-sm text-white bg-red/90 hover:bg-red transition-colors duration-200"
@@ -381,14 +381,13 @@ const Navbar = () => {
                 </div>
             </div>
 
-            {/* Logout Confirmation Modal */}
+            {/* logout modal blur bg */}
             {isLogoutConfirmOpen && (
                 <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
                     <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                        {/* Background overlay */}
                         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" aria-hidden="true"></div>
 
-                        {/* Modal panel */}
+                        {/* modal */}
                         <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                             <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                                 <div className="sm:flex sm:items-start">
@@ -411,14 +410,14 @@ const Navbar = () => {
                                 <button
                                     type="button"
                                     className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red text-base font-medium text-white hover:bg-red/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red sm:ml-3 sm:w-auto sm:text-sm"
-                                    onClick={confirmLogout}
+                                    onClick={confirmLogout} // function invoker double check
                                 >
                                     Log out
                                 </button>
                                 <button
                                     type="button"
                                     className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-darkblue sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                                    onClick={cancelLogout}
+                                    onClick={cancelLogout} // function invoker double check
                                 >
                                     Cancel
                                 </button>

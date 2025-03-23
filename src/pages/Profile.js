@@ -5,6 +5,7 @@ import { updateProfile } from "firebase/auth";
 import { toast } from "react-hot-toast";
 import { FaCamera, FaSpinner, FaUser, FaMapMarkerAlt, FaPhone, FaEnvelope, FaPencilAlt, FaSave, FaTimes, FaExclamationCircle } from "react-icons/fa";
 
+// creds ng cloudinary using env
 const CLOUDINARY_UPLOAD_PRESET = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET;
 const CLOUDINARY_CLOUD_NAME = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME;
 
@@ -17,6 +18,7 @@ const Profile = () => {
         contactNumber: "",
         profileImage: ""
     });
+    // info ng user profile
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewImage, setPreviewImage] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
@@ -33,7 +35,7 @@ const Profile = () => {
 
                 const profileRef = doc(db, "profiles", currentUser.uid);
                 const profileSnap = await getDoc(profileRef);
-
+                // if no profile
                 if (!profileSnap.exists()) {
                     setIsNewUser(true);
                     const newProfile = {
@@ -48,24 +50,26 @@ const Profile = () => {
                         await setDoc(profileRef, newProfile);
                         setProfile(newProfile);
                         setOriginalProfile(newProfile);
-                        setIsEditing(true);
+                        setIsEditing(true); // auto edit mode on para sa new users
                         toast.success("Please complete your profile information.");
                     } catch (error) {
                         console.error("Error initializing profile:", error);
                         toast.error("Failed to initialize profile.");
                     }
                 } else {
+                    // if profile exist fetch na
                     setIsNewUser(false);
                     await fetchProfileData(currentUser.uid);
                 }
             } else {
-                setUser(null);
+                setUser(null); // if user is null then tag as !logged in
             }
             setLoading(false);
         });
         return () => unsubscribe();
     }, []);
 
+    //fetch profile data -basa basa
     const fetchProfileData = async (uid) => {
         try {
             const profileRef = doc(db, "profiles", uid);
@@ -81,6 +85,7 @@ const Profile = () => {
         }
     };
 
+    // check for profile changes
     useEffect(() => {
         if (originalProfile) {
             const hasChanges = Object.keys(profile).some(
@@ -95,7 +100,7 @@ const Profile = () => {
         setProfile((prevProfile) => ({ ...prevProfile, [name]: value }));
     };
 
-    // Generate a simple hash from a string
+    // image hashing para di duplicate sa cloudinary
     const generateSimpleHash = async (str) => {
         const encoder = new TextEncoder();
         const data = encoder.encode(str);
@@ -104,7 +109,7 @@ const Profile = () => {
         return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     };
 
-    // Generate a hash from file content
+    // generate hash
     const getFileHash = (file) => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -123,26 +128,26 @@ const Profile = () => {
 
     const uploadImageToCloudinary = async (file) => {
         try {
-            // Generate hash from file content
+
             const contentHash = await getFileHash(file);
             
-            // Create a unique identifier including user ID and content hash
+            // uniqe id for uploaded image pero check padin sa hash
             const uniqueId = `${user.uid}_${contentHash}`;
             
-            // Check if this is the same as the current image
+            // check for same profile image
             if (profile.profileImage && profile.profileImage.includes(contentHash)) {
-                // Same image already uploaded, return the existing URL
+                // if same then return padin yung dati
                 return profile.profileImage;
             }
             
-            // Create formData for Cloudinary upload
+            // create formdata for cloudinary upload
             const formData = new FormData();
             formData.append("file", file);
             formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
             formData.append("folder", "profiles");
-            formData.append("public_id", uniqueId);  // Use our unique ID for the file
+            formData.append("public_id", uniqueId);  // unique id na instead na public id lang which is file name
             
-            // Upload to Cloudinary
+            // upload to cloudinary
             const res = await fetch(
                 `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
                 {
@@ -173,7 +178,7 @@ const Profile = () => {
             return;
         }
 
-        // Check if the user has a profile image or has selected a new one
+        // check user profile image if naka upload na or di pa para i recommend
         const hasImage = profile.profileImage || selectedFile;
         if (!hasImage) {
             toast.error("Please upload a profile image before saving changes.");
@@ -194,7 +199,7 @@ const Profile = () => {
             if (selectedFile) {
                 setUploadingImage(true);
                 try {
-                    // Before uploading, check if it's a duplicate by content
+                    // check duplicate image to prevent cloud bloating
                     const isDuplicate = await checkIfImageIsDuplicate(selectedFile);
                     
                     if (isDuplicate) {
@@ -242,34 +247,32 @@ const Profile = () => {
         }
     };
 
-    // Check if the image is a duplicate based on content
+    // check image is duplicate
     const checkIfImageIsDuplicate = async (file) => {
         try {
-            // Get hash of file being uploaded
             const newFileHash = await getFileHash(file);
             
-            // Extract content hash from the current profile image if it exists
             if (profile.profileImage) {
-                // Extract hash from the image URL if the URL contains our hash format
                 const urlParts = profile.profileImage.split('/');
                 const filenamePart = urlParts[urlParts.length - 1];
                 
-                // If the filename includes our hash pattern, compare hashes
+                // if same name then compare hash
                 if (filenamePart.includes(user.uid)) {
                     const existingHash = filenamePart.split('_')[1]?.split('.')[0];
                     if (existingHash === newFileHash) {
-                        return true; // Same content, it's a duplicate
+                        return true; // same content so dups
                     }
                 }
             }
             
-            return false; // Not a duplicate
+            return false; // !duplicate
         } catch (error) {
             console.error("Error checking for duplicate image:", error);
-            return false; // In case of error, allow upload
+            return false; // !error !allow
         }
     };
 
+    // for profile image selection
     const handleFileSelect = (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -281,7 +284,7 @@ const Profile = () => {
             return;
         }
 
-        // Validate file size (limit to 5MB)
+        // image limit to 5mb we cant afford it
         const maxSize = 5 * 1024 * 1024; // 5MB
         if (file.size > maxSize) {
             toast.error("Image is too large. Please select an image under 5MB");
@@ -308,7 +311,7 @@ const Profile = () => {
         setIsEditing(true);
     };
 
-    // Check if profile has an image (either existing or new one selected)
+    // check if profile has an image (either existing or new one selected)
     const hasProfileImage = Boolean(profile.profileImage || selectedFile);
 
     if (loading) {
@@ -331,7 +334,7 @@ const Profile = () => {
                 )}
                 
                 <div className="bg-white rounded-2xl shadow-xl overflow-hidden transform transition-all duration-300 hover:shadow-2xl">
-                    {/* Header Section */}
+                    {/* header */}
                     <div className="relative h-40 bg-gradient-to-r from-blue to-blue">
                         <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2">
                             <div className="relative">
@@ -381,7 +384,7 @@ const Profile = () => {
                         </div>
                     </div>
 
-                    {/* Profile Content */}
+                    {/* form (double check for fieldnames -headache) */}
                     <div className="pt-20 px-4 sm:px-6 lg:px-8 pb-8">
                         <div className="text-center mb-8">
                             <h2 className="text-2xl font-bold text-gray-900">
@@ -464,6 +467,7 @@ const Profile = () => {
                             </div>
 
                             <div className="pt-6 flex justify-center gap-4">
+                                {/* if editing */}
                                 {isEditing ? (
                                     <>
                                         <button 
@@ -488,7 +492,7 @@ const Profile = () => {
                                             Cancel
                                         </button>
                                     </>
-                                ) : (
+                                ) : ( // then button is
                                     <button 
                                         type="button" 
                                         onClick={handleEditClick}

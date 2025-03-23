@@ -24,6 +24,7 @@ const PESOHistory = () => {
     return () => observer.disconnect();
   }, []);
 
+  // dito eedit yung history data yung text o pics 
   const timelineData = [
     {
       period: "2000 - 2005",

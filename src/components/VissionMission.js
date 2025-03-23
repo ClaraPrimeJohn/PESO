@@ -17,10 +17,10 @@ const staggerContainer = {
 
 const VisionMission = () => {
   return (
+    //container
     <motion.div
       
     >
-      {/* Dark Overlay for Readability */}
       <div className="relative inset-0 bg-white"></div>
 
       {/* Content Container */}
@@ -44,7 +44,7 @@ const VisionMission = () => {
           </motion.h1>
         </motion.div>
 
-        {/* Card Container */}
+        {/* cards */}
         <motion.div
           className="grid mt-10 grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 max-w-7xl mx-auto"
           variants={staggerContainer}
@@ -52,7 +52,7 @@ const VisionMission = () => {
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
         >
-          {/* Mission Card */}
+          {/* mission */}
           <motion.div
             className="bg-orange p-6 rounded-2xl shadow-lg border-red backdrop-blur-md transform transition-all hover:scale-105 hover:shadow-xl"
             variants={fadeInUp}
@@ -70,7 +70,7 @@ const VisionMission = () => {
             </p>
           </motion.div>
 
-          {/* Vision Card */}
+          {/* vision */}
           <motion.div
             className="bg-blue p-6 rounded-2xl shadow-lg border-blue backdrop-blur-md transform transition-all hover:scale-105 hover:shadow-xl"
             variants={fadeInUp}

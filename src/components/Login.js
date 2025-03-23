@@ -19,7 +19,7 @@ function Login() {
         setLoading(true);
         
         try {
-            // Check if the email exists in the deleted_logs collection
+            // find email in deleted_logs collection
             const deletedLogsRef = collection(db, "deleted_logs");
             const deletedQuery = query(deletedLogsRef, where("email", "==", email));
             const deletedSnapshot = await getDocs(deletedQuery);
@@ -32,7 +32,7 @@ function Login() {
                 return;
             }
             
-            // check if the email exists in the profiles collection
+            // check if email is in profiles collection
             const profilesRef = collection(db, "profiles");
             const emailQuery = query(profilesRef, where("email", "==", email));
             const querySnapshot = await getDocs(emailQuery);
@@ -45,7 +45,7 @@ function Login() {
                 return;
             }
             
-            // if email is there proceed to checking credentials
+            // if found -> authenticate
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
@@ -60,7 +60,7 @@ function Login() {
                 return;
             }
 
-            // Update user profile to mark as verified if it's not already
+            // update invoker 
             const userProfileRef = doc(db, "profiles", user.uid);
             const userProfileSnap = await getDoc(userProfileRef);
             
@@ -73,7 +73,7 @@ function Login() {
                     });
                 }
             } else {
-                // If for some reason the profile doesn't exist (unlikely at this point)
+                // last checking last resort
                 await setDoc(userProfileRef, {
                     email: email,
                     isVerified: true,
@@ -99,6 +99,7 @@ function Login() {
         }
     };
 
+    // login + create account via google account
     const handleGoogleSignIn = async () => {
         setLoading(true);
         try {
@@ -108,7 +109,7 @@ function Login() {
 
             const { uid, displayName, email, photoURL } = user;
             
-            // Check if the email exists in the deleted_logs collection
+            // check ulit sa deleted logs
             const deletedLogsRef = collection(db, "deleted_logs");
             const deletedQuery = query(deletedLogsRef, where("email", "==", email));
             const deletedSnapshot = await getDocs(deletedQuery);
@@ -117,7 +118,7 @@ function Login() {
                 toast.error("This account cannot be used for login.", {
                     duration: 3000,
                 });
-                await auth.signOut(); // Sign out the user
+                await auth.signOut(); // auto sign out user
                 setLoading(false);
                 return;
             }
@@ -125,18 +126,19 @@ function Login() {
             const userRef = doc(db, "profiles", uid);
             const userSnap = await getDoc(userRef);
 
+            // double check fields
             if (!userSnap.exists()) {
                 await setDoc(userRef, {
                     name: displayName || "Unnamed User",
                     email: email,
                     profileImage: photoURL || "",
-                    isVerified: true, // Google accounts are pre-verified
+                    isVerified: true, // rekta verified na google account due to auth rules so true na agad
                     createdAt: new Date(),
                     contactNumber: null,
                     address: null
                 });
             } else {
-                // Update the verification status if not already verified
+                // update verification status another layer para lang sure
                 const userData = userSnap.data();
                 if (!userData.isVerified) {
                     await updateDoc(userRef, {
@@ -205,7 +207,7 @@ function Login() {
                             className="w-full mt-2 text-xs sm:text-sm px-3 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-2 focus:ring-black-secondary focus:outline-none"
                         />
                     </div>
-
+                    {/* route to forgot*/}
                     <div className="flex justify-between items-center mt-1 sm:mt-2">
                         <Link to="/forgot" className="text-xs sm:text-sm text-blue hover:underline">
                             Forgot Password?
@@ -223,7 +225,7 @@ function Login() {
                         </button>
                     </div>
                 </form>
-
+                {/* route to signup*/}
                 <p className="mt-4 sm:mt-6 text-center text-xs sm:text-sm">
                     Don't have an account yet?{" "}
                     <Link to="/signup" className="text-darkblue hover:underline">

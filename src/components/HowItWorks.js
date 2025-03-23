@@ -2,7 +2,7 @@ import React from 'react';
 import { FaRegClipboard, FaRegQuestionCircle, FaUserAlt, FaGraduationCap } from 'react-icons/fa';
 
 const HowItWorks = () => {
-    // Custom color palette
+    // custom color palette kesa tailwind
     const colors = {
         'yellow': "#FFB42C",
         'darkblue': "#001D7D",
@@ -24,11 +24,10 @@ const HowItWorks = () => {
             </div>
             
             <div className="relative">
-                {/* Connection line */}
                 <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-yellow-200 via-orange-400 to-yellow-200 transform -translate-y-1/2 z-0"></div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 relative z-10">
-                    {/* Step 1 */}
+                    {/* step 1 */}
                     <div className="transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl rounded-xl bg-white p-8 shadow-md">
                         <div className="flex justify-center">
                             <div className="flex justify-center items-center w-20 h-20 bg-gradient-to-br from-blue to-darkblue rounded-2xl rotate-3 shadow-lg mb-6" style={{ background: `linear-gradient(to bottom right, ${colors.blue}, ${colors.darkblue})` }}>
@@ -41,7 +40,7 @@ const HowItWorks = () => {
                         </p>
                     </div>
 
-                    {/* Step 2 */}
+                    {/* step 2 */}
                     <div className="transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl rounded-xl bg-white p-8 shadow-md">
                         <div className="flex justify-center">
                             <div className="flex justify-center items-center w-20 h-20 rounded-2xl -rotate-3 shadow-lg mb-6" style={{ background: `linear-gradient(to bottom right, ${colors.yellow}, ${colors.orange})` }}>
@@ -54,7 +53,7 @@ const HowItWorks = () => {
                         </p>
                     </div>
 
-                    {/* Step 3 */}
+                    {/* step 3 */}
                     <div className="transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl rounded-xl bg-white p-8 shadow-md">
                         <div className="flex justify-center">
                             <div className="flex justify-center items-center w-20 h-20 rounded-2xl rotate-3 shadow-lg mb-6" style={{ background: `linear-gradient(to bottom right, ${colors.green}, ${colors.darkblue})` }}>
@@ -67,7 +66,7 @@ const HowItWorks = () => {
                         </p>
                     </div>
 
-                    {/* Step 4 */}
+                    {/* step 4 */}
                     <div className="transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl rounded-xl bg-white p-8 shadow-md">
                         <div className="flex justify-center">
                             <div className="flex justify-center items-center w-20 h-20 rounded-2xl -rotate-3 shadow-lg mb-6" style={{ background: `linear-gradient(to bottom right, ${colors.red}, ${colors.orange})` }}>

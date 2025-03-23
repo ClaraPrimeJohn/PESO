@@ -17,13 +17,13 @@ const ForgotPassword = () => {
     setLoading(true);
     
     try {
-      // Check if email exists in profiles collection
+      // find email in profiles collection
       const profilesRef = collection(db, 'profiles');
       const q = query(profilesRef, where("email", "==", email));
       const querySnapshot = await getDocs(q);
       
       if (querySnapshot.empty) {
-        // Email not found in profiles collection
+        // toast for not found
         toast.error('No account found with this email address.', {
           duration: 3000,
         });
@@ -31,7 +31,7 @@ const ForgotPassword = () => {
         return;
       }
       
-      // Email exists, proceed with password reset
+      // if found then saka lang mag send
       await sendPasswordResetEmail(auth, email);
       setEmailSent(true);
       toast.success('Password reset email sent! Please check your inbox.', {
@@ -64,7 +64,7 @@ const ForgotPassword = () => {
             <p className="text-sm sm:text-base text-neutral-600 text-center mb-4 sm:mb-6 md:mb-8 mt-2">
               Enter your email to receive a reset link
             </p>
-
+            {/*form*/}
             <form className="space-y-4 sm:space-y-6 w-full max-w-sm mx-auto" onSubmit={handleResetPassword}>
               <div>
                 <label htmlFor="email" className="block text-xs sm:text-sm font-medium text-gray-700">
@@ -82,6 +82,8 @@ const ForgotPassword = () => {
               </div>
 
               <div className="mt-2 sm:mt-4">
+                
+            {/*button trigger ng send*/}
                 <button
                   type="submit"
                   className="w-full bg-black-secondary text-white px-4 py-2 text-xs sm:text-sm rounded-md hover:bg-black transition flex items-center justify-center gap-2"
@@ -95,7 +97,7 @@ const ForgotPassword = () => {
 
             <p className="mt-4 sm:mt-6 text-center text-xs sm:text-sm">
               Remember your password?{" "}
-              <Link to="/login" className="text-darkblue hover:underline">
+              <Link to="/login" className="text-darkblue hover:underline"> {/*redirect to login for new password*/}
                 Back to login
               </Link>
             </p>

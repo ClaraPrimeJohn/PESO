@@ -6,6 +6,7 @@ import service3 from '../assets/service3.webp';
 const HeroAnnouncement = () => {
   return (
     <motion.div
+    //container
       initial={{ opacity: 0, scale: 0.9, y: 30 }}
       whileInView={{ opacity: 1, scale: 1, y: 0 }}
       viewport={{ once: false, amount: 0.15 }}
@@ -13,7 +14,7 @@ const HeroAnnouncement = () => {
       whileHover={{ scale: 1.005 }}
       className="mx-4 sm:mx-8 md:mx-16 lg:mx-32 xl:mx-48 mb-3 flex flex-col md:flex-row items-center bg-white shadow-sm rounded-xl overflow-hidden border border-gray-200 px-12 md:px-16 lg:px-20 py-8 md:py-10 lg:py-12 transition-all duration-300"
     >
-      {/* Left Section - Image */}
+      {/* left w/ image */}
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         whileInView={{ opacity: 1, scale: 1, y: 0 }}
@@ -34,7 +35,7 @@ const HeroAnnouncement = () => {
         </motion.div>
       </motion.div>
 
-      {/* Right Section - Text */}
+      {/* right w/ description */}
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         whileInView={{ opacity: 1, scale: 1, y: 0 }}
@@ -68,6 +69,7 @@ const HeroAnnouncement = () => {
           transition={{ duration: 0.2, ease: "easeOut" }}
           className="mt-5 flex justify-center"
         >
+          {/* route to announcement*/}
           <Link
             to="/announcement"
             className="inline-block text-darkblue font-bold border-2 border-darkblue px-4 py-2 rounded-md transition duration-300 transform hover:text-white hover:bg-blue hover:border-orange-600"

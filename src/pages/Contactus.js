@@ -10,8 +10,9 @@ import FaqImage2 from '../assets/Job hunt-pana.webp';
 import FaqImage3 from '../assets/brand communication-pana.webp';
 
 const ContactUs = () => {
+    // accordion state
     const [openIndex, setOpenIndex] = useState(null);
-
+    // invoker ng toggle accordion 
     const toggleAccordion = (index) => {
         setOpenIndex(openIndex === index ? null : index);
     };
@@ -106,7 +107,6 @@ const ContactUs = () => {
     return (
         <PageLoader>
             <div className="w-full">
-                {/* Medium-sized Hero Banner */}
                 <div className="relative w-full h-[400px]">
                     <img src={Banner} alt="Contact Us" className="w-full h-full object-cover brightness-75" />
                       <div className="absolute inset-0 bg-gradient-to-r from-darkblue/90 to-green/90 flex flex-col items-center justify-center text-white p-8">
@@ -118,10 +118,8 @@ const ContactUs = () => {
                         </div>
                     </div>
                 </div>
-
-                {/* Main Content - increased max width */}
                 <div className="max-w-8xl mx-auto py-12 px-4 sm:px-8 md:px-16 lg:px-32 xl:px-48">
-                    {/* Contact Info Cards */}
+                    {/* contact cards grid*/}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-24">
                         {contactOptions.map((option, index) => (
                             <div key={index} className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow duration-300 flex items-start space-x-4 border border-gray-100">
@@ -169,6 +167,7 @@ const ContactUs = () => {
                                                 </span>
                                             </button>
                                             <div
+                                            // animation accordion content
                                                 className={`mt-4 transition-all duration-300 ease-in-out overflow-hidden ${openIndex === index ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
                                                     }`}
                                             >
@@ -192,6 +191,7 @@ const ContactUs = () => {
                                 {faqs.slice(3, 6).map((faq, index) => (
                                     <div key={index + 3}>
                                         <div className="py-5">
+                                        {/* invoker ng accordion */}
                                             <button
                                                 onClick={() => toggleAccordion(index + 3)}
                                                 className="flex items-center justify-between w-full text-left group focus:outline-none"
@@ -257,9 +257,8 @@ const ContactUs = () => {
                         </div>
                     </div>
 
-                    {/* Additional Help Button */}
+                    {/* help button */}
 
-                    {/* Two-column Map Section */}
                     <h2 className="text-3xl font-bold text-darkblue mb-12 text-center">Visit Our Offices</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
                         {officeLocations.map((office, index) => (

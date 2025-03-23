@@ -5,6 +5,7 @@ import service from '../assets/service.webp';
 
 const HeroJoblistings = () => {
   return (
+    //container
     <motion.div
       initial={{ opacity: 0, scale: 0.9, y: 30 }}
       whileInView={{ opacity: 1, scale: 1, y: 0 }}
@@ -32,7 +33,7 @@ const HeroJoblistings = () => {
         Unlock your career potential with PESO's comprehensive services, thoughtfully crafted to empower job seekers and enhance employment opportunities. Discover a wide array of resources, from curated job listings and application guidance to activity announcements and program updates. PESO is your trusted partner in navigating the job market, providing reliable, accessible, and up-to-date support every step of the way.
       </motion.p>
 
-      {/* Job Listings Section */}
+      {/* customize scaling sa hover */}
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         whileInView={{ opacity: 1, scale: 1, y: 0 }}
@@ -41,7 +42,7 @@ const HeroJoblistings = () => {
         whileHover={{ scale: 1.01 }}
         className="mt-1 mx-4 sm:mx-8 md:mx-16 lg:mx-32 xl:mx-48 mb-1 flex flex-col md:flex-row items-center bg-white shadow-sm rounded-xl overflow-hidden border border-gray-200 px-4 md:px-6 lg:px-8 py-6 md:py-8 lg:py-10 transition-all duration-300"
       >
-        {/* Left Section - Image */}
+        {/* left w/ image */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           whileInView={{ opacity: 1, scale: 1, y: 0 }}
@@ -62,7 +63,7 @@ const HeroJoblistings = () => {
           </motion.div>
         </motion.div>
 
-        {/* Right Section - Text */}
+        {/* right w/ description*/}
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           whileInView={{ opacity: 1, scale: 1, y: 0 }}
@@ -96,6 +97,7 @@ const HeroJoblistings = () => {
             transition={{ duration: 0.2, ease: "easeOut" }}
             className="mt-5 flex justify-center"
           >
+            {/* route to joblisting parang si application*/}
             <Link
               to="/job-listing"
               className="inline-block text-darkblue font-bold border-2 border-darkblue px-4 py-2 rounded-md transition duration-300 transform hover:text-white hover:bg-blue hover:border-orange-600"

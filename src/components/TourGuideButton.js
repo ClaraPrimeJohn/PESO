@@ -9,11 +9,10 @@ const TourGuide = ({ onClose }) => {
     height: window.innerHeight
   });
 
-  // Define constant values
-  const MARGIN = 15; // Minimum margin from screen edge
-  const TOOLTIP_HEIGHT = 150; // Approximate tooltip height
+  const MARGIN = 15; // min margin from screen edge
+  const TOOLTIP_HEIGHT = 150; // tooltip height para di lagpas pag responsive
 
-  // Define all the steps in the tour with useMemo to prevent recreation on every render
+  // all steps with classname selector (double check invokers)
   const tourSteps = useMemo(() => [
     {
       selector: '.search-bar', 
@@ -57,48 +56,41 @@ const TourGuide = ({ onClose }) => {
   const determineOptimalPosition = useCallback((rect, preferredPosition) => {
     const tooltipWidth = Math.min(300, windowSize.width * 0.8); 
     
-
+    // hehe nagamit ko din switch (ayaw ng ibang dev toh eh) 
+    // context find enough space to cover responsiveness para di putol pag na invoke tooltip
     switch (preferredPosition) {
       case 'bottom':
         if (rect.bottom + TOOLTIP_HEIGHT + MARGIN > windowSize.height) {
-          // Not enough space at bottom, try top
           if (rect.top - TOOLTIP_HEIGHT - MARGIN > 0) {
             return 'top';
           } else {
-            // Try left or right
             return rect.left > windowSize.width / 2 ? 'left' : 'right';
           }
         }
         break;
       case 'top':
         if (rect.top - TOOLTIP_HEIGHT - MARGIN < 0) {
-          // Not enough space at top, try bottom
           if (rect.bottom + TOOLTIP_HEIGHT + MARGIN < windowSize.height) {
             return 'bottom';
           } else {
-            // Try left or right
             return rect.left > windowSize.width / 2 ? 'left' : 'right';
           }
         }
         break;
       case 'left':
         if (rect.left - tooltipWidth - MARGIN < 0) {
-          // Not enough space at left, try right
           if (rect.right + tooltipWidth + MARGIN < windowSize.width) {
             return 'right';
           } else {
-            // Try top or bottom
             return rect.top > windowSize.height / 2 ? 'top' : 'bottom';
           }
         }
         break;
       case 'right':
         if (rect.right + tooltipWidth + MARGIN > windowSize.width) {
-          // Not enough space at right, try left
           if (rect.left - tooltipWidth - MARGIN > 0) {
             return 'left';
           } else {
-            // Try top or bottom
             return rect.top > windowSize.height / 2 ? 'top' : 'bottom';
           }
         }
@@ -107,10 +99,10 @@ const TourGuide = ({ onClose }) => {
         break;
     }
     
-    return preferredPosition; // Return original if no issues
+    return preferredPosition; 
   }, [windowSize]);
 
-  // Update highlight position on resize or scroll
+  // move highlight with screeb positiion mapping currentstep with highlighted divs so it follows screen position
   const updateHighlightPosition = useCallback(() => {
     if (currentStep >= 0 && currentStep < tourSteps.length) {
       const element = document.querySelector(tourSteps[currentStep].selector);
@@ -124,15 +116,14 @@ const TourGuide = ({ onClose }) => {
           width: rect.width,
           height: rect.height,
           position: position,
-          // Store these for calculating absolute position
-          scrollY: window.scrollY,
-          scrollX: window.scrollX
+          scrollY: window.scrollY, // for precision when scrolling
+          scrollX: window.scrollX  // also this
         });
       }
     }
   }, [currentStep, tourSteps, determineOptimalPosition]);
 
-  // Track window resize and scroll
+  // for resize kasi may issue sa mga devices eh area lang compute 
   useEffect(() => {
     const handleResize = () => {
       setWindowSize({
@@ -150,19 +141,17 @@ const TourGuide = ({ onClose }) => {
     };
   }, [updateHighlightPosition]);
 
-  // Update highlight when step changes or window resizes
+  // update position of blue highlight
   useEffect(() => {
     updateHighlightPosition();
   }, [currentStep, updateHighlightPosition, windowSize]);
 
-  // Scroll element into view when step changes
+  // scroll to div
   useEffect(() => {
     const element = document.querySelector(tourSteps[currentStep]?.selector);
     if (element) {
-      // Use a small timeout to ensure DOM is ready
       const timer = setTimeout(() => {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        // Update position after scrolling completes
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' }); // smooth transtion when nexting
         setTimeout(updateHighlightPosition, 500);
       }, 100);
       
@@ -188,15 +177,14 @@ const TourGuide = ({ onClose }) => {
     onClose();
   };
 
-  // If no highlight position is set yet, don't render
+ 
   if (!highlightPosition) return null;
 
-  // Calculate tooltip position based on the highlighted element
+  // computation of tooltip position referenced at top - customize if necessary
   let tooltipStyle = {};
-  const offset = Math.min(15, windowSize.width * 0.03); // Responsive offset
-  const tooltipWidth = Math.min(300, windowSize.width * 0.8); // Responsive width
+  const offset = Math.min(15, windowSize.width * 0.03);  
+  const tooltipWidth = Math.min(300, windowSize.width * 0.8); 
   
-  // Ensure the tooltip stays within viewport boundaries
   switch (highlightPosition.position) {
     case 'bottom':
       tooltipStyle = {
@@ -329,7 +317,7 @@ const TourGuide = ({ onClose }) => {
   );
 };
 
-// Help button that triggers the tour
+// invoke tour
 const TourGuideButton = () => {
   const [isTourActive, setIsTourActive] = useState(false);
 

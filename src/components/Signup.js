@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { auth, db } from "../firebase";
 import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { doc, setDoc, collection, query, where, getDocs } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { ClipLoader } from "react-spinners";
 import pesoLogo from "../assets/peso-logo.webp"; 
@@ -14,6 +14,8 @@ function Signup() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
+
+    //signup padin pero check sa deleted logs plus if existing na sa profiles
     const handleSignup = async (e) => {
         e.preventDefault();
         if (password.length < 6) {
@@ -23,7 +25,7 @@ function Signup() {
         setLoading(true);
 
         try {
-            const deletedLogsRef = collection(db, "deleted_logs");
+            const deletedLogsRef = collection(db, "deleted_logs"); //deleted loggs check
             const deletedQuery = query(deletedLogsRef, where("email", "==", email));
             const deletedSnapshot = await getDocs(deletedQuery);
             
@@ -33,7 +35,7 @@ function Signup() {
                 return;
             }
 
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password); // create to profiles
             const user = userCredential.user;
             await sendEmailVerification(user);
 
@@ -72,6 +74,7 @@ function Signup() {
                     Create your account to get started
                 </p>
 
+                {/* double check form values para di inconsistent sa fields - headache */}
                 <form className="space-y-4 sm:space-y-6 w-full max-w-sm mx-auto" onSubmit={handleSignup}>
                     <div>
                         <label htmlFor="name" className="block text-xs sm:text-sm font-medium text-gray-700">
@@ -129,12 +132,12 @@ function Signup() {
                         </button>
                     </div>
                 </form>
-
+                {/* naka a href pa pala toh - link na charan*/}
                 <p className="mt-4 sm:mt-6 text-center text-xs sm:text-sm">
                     Already have an account?{" "}
-                    <a href="/login" className="text-darkblue hover:underline">
-                        Sign in here
-                    </a>
+                    <Link to="/login" className="text-darkblue hover:underline">
+                    Sign in here
+                    </Link>
                 </p>
             </div>
         </div>

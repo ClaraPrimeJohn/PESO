@@ -14,8 +14,7 @@ import img10 from "../assets/hired6.webp";
 const HiredGallery = () => {
   const [selectedImage, setSelectedImage] = useState(null);
 
-  // Define images with offset positions - adjusted for 5 columns
-  // Columns 1, 3, and 5 will have the same offset pattern
+  // sampuan with offset pattern to align properly
   const images = [
     { src: img1, id: 1, offsetY: 0 },      // Column 1
     { src: img2, id: 2, offsetY: 40 },     // Column 2
@@ -29,10 +28,10 @@ const HiredGallery = () => {
     { src: img10, id: 10, offsetY: 60 },     // Column 5 (row 2)
   ];
 
-  // Standard blue hover color
-  const hoverColor = "#0835CA"; // blue
+  const hoverColor = "#0835CA"; // blue hover color
 
   return (
+    //container
     <motion.section
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -67,7 +66,7 @@ const HiredGallery = () => {
         </motion.p>
       </div>
 
-      {/* 5-column layout */}
+      {/* lg 5 columns tas paonti paliit - customizable */}
       <div className="relative h-full">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
           {images.map((img, index) => (
@@ -83,7 +82,7 @@ const HiredGallery = () => {
               onClick={() => setSelectedImage(img.src)}
               style={{ 
                 boxShadow: `0 8px 24px rgba(0, 0, 0, 0.12)`,
-                // Make columns 1, 3, and 5 have the same offset pattern
+                // columns odd sequence 
                 marginTop: index % 5 === 0 || index % 5 === 2 || index % 5 === 4 ? "0px" : 
                          index % 5 === 1 || index % 5 === 3 ? "40px" : `${img.offsetY}px`,
               }}
@@ -91,12 +90,12 @@ const HiredGallery = () => {
               <div 
                 className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4 z-10"
                 style={{ 
-                  background: `linear-gradient(to top, ${hoverColor}CC, transparent)` 
+                  background: `linear-gradient(to top, ${hoverColor}CC, transparent)` //pailaw invoker
                 }}
               >
                 <div 
                   className="absolute top-0 left-0 w-full h-1 opacity-0 group-hover:opacity-100 transition-all duration-300"
-                  style={{ backgroundColor: hoverColor }}
+                  style={{ backgroundColor: hoverColor }} //pailaw invoker
                 ></div>
                 
                 <motion.div
@@ -121,7 +120,7 @@ const HiredGallery = () => {
               
               <motion.div 
                 className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-md"
-                style={{ color: hoverColor }}
+                style={{ color: hoverColor }} //pailaw invoker
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
@@ -133,7 +132,7 @@ const HiredGallery = () => {
         </div>
       </div>
 
-      {/* Lightbox Modal */}
+      {/* zoom image */}
       <AnimatePresence>
         {selectedImage && (
           <motion.div

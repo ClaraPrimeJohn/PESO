@@ -49,6 +49,7 @@ const JobDetails = () => {
     setIsDragging(false);
   };
 
+  // for lacking in profile
   const getFieldDisplayName = (fieldName) => {
     const displayNames = {
       'name': 'Full Name',
@@ -59,7 +60,7 @@ const JobDetails = () => {
     return displayNames[fieldName] || fieldName;
   };
 
- 
+ // fetch selected job
   useEffect(() => {
     const fetchJob = async () => {
       if (!jobId) {
@@ -91,7 +92,7 @@ const JobDetails = () => {
     fetchJob();
   }, [jobId]);
 
- 
+ // check profile ni applicant (logged in user)
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
@@ -109,7 +110,7 @@ const JobDetails = () => {
     return () => unsubscribe();
   }, []);
 
- 
+ // get profile of jobseeker pati yung previous application for previous resume
   const fetchUserData = async (user) => {
     try {
       
@@ -178,6 +179,7 @@ const JobDetails = () => {
     }
   };
 
+  // file selection - new
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -191,6 +193,7 @@ const JobDetails = () => {
     }
   };
 
+  // drag drop upload
   const handleDrag = (e, isDragging) => {
     e.preventDefault();
     e.stopPropagation();
@@ -213,6 +216,7 @@ const JobDetails = () => {
     }
   };
 
+  // dito nagamit yung sa previous to prevent clogging sa cloudinary
   const toggleExistingResume = (resumeUrl) => {
     if (selectedExistingResume === resumeUrl) {
       setSelectedExistingResume(null);
@@ -223,6 +227,7 @@ const JobDetails = () => {
     }
   };
 
+  // upload pdf file to cloudinary
   const uploadToCloudinary = async (file) => {
     const formData = new FormData();
     formData.append("file", file);
@@ -241,6 +246,7 @@ const JobDetails = () => {
     }
   };
 
+  // submit with security features para ma prevent empy uploads in case of knowledgable users
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -266,6 +272,7 @@ const JobDetails = () => {
         day: 'numeric'
       });
 
+      // add applicant and job data sa applications collection (double check padin fields for consistency)
       await addDoc(collection(db, "applications"), {
         job_id: jobId,
         job_title: job.job_title,
@@ -279,6 +286,7 @@ const JobDetails = () => {
         timestamp: timestamp,
       });
      
+      // for emailing applicant with emailjs with added email syempre
       try {
         const emailParams = {
           to_name: applicationForm.name,
@@ -348,6 +356,7 @@ const JobDetails = () => {
     });
   };
 
+  // in case may error invoked tong content na toh
   const renderContent = () => {
     if (error) {
       return (
@@ -372,7 +381,7 @@ const JobDetails = () => {
 
     return (
       <div className={`min-h-screen transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
-        {/* Navigation Bar */}
+        {/* navbar */}
         <div className="bg-white">
           <div className="container mx-auto px-4 md:px-8 pt-12">
             <button
@@ -388,9 +397,8 @@ const JobDetails = () => {
 
         <div className="container mx-auto px-4 md:px-8 py-4">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left Column - Job Details */}
+            {/* left w/ details */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Responsive Job Header */}
               <div className="bg-white rounded-xl border border-neutral-300 p-4 sm:p-6 md:p-8">
                 <div className="flex flex-col sm:flex-row items-start">
                   <img
@@ -441,7 +449,7 @@ const JobDetails = () => {
                 </div>
               </div>
 
-              {/* Job Description */}
+              {/* mismong job desc */}
               <div className="bg-white rounded-xl border border-neutral-300 p-8">
                 <h3 className="text-xl font-bold text-black-primary mb-6 flex items-center">
                   <IoBriefcase className="mr-2 text-blue" />Job Description
@@ -454,7 +462,7 @@ const JobDetails = () => {
                 </div>
               </div>
 
-              {/* Skills Required */}
+              {/* skills */}
               <div className="bg-white rounded-xl border border-neutral-300 p-8">
                 <h3 className="text-xl font-bold text-black-primary mb-6 flex items-center">
                   <FaClock className="mr-2 text-blue" />
@@ -478,9 +486,9 @@ const JobDetails = () => {
               </div>
             </div>
 
-            {/* Right Column - Apply Now */}
+            {/* right panel w/ apply button */}
             <div className="lg:col-span-1 space-y-6">
-              {/* Apply Now Card */}
+              {/* card */}
               <div className="bg-white rounded-xl border border-neutral-300 overflow-hidden sticky top-24">
                 <div className="bg-gradient-to-r from-blue to-darkblue p-6">
                   <h3 className="text-xl font-bold text-white">Apply Now</h3>
@@ -513,6 +521,7 @@ const JobDetails = () => {
                         <div className="w-6 h-6 border-2 border-blue border-t-transparent rounded-full animate-spin"></div>
                       </div>
                     ) : (
+                      //if current user profile complete
                       <button
                         onClick={() => auth.currentUser && setIsModalOpen(true)}
                         disabled={!auth.currentUser}
@@ -526,6 +535,7 @@ const JobDetails = () => {
                       </button>
                     )}
 
+                    {/* dito na invoked yung handler ng is logged in saka profile complete */}
                     {!auth.currentUser ? (
                       <div className="bg-yellow/10 border border-yellow/30 rounded-lg p-4 mt-4">
                         <p className="text-sm text-center text-orange">
@@ -562,7 +572,7 @@ const JobDetails = () => {
           </div>
         </div>
 
-        {/* Application Modal */}
+        {/* application popup */}
         {isModalOpen && (
           <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50 p-4">
             <div className="bg-white w-full max-w-xl rounded-xl overflow-hidden shadow-2xl transition-opacity duration-300 opacity-100 max-h-[90vh] overflow-y-auto">
@@ -584,7 +594,7 @@ const JobDetails = () => {
 
               <form onSubmit={handleSubmit} className="p-4">
                 <div className="space-y-4">
-                  {/* Personal Details */}
+                  {/* applicant details for edit lang */}
                   <div>
                     <h3 className="font-bold text-black-primary mb-2 flex items-center text-sm">
                       <BsCheckCircleFill className="text-green mr-2" />
@@ -615,7 +625,7 @@ const JobDetails = () => {
                     </div>
                   </div>
 
-                  {/* Previous Resumes Section */}
+                  {/*choice to select old resume (most recent) */}
                   {previousResumes.length > 0 && (
                     <div>
                       <h3 className="font-bold text-black-primary mb-2 flex items-center text-sm">
@@ -671,7 +681,7 @@ const JobDetails = () => {
                     </div>
                   )}
 
-                  {/* Resume Upload Section */}
+                  {/* resume upload box with drag drop animations */}
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="font-bold text-black-primary flex items-center text-sm">
@@ -758,7 +768,7 @@ const JobDetails = () => {
                     </div>
                   </div>
 
-                  {/* Submit Button */}
+                  {/* handle submit */}
                   <button
                     type="submit"
                     disabled={uploading || (!selectedFile && !selectedExistingResume)}

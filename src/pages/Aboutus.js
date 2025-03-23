@@ -10,16 +10,16 @@ import PageLoader from '../components/PageLoader'
 
 const Aboutus = () => {
   return (
-    <PageLoader>
+    <PageLoader> {/* bigyan ng pageloader yan */}
       <div>
         <div className="w-full">
-          <img src={aboutBanner} alt="About Us Banner" className="w-full h-auto" />
+        <img src={aboutBanner} alt="About Us Banner" className="w-full h-auto" /> {/* banner edited by pacats */}
         </div>
     
         <HowItWorks />
         <AboutCity />
       
-        <div className='lg:px-32 px-8 py-16'>
+        <div className='lg:px-32 px-8 py-16'>  {/* mission vision responsive */}
           <VisionMission />
         </div>
         <PESOHistory />

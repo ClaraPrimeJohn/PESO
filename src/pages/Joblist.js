@@ -21,13 +21,14 @@ const Joblist = () => {
   const navigate = useNavigate();
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [jobsPerPage] = useState(6);
+  const [jobsPerPage] = useState(6); // set @ 6 pero pwede taasan pag madami na jobs
   const [viewMode, setViewMode] = useState("list");
   const [sortBy, setSortBy] = useState("latest");
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [appliedJobIds, setAppliedJobIds] = useState([]);
   const [, setIsLoading] = useState(true);
 
+  // fetch job listings
   useEffect(() => {
     const fetchJobs = async () => {
       try {
@@ -40,7 +41,7 @@ const Joblist = () => {
         .filter(job => job.isOpen);
         setJobs(fetchedJobs);
 
-        // Add this timeout to trigger the visibility transition after jobs are loaded
+        // timeout to avoid no results
         setTimeout(() => setIsVisible(true), 100);
       } catch (error) {
         console.error("Error fetching jobs:", error);
@@ -58,13 +59,13 @@ const Joblist = () => {
 
   const toggleFilter = () => {
     if (isFilterOpen) {
-      // If closing the filter
+      // if closing the filter
       setFilterTransition(false);
       setTimeout(() => {
         setIsFilterOpen(false);
       }, 300);
     } else {
-      // If opening the filter
+      // if opening the filter
       setIsFilterOpen(true);
       setTimeout(() => {
         setFilterTransition(true);
@@ -72,6 +73,8 @@ const Joblist = () => {
     }
   };
 
+
+// fetch applied jobs for checking and tagging applied (para disabled na button)
   useEffect(() => {
     const fetchAppliedJobs = async () => {
       try {
@@ -100,16 +103,15 @@ const Joblist = () => {
     }
   }, [user]);
 
+  // smooth transition with grid and list view
   const handleViewModeChange = (mode) => {
     if (viewMode !== mode) {
-      // Hide content with smooth transition before changing view mode
       setIsVisible(false);
       setIsTransitioning(true);
 
       setTimeout(() => {
         setViewMode(mode);
 
-        // After changing the view mode, show content again with smooth transition
         setTimeout(() => {
           setIsTransitioning(false);
           setIsVisible(true);
@@ -118,6 +120,7 @@ const Joblist = () => {
     }
   };
 
+  // for pagination change
   const handlePageChange = (pageNumber) => {
     if (currentPage !== pageNumber) {
       setIsVisible(false);
@@ -133,6 +136,7 @@ const Joblist = () => {
     }
   };
 
+  // filtering ng jobs
   const applyFilters = () => {
     const filteredJobs = jobs.filter((job) => {
       const jobDate = job.date_posted.toDate();
@@ -168,6 +172,7 @@ const Joblist = () => {
     }
   };
 
+  // job sorting LIFO syempre
   const sortJobs = (jobs) => {
     return [...jobs].sort((a, b) => {
       const dateA = getDateFromJob(a);
@@ -178,7 +183,7 @@ const Joblist = () => {
       } else if (sortBy === "oldest") {
         return dateA - dateB;
       } else if (sortBy === "relevance") {
-        // Simple relevance sorting based on search term matching job title
+        // based on title ng job
         if (searchTerm) {
           const titleMatchA = a.job_title.toLowerCase().includes(searchTerm.toLowerCase()) ? 1 : 0;
           const titleMatchB = b.job_title.toLowerCase().includes(searchTerm.toLowerCase()) ? 1 : 0;
@@ -187,7 +192,6 @@ const Joblist = () => {
             return titleMatchB - titleMatchA;
           }
 
-          // If title match is the same, sort by company match
           const companyMatchA = a.company.toLowerCase().includes(searchTerm.toLowerCase()) ? 1 : 0;
           const companyMatchB = b.company.toLowerCase().includes(searchTerm.toLowerCase()) ? 1 : 0;
 
@@ -195,7 +199,6 @@ const Joblist = () => {
             return companyMatchB - companyMatchA;
           }
         }
-        // Fall back to latest if no search term or equal matches
         return dateB - dateA;
       }
 
@@ -203,8 +206,10 @@ const Joblist = () => {
     });
   };
 
+  //show filtered jobs
   const filteredJobs = sortJobs(applyFilters());
 
+  // pagination logic
   const indexOfLastJob = currentPage * jobsPerPage;
   const indexOfFirstJob = indexOfLastJob - jobsPerPage;
   const currentJobs = filteredJobs.slice(indexOfFirstJob, indexOfLastJob);
@@ -214,7 +219,7 @@ const Joblist = () => {
     setSelectedJobType((prev) =>
       prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
     );
-    setCurrentPage(1);
+    setCurrentPage(1); // return to page 1 
   };
 
   const handleExperienceChange = (level) => {
@@ -271,7 +276,7 @@ const Joblist = () => {
     return (
       <div className="flex justify-center items-center space-x-1 mt-8 pagination-controls"> 
         <button
-          onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+          onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)} //handle yung backwarding through pages
           disabled={currentPage === 1}
           className={`p-2 rounded-lg transition-all duration-300 ${currentPage === 1
             ? 'text-gray-secondary cursor-not-allowed'
@@ -310,7 +315,7 @@ const Joblist = () => {
         </div>
 
         <button
-          onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
+          onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)} //handle yung forwarding through pages
           disabled={currentPage === totalPages}
           className={`p-2 rounded-lg transition-all duration-300 ${currentPage === totalPages
             ? 'text-gray-secondary cursor-not-allowed'
@@ -336,12 +341,14 @@ const Joblist = () => {
     );
   };
 
+  // for list view (job format)
   const ListViewJob = ({ job }) => (
     <div
       className={`bg-white rounded-xl p-6 mb-6 transition-all duration-300 hover:shadow-md border border-neutral-300 ${isTransitioning ? 'opacity-0 transform scale-95' :
         isVisible ? 'opacity-100 transform scale-100' : 'opacity-0 transform scale-95'
         }`}
     >
+      {/* layout */}
       <div className="flex flex-col lg:flex-row items-start">
         <div className="flex items-center lg:w-2/3">
           <div className="bg-gray-100 p-3 rounded-xl">
@@ -432,12 +439,14 @@ const Joblist = () => {
     </div>
   );
 
+  // for grid view (job format)
   const GridViewJob = ({ job }) => (
     <div
       className={`bg-white rounded-xl p-6 mb-6 transition-all duration-300 hover:shadow-md border border-neutral-300 ${isTransitioning ? 'opacity-0 transform scale-95' :
         isVisible ? 'opacity-100 transform scale-100' : 'opacity-0 transform scale-95'
         }`}
     >
+      {/* layout */}
       <div className="flex flex-col">
         <div className="flex items-center justify-between">
           <div className="bg-gray-100 p-3 rounded-xl">
@@ -501,7 +510,7 @@ const Joblist = () => {
         className={`mt-6 px-6 py-3 rounded-lg font-medium text-sm transition-all duration-300 w-full apply-button ${job.isOpen
           ? "bg-blue text-white hover:bg-darkblue"
           : "bg-gray-300 text-gray-600 cursor-not-allowed"
-          }`} // Added apply-button class
+          }`} 
         onClick={() => job.isOpen && handleApplyNow(job.id)}
         disabled={!job.isOpen}
         title={!job.isOpen ? "Not accepting applicants" : ""}

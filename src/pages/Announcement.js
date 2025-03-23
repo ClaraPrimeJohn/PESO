@@ -33,7 +33,6 @@ const Announcement = () => {
         setLocations(uniqueLocations);
         setAnnouncements(sortedAnnouncements);
         
-        // Let the PageLoader handle the transition
         setLoading(false);
       } catch (error) {
         console.error("Error fetching announcements:", error);
@@ -78,7 +77,7 @@ const Announcement = () => {
       grouped[key].push(announcement);
     });
 
-    // Sort the groups by date (most recent first)
+    // LIFO sorting
     return Object.entries(grouped)
       .sort(([keyA], [keyB]) => {
         const [monthA, yearA] = keyA.split(' ');
@@ -92,11 +91,10 @@ const Announcement = () => {
   const filteredAnnouncements = applyFilters();
   const groupedAnnouncements = groupAnnouncementsByMonthYear(filteredAnnouncements);
 
-  // Pagination for grouped announcements
+  // pagination when filtered
   const indexOfLastGroup = currentPage * announcementsPerPage;
   const indexOfFirstGroup = indexOfLastGroup - announcementsPerPage;
 
-  // Flatten the grouped announcements for pagination
   const flattenedAnnouncements = groupedAnnouncements.flatMap(([group, announcements]) =>
     announcements.map(announcement => ({ ...announcement, group }))
   );
@@ -104,7 +102,7 @@ const Announcement = () => {
   const currentAnnouncements = flattenedAnnouncements.slice(indexOfFirstGroup, indexOfLastGroup);
   const totalPages = Math.ceil(flattenedAnnouncements.length / announcementsPerPage);
 
-  // Regroup the current page announcements
+  // regroup announcements every after filter
   const regroupCurrentAnnouncements = () => {
     const grouped = {};
 
@@ -139,12 +137,14 @@ const Announcement = () => {
     });
   };
 
+  // for click popup
   const openModal = (announcement) => {
     setSelectedAnnouncement(announcement);
     setIsModalOpen(true);
     document.body.style.overflow = 'hidden';
   };
 
+  // for close pop up
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedAnnouncement(null);
@@ -225,7 +225,7 @@ const Announcement = () => {
       <div className="min-h-screen">
         <div className="w-full py-12 px-4 sm:px-8 md:px-16 lg:px-32 xl:px-48 mx-auto">
           <div className="flex flex-col lg:flex-row gap-8">
-            {/* Updated Sidebar */}
+            {/* left side with filtering */}
             <div className="w-full lg:w-1/4">
               <div className="bg-white p-6 rounded-xl shadow-sm border border-neutral-200 sticky top-36">
                 <div className="flex items-center space-x-3 mb-6">
@@ -275,7 +275,7 @@ const Announcement = () => {
                     <div className="relative">
                       <input
                         type="text"
-                        value={searchTerm}
+                        value={searchTerm} //check always for consistency
                         onChange={(e) => {
                           setSearchTerm(e.target.value);
                           setCurrentPage(1);
@@ -351,16 +351,6 @@ const Announcement = () => {
                       </div>
                     </div>
                   </div>
-
-                  {/* <button
-                    onClick={clearFilters}
-                    className="w-full bg-blue border border-gray-300 hover:bg-darkblue text-white py-3 text-sm rounded-lg transition font-medium flex items-center justify-center"
-                  >
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    Clear Filters
-                  </button> */}
                 </div>
               </div>
             </div>
@@ -387,11 +377,12 @@ const Announcement = () => {
                 )}
               </div>
 
-              {/* Announcements Grid with content fade in */}
+              {/* grid view content */}
               <div className="transition-opacity duration-500 ease-in-out opacity-100">
                 {filteredAnnouncements.length > 0 ? (
                   <div className="mb-8 space-y-12">
                     {currentGroupedAnnouncements.map(([monthYear, groupAnnouncements]) => (
+                      // month header 
                       <div key={monthYear} className="mb-8">
                         <div className="relative mb-8">
                           <div className="absolute inset-0 flex items-center">
@@ -403,7 +394,7 @@ const Announcement = () => {
                             </span>
                           </div>
                         </div>
-
+                        {/* pwede custom columns */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                           {groupAnnouncements.map((announcement) => (
                             <div
@@ -446,6 +437,7 @@ const Announcement = () => {
                     ))}
                   </div>
                 ) : (
+                  // if no results found invoke these
                   <div className="text-center py-16 bg-white rounded-xl shadow-sm border border-neutral-200">
                     <svg className="mx-auto h-12 w-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -501,7 +493,6 @@ const Announcement = () => {
           </div>
         </div>
 
-        {/* Announcement Modal */}
         {isModalOpen && (
           <AnnouncementModal
             announcement={selectedAnnouncement}

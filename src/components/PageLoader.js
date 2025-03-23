@@ -6,6 +6,8 @@ const PageLoader = ({ children, isLoading }) => {
   const [fadeIn, setFadeIn] = useState(false);
   const [mounted, setMounted] = useState(false);
 
+  // revised to fade in
+
   useEffect(() => {
     setMounted(true); 
     const handleLoad = () => setLoading(false);
@@ -18,7 +20,7 @@ const PageLoader = ({ children, isLoading }) => {
       setTimeout(() => setFadeOut(true), 200); 
       setTimeout(() => {
         setLoading(false);
-        // Start fade-in effect once loader is gone
+        // fade in when loading done
         setTimeout(() => setFadeIn(true), 50);
       }, 500); 
     }

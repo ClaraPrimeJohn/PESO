@@ -22,21 +22,21 @@ const Hero = () => {
             easing: 'ease-out',
         });
         
-        // Stats counter animation - FIXED to prevent infinite counting
+        // count effect customizer
         const finalStats = {
             jobOpenings: 5000,
             partnerAgencies: 300,
             placements: 10000
         };
         
-        const duration = 2000; // 2 seconds for the animation
+        const duration = 2000; // 2 seconds lang hehe
         const frameRate = 60;
         const totalFrames = duration / (1000 / frameRate);
         
         let frame = 0;
         const timer = setInterval(() => {
             frame++;
-            const progress = Math.min(frame / totalFrames, 1); // Ensure progress never exceeds 1
+            const progress = Math.min(frame / totalFrames, 1); 
             
             setAnimatedStats({
                 jobOpenings: Math.floor(progress * finalStats.jobOpenings),
@@ -46,7 +46,7 @@ const Hero = () => {
             
             if (frame >= totalFrames) {
                 clearInterval(timer);
-                // Explicitly set final values to avoid any rounding issues
+                // values ng output 
                 setAnimatedStats({
                     jobOpenings: finalStats.jobOpenings,
                     partnerAgencies: finalStats.partnerAgencies,
@@ -54,8 +54,6 @@ const Hero = () => {
                 });
             }
         }, 1000 / frameRate);
-        
-        // Cleanup function to clear interval if component unmounts
         return () => {
             clearInterval(timer);
         };
@@ -63,7 +61,7 @@ const Hero = () => {
 
     return (
         <div className="relative">
-            {/* Hero section with background image - Modified positioning */}
+            {/* city hall image in banner */}
             <div 
                 className="bg-cover bg-center bg-no-repeat h-screen flex items-start pt-20 md:pt-28 justify-center" 
                 style={{ 
@@ -73,7 +71,6 @@ const Hero = () => {
             >
                 <div className="container mx-auto px-4">
                     <div className="max-w-8xl mx-auto text-center" data-aos="fade-up">
-                        {/* Added new engaging text above the main heading */}
                         <div className="mb-4">
                             <span className="inline-block bg-yellow text-darkblue text-sm md:text-base px-4 py-1 rounded-full font-semibold mb-4">
                                 Find Your Perfect Career Path
@@ -83,7 +80,7 @@ const Hero = () => {
                             Connecting passionate professionals with meaningful careers in public service and government sectors across the nation.
                         </p>
                         
-                        {/* Main heading - adjusted spacing */}
+                        {/* title */}
                         <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-4">
                             <span className="text-orange">Ready to Take</span> the Next Step?
                         </h1>
@@ -91,7 +88,7 @@ const Hero = () => {
                             Your dream job is waiting for you - let's make it happen!
                         </p>
                         
-                        {/* Featured categories in hero section - improved responsiveness */}
+                        {/* images w/ description transition from row to column if responsive */}
                         <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mt-6">
                             {[
                                 { img: heroImage, title: 'Professional Networks', count: '1,200+ Jobs' },
@@ -121,14 +118,14 @@ const Hero = () => {
                             ))}
                         </div>
                         
-                        {/* Call to action buttons */}
+                        {/* button invokers -hi carl! */}
                         <div className="flex flex-col sm:flex-row justify-center gap-4 mt-6 md:mt-8" data-aos="fade-up" data-aos-delay="400">
-                        <Link to="/job-listing">
+                        <Link to="/job-listing"> {/* route to joblisting */}
                             <button className="px-6 py-3 bg-orange text-white rounded-md hover:bg-[#e05d10] transition duration-300 font-semibold text-sm md:text-base">
                                 Browse All Jobs
                             </button>
                         </Link>
-                        <Link to="/login">
+                        <Link to="/login">  {/*route to login page */}
                             <button className="px-6 py-3 bg-transparent border-2 border-white text-white rounded-md hover:bg-white hover:text-darkblue transition duration-300 font-semibold text-sm md:text-base">
                                 Create Account
                             </button>
@@ -138,7 +135,6 @@ const Hero = () => {
                 </div>
             </div>
             
-            {/* Quick stats section */}
             <div className="container mx-auto px-4 py-12 md:py-16">
                 <div className="text-center mb-8 md:mb-12">
                     <h2 className="text-2xl md:text-4xl font-bold mb-4 text-black-primary">Why Choose Us</h2>
@@ -184,8 +180,7 @@ const Hero = () => {
                     </div>
                 </div>
             </div>
-            
-            {/* Call to action */}
+             {/* another button invokers -hi carl! */}
             <div className="bg-darkblue py-10 md:py-16 text-white text-center">
                 <div className="container mx-auto px-4">
                     <h2 className="text-2xl md:text-4xl font-bold mb-4" data-aos="fade-up">Ready to Start Your Career Journey?</h2>
@@ -193,12 +188,12 @@ const Hero = () => {
                         Create your profile today and get personalized job recommendations based on your skills and interests.
                     </p>
                     <div className="flex flex-col sm:flex-row justify-center gap-4" data-aos="fade-up" data-aos-delay="200">
-                        <Link to="/login">
+                        <Link to="/login">  {/*route to login page din */}
                             <button className="px-6 py-3 bg-yellow text-darkblue rounded-md hover:bg-[#e09c20] transition duration-300 font-semibold text-sm md:text-base">
                                 Register Now
                             </button>
                         </Link>
-                        <Link to="/about-us">
+                        <Link to="/about-us">  {/*route to about final na? */}
                             <button className="px-6 py-3 bg-transparent border-2 border-white text-white rounded-md hover:bg-white hover:text-darkblue transition duration-300 font-semibold text-sm md:text-base">
                                 Learn More
                             </button>

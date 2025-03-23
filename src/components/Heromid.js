@@ -3,8 +3,9 @@ import pesoJob from '../assets/peso-jobs.webp';
 
 const Heromid = () => {
     return (
+        //og from wirefire hehe
         <div className="py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-8 lg:px-16 xl:px-24 2xl:px-48 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 bg-gray-100">
-            {/* Left Side Text */}
+            {/* left w/ text */}
             <div className="flex flex-col">
                 <h1 className="text-2xl sm:text-3xl md:text-3xl lg:text-4xl font-bold py-2">
                     What is{" "}
@@ -22,7 +23,7 @@ const Heromid = () => {
                 </p>
             </div>
 
-            {/* Right Side Image */}
+            {/* right w/ image */}
             <div className="flex justify-center items-center md:items-start">
                 <img 
                     src={pesoJob} 

@@ -6,6 +6,7 @@ import service2 from '../assets/service2.webp';
 const HeroJobApplications = () => {
   return (
     <motion.div
+    //container
       initial={{ opacity: 0, scale: 0.9, y: 30 }}
       whileInView={{ opacity: 1, scale: 1, y: 0 }}
       viewport={{ once: false, amount: 0.15 }}
@@ -13,7 +14,7 @@ const HeroJobApplications = () => {
       whileHover={{ scale: 1.005 }}
       className="mx-4 sm:mx-8 md:mx-16 lg:mx-32 xl:mx-48 mb-3 flex flex-col md:flex-row-reverse items-center bg-white shadow-sm rounded-xl overflow-hidden border border-gray-200 p-6 md:p-10 lg:p-12 transition-all duration-300"
     >
-      {/* Right Section - Image */}
+      {/* right  w/ image  */}
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         whileInView={{ opacity: 1, scale: 1, y: 0 }}
@@ -34,7 +35,7 @@ const HeroJobApplications = () => {
         </motion.div>
       </motion.div>
 
-      {/* Left Section - Text */}
+      {/* left w/ description */}
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         whileInView={{ opacity: 1, scale: 1, y: 0 }}
@@ -68,6 +69,7 @@ const HeroJobApplications = () => {
           transition={{ duration: 0.2, ease: "easeOut" }}
           className="mt-5 flex justify-center"
         >
+            {/* route to job listing*/}
           <Link
             to="/job-listing"
             className="inline-block text-darkblue font-bold border-2 border-darkblue px-4 py-2 rounded-md transition duration-300 transform hover:text-white hover:bg-blue hover:border-orange-600"
