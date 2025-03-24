@@ -42,7 +42,8 @@ const Announcement = () => {
 
     fetchAnnouncements();
   }, []);
-
+  
+// for search with all filters
   const applyFilters = () => {
     return announcements.filter((announcement) => {
       const announcementDate = new Date(announcement.date.seconds * 1000);

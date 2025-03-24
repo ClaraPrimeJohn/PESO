@@ -93,6 +93,7 @@ const Navbar = () => {
         }
     };
 
+    // active tab
     const getActiveClass = (path) =>
         location.pathname === path
             ? "text-darkblue font-semibold relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-yellow"

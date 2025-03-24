@@ -222,6 +222,7 @@ const Profile = () => {
                 }
             }
 
+            //update sdk wahahaha
             const profileRef = doc(db, "profiles", user.uid);
             await updateDoc(profileRef, updatedProfile);
 
@@ -277,7 +278,7 @@ const Profile = () => {
         const file = e.target.files[0];
         if (!file) return;
 
-        // Validate file type
+        // validate file type
         const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
         if (!validTypes.includes(file.type)) {
             toast.error("Please select a valid image file (JPEG, PNG, GIF, or WEBP)");

@@ -19,16 +19,16 @@ function App() {
     useEffect(() => {
         const auth = getAuth();
         
-        // Check on reload if the user was gone for more than 1 minute
+        //check if user is active in site
         const lastVisit = localStorage.getItem("lastVisit");
         if (lastVisit) {
             const timeElapsed = Date.now() - parseInt(lastVisit, 10);
-            if (timeElapsed > 30 * 1000) { // 30 seconds
-                signOut(auth).catch((error) => console.error("Sign-out error:", error));
+            if (timeElapsed > 30 * 1000) { // > 30 seconds 
+                signOut(auth).catch((error) => console.error("Sign-out error:", error)); // signed out ka na 
             }
         }
 
-        // Store the timestamp when the user leaves the site
+        // timestamp kelan nagleft
         const handleUnload = () => {
             localStorage.setItem("lastVisit", Date.now().toString());
         };

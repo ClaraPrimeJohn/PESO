@@ -535,7 +535,7 @@ const JobDetails = () => {
                       </button>
                     )}
 
-                    {/* dito na invoked yung handler ng is logged in saka profile complete */}
+                    {/* dito na invoke yung handler ng is logged in saka profile complete */}
                     {!auth.currentUser ? (
                       <div className="bg-yellow/10 border border-yellow/30 rounded-lg p-4 mt-4">
                         <p className="text-sm text-center text-orange">
