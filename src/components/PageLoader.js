@@ -26,6 +26,21 @@ const PageLoader = ({ children, isLoading }) => {
     }
   }, [isLoading]);
 
+ 
+  useEffect(() => {
+    if (!isLoading) {
+      setLoading(true);
+      const timer = setTimeout(() => {
+        setFadeOut(true);
+        setTimeout(() => {
+          setLoading(false);
+          setFadeIn(true);
+        }, 500);
+      }, 200);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading]);
+
   return (
     <>
       {(!mounted || loading) && (
