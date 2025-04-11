@@ -524,9 +524,9 @@ const JobDetails = () => {
                       //if current user profile complete
                       <button
                         onClick={() => auth.currentUser && setIsModalOpen(true)}
-                        disabled={!auth.currentUser}
+                        disabled={!auth.currentUser || !isProfileComplete}
                         className={`w-full flex items-center justify-center px-4 py-3 rounded-xl transition duration-300 shadow-md text-white ${
-                          auth.currentUser
+                          auth.currentUser && isProfileComplete
                           ? "bg-gradient-to-r from-blue to-darkblue hover:shadow-lg"
                           : "bg-gray-300 cursor-not-allowed"
                         }`}
