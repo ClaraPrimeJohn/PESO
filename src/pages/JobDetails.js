@@ -4,8 +4,8 @@ import { doc, getDoc, collection, addDoc, query, where, getDocs } from "firebase
 import { db, auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { IoIosArrowBack } from "react-icons/io";
-import { IoClose, IoBriefcase, IoLocationSharp, IoCalendar } from "react-icons/io5";
-import { FaMoneyBillWave, FaClock, FaFileUpload } from "react-icons/fa";
+import { IoClose, IoBriefcase, IoCalendar } from "react-icons/io5";
+import { FaClock, FaFileUpload } from "react-icons/fa";
 import { BsCheckCircleFill } from "react-icons/bs";
 import axios from "axios";
 import { toast } from "react-hot-toast";
@@ -411,8 +411,7 @@ const JobDetails = () => {
                       <div>
                         <h1 className="text-xl sm:text-2xl font-bold text-black-primary ">{job.job_title}</h1>
                         <h2 className="text-lg font-semibold text-darkblue mb-1">{job.company}</h2>
-                        <div className="flex items-center text-black-secondary">
-                          <IoLocationSharp className="mr-1" />
+                        <div className="flex items-center text-black-secondary mr-1">
                           <span>{job.location}</span>
                         </div>
                       </div>
@@ -426,7 +425,6 @@ const JobDetails = () => {
                           </span>
                         </div>
                         <div className="flex items-center text-darkblue font-semibold text-sm md:text-lg">
-                          <FaMoneyBillWave className="mr-1 text-lg" />
                           <span>
                             ₱{job.salary_min.toLocaleString()} - ₱{job.salary_max.toLocaleString()}
                           </span>
