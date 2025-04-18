@@ -21,7 +21,7 @@ const Joblist = () => {
   const navigate = useNavigate();
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [jobsPerPage] = useState(6); // set @ 6 pero pwede taasan pag madami na jobs
+  const [jobsPerPage] = useState(9); // set @ 6 pero pwede taasan pag madami na jobs
   const [viewMode, setViewMode] = useState("list");
   const [sortBy, setSortBy] = useState("latest");
   const [isTransitioning, setIsTransitioning] = useState(false);
