@@ -41,9 +41,21 @@ function App() {
 
     return (
         <Router>
+            <ScrollToTop />
             <AppContent />
         </Router>
     );
+}
+
+// scroll to top
+function ScrollToTop() {
+    const { pathname } = useLocation();
+    
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [pathname]);
+    
+    return null;
 }
 
 function AppContent() {
