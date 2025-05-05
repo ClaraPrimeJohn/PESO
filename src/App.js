@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
-import { getAuth, signOut } from "firebase/auth";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer"; 
 import Contactus from "./pages/Contactus";
@@ -16,29 +15,6 @@ import ForgotPassword from "./components/ForgotPassword";
 import AppliedJobs from "./pages/AppliedJobs";
 
 function App() {
-    useEffect(() => {
-        const auth = getAuth();
-        
-        //check if user is active in site
-        const lastVisit = localStorage.getItem("lastVisit");
-        if (lastVisit) {
-            const timeElapsed = Date.now() - parseInt(lastVisit, 10);
-            if (timeElapsed > 30 * 1000) { // > 30 seconds 
-                signOut(auth).catch((error) => console.error("Sign-out error:", error)); // signed out ka na 
-            }
-        }
-
-        // timestamp kelan nagleft
-        const handleUnload = () => {
-            localStorage.setItem("lastVisit", Date.now().toString());
-        };
-
-        window.addEventListener("beforeunload", handleUnload);
-        return () => {
-            window.removeEventListener("beforeunload", handleUnload);
-        };
-    }, []);
-
     return (
         <Router>
             <ScrollToTop />
@@ -47,7 +23,6 @@ function App() {
     );
 }
 
-// scroll to top
 function ScrollToTop() {
     const { pathname } = useLocation();
     
